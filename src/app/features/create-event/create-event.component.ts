@@ -1,51 +1,58 @@
-import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-create-event',
   imports: [
-    CommonModule, 
+    CommonModule,
     RouterLink,
     FormsModule,
     MatDatepickerModule,
     MatInputModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.css']
+  styleUrls: ['./create-event.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateEventComponent {
-  
+
   // Form State
   title = signal("Sarah's Birthday Party");
   date = signal<Date | null>(new Date('2024-12-25'));
   time = signal("18:00");
-  
+
   // Pre-defined categories
   categories = signal([
-    'Birthday', 
-    'Anniversary', 
-    'Holiday', 
-    'Vacation', 
-    'Concert', 
+    'Birthday',
+    'Anniversary',
+    'Holiday',
+    'Vacation',
+    'Concert',
     'Graduation',
     'Retirement'
   ]);
-  
+
   // State for the selected category
   selectedCategory = signal('Birthday');
   customCategoryName = signal('');
-  
+
   // Computed display for category in preview
   displayCategory = computed(() => {
     if (this.selectedCategory() === 'Custom') {
@@ -56,7 +63,7 @@ export class CreateEventComponent {
 
   // Appearance Logic
   appearanceType = signal<'image' | 'color'>('image');
-  
+
   // Default Images
   images = [
     'https://lh3.googleusercontent.com/aida-public/AB6AXuBOWlV08KkBqLG3xtNSj0FHGZvE0qSKr3e3ZyOay4Is9q6OvDXhCcaf9LTVLF105k6kkYY0JlfkGI1cA7hf7-p77sd2q6Ac1Xrp9D-nUZpXmxTvTBXdLvv_E0vsNc1HplwDn12vuvgxrFMLe6_6l-DXm42GqZt5DmqY-mAXNVk3T7uyOlTycdwZDlZ_63PggFrgFz8WAuCcQxf9xaCdJMagcEI9NwNL2YcjVUcDWrXRhgankxsrx_dl5nIKzjlj9obwBoPRH-OYLUlZ',

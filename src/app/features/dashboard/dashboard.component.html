@@ -1,7 +1,9 @@
-<div class="flex h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-hidden">
-      
+<div
+  class="flex h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-hidden">
+
   <!-- Sidebar -->
-  <div class="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark h-full">
+  <div
+    class="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark h-full">
     <div class="p-6">
       <div class="flex items-center gap-3 mb-8">
         <div class="bg-primary/20 flex items-center justify-center rounded-lg size-10">
@@ -9,30 +11,37 @@
         </div>
         <h1 class="text-xl font-bold tracking-tight">TimeKeeper</h1>
       </div>
-      
+
       <nav class="flex flex-col gap-2">
-        <a routerLink="/events" routerLinkActive="bg-primary text-white" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer" [class.bg-primary]="false" [class.text-white]="false">
+        <a routerLink="/events" routerLinkActive="bg-primary text-white"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer"
+          [class.bg-primary]="false" [class.text-white]="false">
           <span class="material-symbols-outlined text-[20px]">dashboard</span>
           <span class="text-sm font-medium">All Events</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'anniversary'}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
+        <a routerLink="/events" [queryParams]="{filter: 'anniversary'}"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">favorite</span>
           <span class="text-sm font-medium">Anniversaries</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'birthday'}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
+        <a routerLink="/events" [queryParams]="{filter: 'birthday'}"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">cake</span>
           <span class="text-sm font-medium">Birthdays</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'holiday'}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
+        <a routerLink="/events" [queryParams]="{filter: 'holiday'}"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">ac_unit</span>
           <span class="text-sm font-medium">Holidays</span>
         </a>
       </nav>
     </div>
-    
+
     <div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-800">
       <div class="flex items-center gap-3">
-        <div class="size-8 rounded-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCchE2eIFWe3pVkBFs1xWq7B1SGArxlezGU6y-Abh13NDJcamo655-5GlEPEVyOLZlk_lEzPadZUMi7gqzisye0NmXYBbCCVs-Jw9TRQwCsffv0NQ48VS7LCFiXC3pdHi5Ni3WAG5rTFJQb0fKzyiFHD0JXat50CbLOe2bQb6wc1mxpqZbusnFWYSI4u-6lMl-0_1q3MTS5Pa3cevCmlXwPnM637FqTycB_SgVpsjdOiq-xNXk6PL7djDKA2tSj5bQWFYfuPS9kebr5')"></div>
+        <div class="size-8 rounded-full bg-cover bg-center"
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCchE2eIFWe3pVkBFs1xWq7B1SGArxlezGU6y-Abh13NDJcamo655-5GlEPEVyOLZlk_lEzPadZUMi7gqzisye0NmXYBbCCVs-Jw9TRQwCsffv0NQ48VS7LCFiXC3pdHi5Ni3WAG5rTFJQb0fKzyiFHD0JXat50CbLOe2bQb6wc1mxpqZbusnFWYSI4u-6lMl-0_1q3MTS5Pa3cevCmlXwPnM637FqTycB_SgVpsjdOiq-xNXk6PL7djDKA2tSj5bQWFYfuPS9kebr5')">
+        </div>
         <div>
           <p class="text-sm font-semibold dark:text-white">Alex Morgan</p>
           <p class="text-xs text-gray-500 dark:text-gray-400">Pro Member</p>
@@ -44,7 +53,8 @@
   <!-- Main Content -->
   <main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
     <!-- Header -->
-    <header class="h-20 flex items-center justify-between px-6 md:px-10 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark/80 backdrop-blur-md z-10 sticky top-0">
+    <header
+      class="h-20 flex items-center justify-between px-6 md:px-10 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark/80 backdrop-blur-md z-10 sticky top-0">
       <h2 class="text-2xl font-bold dark:text-white">My Dashboard</h2>
       <div class="flex items-center gap-4">
         <div class="hidden sm:block w-64 md:w-80">
@@ -52,11 +62,12 @@
             <span class="absolute left-3 text-gray-400">
               <span class="material-symbols-outlined text-[20px]">search</span>
             </span>
-            <input type="text" placeholder="Search events..." class="w-full bg-white dark:bg-surface-dark text-sm text-gray-900 dark:text-white rounded-lg pl-10 pr-4 py-2.5 border border-gray-200 dark:border-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-gray-400">
+            <input type="text" placeholder="Search events..."
+              class="w-full bg-white dark:bg-surface-dark text-sm text-gray-900 dark:text-white rounded-lg pl-10 pr-4 py-2.5 border border-gray-200 dark:border-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-gray-400">
           </label>
         </div>
-        <button routerLink="/create" class="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
-          <span class="material-symbols-outlined text-[20px]">add</span>
+        <button mat-raised-button color="primary" routerLink="/create" class="flex items-center justify-center gap-2">
+          <mat-icon>add</mat-icon>
           <span class="hidden sm:inline">Create New</span>
         </button>
       </div>
@@ -65,23 +76,31 @@
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar">
       <div class="max-w-[1400px] mx-auto">
-        
+
         <!-- Quick Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Events</div>
+          <div
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Events
+            </div>
             <div class="text-2xl font-bold dark:text-white">12</div>
           </div>
-          <div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">This Month</div>
+          <div
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">This Month
+            </div>
             <div class="text-2xl font-bold dark:text-white">3</div>
           </div>
-          <div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Upcoming</div>
+          <div
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Upcoming
+            </div>
             <div class="text-2xl font-bold text-primary">Christmas</div>
           </div>
-          <div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Next Holiday</div>
+          <div
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Next Holiday
+            </div>
             <div class="text-2xl font-bold dark:text-white">Thanksgiving</div>
           </div>
         </div>
@@ -93,15 +112,20 @@
 
         <!-- Grid Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
-          
+
           <!-- Card 1: Christmas -->
-          <div routerLink="/events/detail" class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmliEMLmLziPt28jX5B7wlI0MLR47_twyKtalnX_QophPrq_ZhmKW0VZtyfAkXLw9w4XDPHp_RZaW9mUnmpdVpxqTHEr4KRMUeohtpTMRSU1sBmQB74wAqSalGxvFwFcffLxFCc9D3rbUFP3Tp_6UXvJnlyneaSbY6eS8oaf8LST38nzJETm3ytxj3ncs5Ui7wHyoO7YKJh0-2j3a3d8DlbgNe3xtGrQ-4mqyDLh9wP4S9LJ_wU-6lkj-sStDM9q_WKFoPvzl-CTsb')"></div>
+          <div routerLink="/events/detail"
+            class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+              style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmliEMLmLziPt28jX5B7wlI0MLR47_twyKtalnX_QophPrq_ZhmKW0VZtyfAkXLw9w4XDPHp_RZaW9mUnmpdVpxqTHEr4KRMUeohtpTMRSU1sBmQB74wAqSalGxvFwFcffLxFCc9D3rbUFP3Tp_6UXvJnlyneaSbY6eS8oaf8LST38nzJETm3ytxj3ncs5Ui7wHyoO7YKJh0-2j3a3d8DlbgNe3xtGrQ-4mqyDLh9wP4S9LJ_wU-6lkj-sStDM9q_WKFoPvzl-CTsb')">
+            </div>
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
               <div class="flex justify-between items-start">
-                <span class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Holiday</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+                <span
+                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Holiday</span>
+                <button class="text-white/70 hover:text-white transition-colors"><span
+                    class="material-symbols-outlined">more_horiz</span></button>
               </div>
               <div class="flex flex-col gap-6">
                 <div class="flex justify-between gap-2 text-center">
@@ -136,13 +160,18 @@
           </div>
 
           <!-- Card 2: Anniversary -->
-          <div routerLink="/events/detail" class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105"></div>
+          <div routerLink="/events/detail"
+            class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
+            </div>
             <div class="absolute inset-0 bg-black/20"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
               <div class="flex justify-between items-start">
-                <span class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Anniversary</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+                <span
+                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Anniversary</span>
+                <button class="text-white/70 hover:text-white transition-colors"><span
+                    class="material-symbols-outlined">more_horiz</span></button>
               </div>
               <div class="flex flex-col gap-6">
                 <div class="grid grid-cols-4 gap-2 text-center">
@@ -174,13 +203,18 @@
           </div>
 
           <!-- Card 3: Mom's Birthday -->
-          <div routerLink="/events/detail" class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKQphTZg0bDpe9z0k3icHHrnUDZsFT4fOoZUgaMyPEgauC5T7nz-4Uh_0BtRPl-HEf0VBKUscadYVaDuUkhODAaRtwKmjDAw6ozHuIUNfzSwla3mutt3ZkUxuLWvVXh4ne-l1_Ot-WD-pl0EpqMSa25eOPJMa8QVMc3CP-vwgWu69YymyftP5nh4Dj9JGFksliu6MOcN5-27CzuD1s-kkoD3e7J7_vffFvYqBul3cNJXV4FMi6GZ2MisgiRRlLxxF2GH3w-nbuWmVd')"></div>
+          <div routerLink="/events/detail"
+            class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+              style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKQphTZg0bDpe9z0k3icHHrnUDZsFT4fOoZUgaMyPEgauC5T7nz-4Uh_0BtRPl-HEf0VBKUscadYVaDuUkhODAaRtwKmjDAw6ozHuIUNfzSwla3mutt3ZkUxuLWvVXh4ne-l1_Ot-WD-pl0EpqMSa25eOPJMa8QVMc3CP-vwgWu69YymyftP5nh4Dj9JGFksliu6MOcN5-27CzuD1s-kkoD3e7J7_vffFvYqBul3cNJXV4FMi6GZ2MisgiRRlLxxF2GH3w-nbuWmVd')">
+            </div>
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
               <div class="flex justify-between items-start">
-                <span class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Birthday</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+                <span
+                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Birthday</span>
+                <button class="text-white/70 hover:text-white transition-colors"><span
+                    class="material-symbols-outlined">more_horiz</span></button>
               </div>
               <div class="flex flex-col gap-6">
                 <div class="flex items-baseline gap-1 text-white">

@@ -1,40 +1,40 @@
 <div class="flex flex-col h-screen w-screen overflow-hidden bg-black text-white">
-      
+
   <!-- Navigation Bar -->
-  <nav class="flex-none h-14 bg-neutral-900 border-b border-neutral-800 flex items-center justify-center px-4 overflow-x-auto no-scrollbar z-50">
-    <div class="flex items-center gap-1 p-1 bg-neutral-800 rounded-lg border border-neutral-700">
-      
-      <a routerLink="/landing" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+  <mat-toolbar class="z-50 border-b border-neutral-800">
+    <div class="flex items-center gap-1 p-1  rounded-lg border border-neutral-700">
+
+      <a mat-button routerLink="/landing" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         Home
       </a>
-      
+
       <div class="w-px h-4 bg-neutral-700 mx-1"></div>
 
-      <a routerLink="/dashboard" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+      <a mat-button routerLink="/dashboard" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         Dashboard
       </a>
-      
-      <a routerLink="/create" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+
+      <a mat-button routerLink="/create" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         New Event
       </a>
 
       <div class="w-px h-4 bg-neutral-700 mx-1"></div>
 
-      <a routerLink="/events" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+      <a mat-button routerLink="/events" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         All Events
       </a>
 
-      <a routerLink="/events/detail" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+      <a mat-button routerLink="/events/detail" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         Details
       </a>
 
       <div class="w-px h-4 bg-neutral-700 mx-1"></div>
 
-      <a routerLink="/customize" routerLinkActive="bg-neutral-600 text-white shadow-sm" class="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all whitespace-nowrap">
+      <a mat-button routerLink="/customize" routerLinkActive="active" class="text-xs font-medium whitespace-nowrap">
         Customize
       </a>
     </div>
-  </nav>
+  </mat-toolbar>
 
   <!-- Main Viewport -->
   <div class="flex-1 overflow-hidden relative">

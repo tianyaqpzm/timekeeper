@@ -13,9 +13,8 @@
 
     <!-- Header -->
     <header class="flex items-center justify-between py-6">
-      <button
-        class="flex items-center justify-center size-12 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-colors">
-        <span class="material-symbols-outlined text-2xl">arrow_back</span>
+      <button mat-icon-button class="bg-white/10 backdrop-blur-md hover:bg-white/20">
+        <mat-icon>arrow_back</mat-icon>
       </button>
       <!-- <button class="flex items-center justify-center size-12 rounded-full backdrop-blur-md transition-all duration-300"
         [class.bg-white/10]="!isFavorite()" [class.text-white]="!isFavorite()" [class.bg-pink-500/20]="isFavorite()"
@@ -78,16 +77,16 @@
     <footer class="pb-10 px-4 flex justify-center">
       <div
         class="flex justify-between items-center bg-white/10 backdrop-blur-xl border border-white/10 rounded-full p-2 px-8 shadow-2xl gap-8">
-        <button class="p-3 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-          <span class="material-symbols-outlined text-3xl">edit</span>
+        <button mat-icon-button class="hover:bg-white/10 text-white/80 hover:text-white">
+          <mat-icon class="text-3xl">edit</mat-icon>
         </button>
         <div class="w-px h-8 bg-white/20"></div>
-        <button class="p-3 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-          <span class="material-symbols-outlined text-3xl">ios_share</span>
+        <button mat-icon-button class="hover:bg-white/10 text-white/80 hover:text-white">
+          <mat-icon class="text-3xl">ios_share</mat-icon>
         </button>
         <div class="w-px h-8 bg-white/20"></div>
-        <button class="p-3 rounded-full hover:bg-red-500/20 text-white/80 hover:text-red-400 transition-colors">
-          <span class="material-symbols-outlined text-3xl">delete</span>
+        <button mat-icon-button class="hover:bg-red-500/20 text-white/80 hover:text-red-400">
+          <mat-icon class="text-3xl">delete</mat-icon>
         </button>
       </div>
     </footer>

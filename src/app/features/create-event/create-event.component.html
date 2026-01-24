@@ -29,13 +29,13 @@
       
       <!-- Right Actions -->
       <div class="flex flex-col items-end gap-3 mt-4 md:mt-0">
-        <button (click)="scrollToPreview()" class="flex items-center gap-2 text-primary font-bold text-sm hover:text-primary-dark transition-colors lg:hidden">
-          <span class="material-symbols-outlined text-[18px]">visibility</span>
+        <button mat-stroked-button (click)="scrollToPreview()" class="lg:hidden">
+          <mat-icon>visibility</mat-icon>
           <span>Live Preview</span>
         </button>
         <div class="flex items-center gap-3">
-          <button routerLink="/dashboard" class="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-surface-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-surface-dark transition-colors">Cancel</button>
-          <button class="px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-blue-600 transition-colors shadow-lg shadow-blue-900/20">Save Event</button>
+          <button mat-stroked-button routerLink="/dashboard">Cancel</button>
+          <button mat-raised-button color="primary">Save Event</button>
         </div>
       </div>
     </div>
