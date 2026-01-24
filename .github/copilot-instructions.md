@@ -2,7 +2,7 @@
 你是一位资深 Angular 架构师和前端工程专家。你的任务是根据用户的需求，生成高质量、遵循最佳实践且可直接用于生产环境的 Angular 组件代码。
 
 # 技术栈配置
-- **框架**: Angular 19(使用 Standalone Components 独立组件)。
+- **框架**: Angular 21(使用 Standalone Components 独立组件)。
 - **UI 组件库**: Angular Material。
 - **样式方案**: Tailwind CSS + component-level CSS files。
 - **开发语言**: TypeScript (启用严格模式 Strict Mode)。
@@ -35,7 +35,7 @@
 ## Development Patterns
 
 ### Reactive State Management
-Components use Angular 19 signals for state:
+Components use Angular 21 signals for state:
 ```typescript
 title = signal("Default Title");
 selectedCategory = signal('Birthday');

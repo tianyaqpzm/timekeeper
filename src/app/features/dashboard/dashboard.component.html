@@ -62,7 +62,8 @@
             <span class="absolute left-3 text-gray-400">
               <span class="material-symbols-outlined text-[20px]">search</span>
             </span>
-            <input type="text" placeholder="Search events..."
+            <input type="text" placeholder="Search events..." [value]="searchQuery()"
+              (input)="setSearchQuery($event.target.value)"
               class="w-full bg-white dark:bg-surface-dark text-sm text-gray-900 dark:text-white rounded-lg pl-10 pr-4 py-2.5 border border-gray-200 dark:border-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-gray-400">
           </label>
         </div>
@@ -83,158 +84,144 @@
             class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
             <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Events
             </div>
-            <div class="text-2xl font-bold dark:text-white">12</div>
+            <div class="text-2xl font-bold dark:text-white">{{ totalEvents() }}</div>
           </div>
           <div
             class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
             <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">This Month
             </div>
-            <div class="text-2xl font-bold dark:text-white">3</div>
+            <div class="text-2xl font-bold dark:text-white">{{ upcomingThisMonth() }}</div>
           </div>
           <div
             class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
             <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Upcoming
             </div>
-            <div class="text-2xl font-bold text-primary">Christmas</div>
+            <div class="text-2xl font-bold text-primary">{{ nextEvent() }}</div>
           </div>
           <div
             class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Next Holiday
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Categories
             </div>
-            <div class="text-2xl font-bold dark:text-white">Thanksgiving</div>
+            <div class="text-2xl font-bold dark:text-white">4</div>
           </div>
         </div>
 
         <h3 class="text-lg font-bold mb-5 dark:text-white flex items-center gap-2">
           <span class="material-symbols-outlined text-primary">event_upcoming</span>
           Upcoming Events
+          <button mat-button (click)="filterByCategory(null)" 
+            [class.text-primary]="!selectedCategory()"
+            class="ml-auto text-xs font-medium">
+            All
+          </button>
+          <button mat-button (click)="filterByCategory('Birthday')"
+            [class.text-primary]="selectedCategory() === 'Birthday'"
+            class="text-xs font-medium">
+            Birthdays
+          </button>
+          <button mat-button (click)="filterByCategory('Anniversary')"
+            [class.text-primary]="selectedCategory() === 'Anniversary'" class="text-xs font-medium">
+            Anniversaries
+          </button>
+          <button mat-button (click)="filterByCategory('Holiday')"
+            [class.text-primary]="selectedCategory() === 'Holiday'" class="text-xs font-medium">
+            Holidays
+          </button>
         </h3>
 
         <!-- Grid Layout -->
+        @if (filteredEvents().length > 0) {
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
-
-          <!-- Card 1: Christmas -->
+          @for (event of filteredEvents(); track event.id) {
           <div routerLink="/events/detail"
             class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmliEMLmLziPt28jX5B7wlI0MLR47_twyKtalnX_QophPrq_ZhmKW0VZtyfAkXLw9w4XDPHp_RZaW9mUnmpdVpxqTHEr4KRMUeohtpTMRSU1sBmQB74wAqSalGxvFwFcffLxFCc9D3rbUFP3Tp_6UXvJnlyneaSbY6eS8oaf8LST38nzJETm3ytxj3ncs5Ui7wHyoO7YKJh0-2j3a3d8DlbgNe3xtGrQ-4mqyDLh9wP4S9LJ_wU-6lkj-sStDM9q_WKFoPvzl-CTsb')">
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30"></div>
-            <div class="relative z-10 flex flex-col h-full p-6 justify-between">
-              <div class="flex justify-between items-start">
-                <span
-                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Holiday</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span
-                    class="material-symbols-outlined">more_horiz</span></button>
+            <!-- Background based on category -->
+            @switch(event.category) {
+              @case('Holiday') {
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmliEMLmLziPt28jX5B7wlI0MLR47_twyKtalnX_QophPrq_ZhmKW0VZtyfAkXLw9w4XDPHp_RZaW9mUnmpdVpxqTHEr4KRMUeohtpTMRSU1sBmQB74wAqSalGxvFwFcffLxFCc9D3rbUFP3Tp_6UXvJnlyneaSbY6eS8oaf8LST38nzJETm3ytxj3ncs5Ui7wHyoO7YKJh0-2j3a3d8DlbgNe3xtGrQ-4mqyDLh9wP4S9LJ_wU-6lkj-sStDM9q_WKFoPvzl-CTsb')">
               </div>
-              <div class="flex flex-col gap-6">
-                <div class="flex justify-between gap-2 text-center">
-                  <div class="flex flex-col items-center">
-                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">124</span>
-                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Days</span>
-                  </div>
-                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
-                  <div class="flex flex-col items-center">
-                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">04</span>
-                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Hrs</span>
-                  </div>
-                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
-                  <div class="flex flex-col items-center">
-                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">22</span>
-                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Mins</span>
-                  </div>
-                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
-                  <div class="flex flex-col items-center">
-                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">10</span>
-                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Secs</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-white mb-1">Christmas</h3>
-                  <div class="flex items-center gap-2 text-white/80 text-sm font-medium">
-                    <span class="material-symbols-outlined text-base">calendar_month</span> Dec 25, 2023
-                  </div>
-                </div>
+              }
+              @case('Anniversary') {
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
               </div>
-            </div>
-          </div>
-
-          <!-- Card 2: Anniversary -->
-          <div routerLink="/events/detail"
-            class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
-            </div>
-            <div class="absolute inset-0 bg-black/20"></div>
-            <div class="relative z-10 flex flex-col h-full p-6 justify-between">
-              <div class="flex justify-between items-start">
-                <span
-                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Anniversary</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span
-                    class="material-symbols-outlined">more_horiz</span></button>
+              }
+              @default {
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKQphTZg0bDpe9z0k3icHHrnUDZsFT4fOoZUgaMyPEgauC5T7nz-4Uh_0BtRPl-HEf0VBKUscadYVaDuUkhODAaRtwKmjDAw6ozHuIUNfzSwla3mutt3ZkUxuLWvVXh4ne-l1_Ot-WD-pl0EpqMSa25eOPJMa8QVMc3CP-vwgWu69YymyftP5nh4Dj9JGFksliu6MOcN5-27CzuD1s-kkoD3e7J7_vffFvYqBul3cNJXV4FMi6GZ2MisgiRRlLxxF2GH3w-nbuWmVd')">
               </div>
-              <div class="flex flex-col gap-6">
-                <div class="grid grid-cols-4 gap-2 text-center">
-                  <div class="bg-black/20 backdrop-blur-sm rounded-lg p-2">
-                    <div class="text-2xl font-bold text-white tabular-nums">12</div>
-                    <div class="text-[10px] text-white/80 uppercase">Days</div>
-                  </div>
-                  <div class="bg-black/20 backdrop-blur-sm rounded-lg p-2">
-                    <div class="text-2xl font-bold text-white tabular-nums">10</div>
-                    <div class="text-[10px] text-white/80 uppercase">Hrs</div>
-                  </div>
-                  <div class="bg-black/20 backdrop-blur-sm rounded-lg p-2">
-                    <div class="text-2xl font-bold text-white tabular-nums">05</div>
-                    <div class="text-[10px] text-white/80 uppercase">Mins</div>
-                  </div>
-                  <div class="bg-black/20 backdrop-blur-sm rounded-lg p-2">
-                    <div class="text-2xl font-bold text-white tabular-nums">00</div>
-                    <div class="text-[10px] text-white/80 uppercase">Secs</div>
-                  </div>
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-white mb-1">Wedding Anniversary</h3>
-                  <div class="flex items-center gap-2 text-white/80 text-sm font-medium">
-                    <span class="material-symbols-outlined text-base">calendar_month</span> Sep 12, 2023
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3: Mom's Birthday -->
-          <div routerLink="/events/detail"
-            class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKQphTZg0bDpe9z0k3icHHrnUDZsFT4fOoZUgaMyPEgauC5T7nz-4Uh_0BtRPl-HEf0VBKUscadYVaDuUkhODAaRtwKmjDAw6ozHuIUNfzSwla3mutt3ZkUxuLWvVXh4ne-l1_Ot-WD-pl0EpqMSa25eOPJMa8QVMc3CP-vwgWu69YymyftP5nh4Dj9JGFksliu6MOcN5-27CzuD1s-kkoD3e7J7_vffFvYqBul3cNJXV4FMi6GZ2MisgiRRlLxxF2GH3w-nbuWmVd')">
-            </div>
+              }
+            }
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
               <div class="flex justify-between items-start">
                 <span
-                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">Birthday</span>
-                <button class="text-white/70 hover:text-white transition-colors"><span
-                    class="material-symbols-outlined">more_horiz</span></button>
+                  class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">
+                  {{ event.category }}
+                </span>
+                <button [matMenuTriggerFor]="menu" class="text-white/70 hover:text-white transition-colors">
+                  <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="editEvent(event)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button mat-menu-item (click)="deleteEvent(event.id)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
               </div>
               <div class="flex flex-col gap-6">
-                <div class="flex items-baseline gap-1 text-white">
-                  <span class="text-6xl font-black tabular-nums tracking-tighter">02</span>
-                  <span class="text-xl font-medium text-white/80 mr-4">Days</span>
-                  <div class="flex items-center gap-2 text-lg text-white/70 font-mono">
-                    <span>01</span>:<span>15</span>:<span>30</span>
+                <div class="flex justify-between gap-2 text-center">
+                  <div class="flex flex-col items-center">
+                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">
+                      {{ String(calculateTimeUntil(event.date).days).padStart(2, '0') }}
+                    </span>
+                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Days</span>
+                  </div>
+                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
+                  <div class="flex flex-col items-center">
+                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">
+                      {{ String(calculateTimeUntil(event.date).hours).padStart(2, '0') }}
+                    </span>
+                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Hrs</span>
+                  </div>
+                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
+                  <div class="flex flex-col items-center">
+                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">
+                      {{ String(calculateTimeUntil(event.date).minutes).padStart(2, '0') }}
+                    </span>
+                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Mins</span>
+                  </div>
+                  <div class="text-2xl font-light text-white/30 pt-2">:</div>
+                  <div class="flex flex-col items-center">
+                    <span class="text-4xl font-black text-white tabular-nums tracking-tight">
+                      {{ String(calculateTimeUntil(event.date).seconds).padStart(2, '0') }}
+                    </span>
+                    <span class="text-xs font-medium text-white/70 uppercase tracking-widest mt-1">Secs</span>
                   </div>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-white mb-1">Mom's Birthday</h3>
+                  <h3 class="text-2xl font-bold text-white mb-1">{{ event.title }}</h3>
                   <div class="flex items-center gap-2 text-white/80 text-sm font-medium">
-                    <span class="material-symbols-outlined text-base">calendar_month</span> Aug 28, 2023
+                    <span class="material-symbols-outlined text-base">calendar_month</span> {{ formatDate(event.date) }}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
+          }
         </div>
+        } @else {
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <span class="material-symbols-outlined text-5xl text-gray-400 mb-4">event_note</span>
+          <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">No events found</p>
+          <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Try adjusting your search or filters</p>
+        </div>
+        }
       </div>
     </div>
   </main>
