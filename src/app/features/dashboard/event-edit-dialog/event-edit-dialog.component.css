@@ -1,0 +1,9 @@
+/* 对话框背景遮蔽 */
+.dialog-overlay {
+    position: fixed !important;
+    pointer-events: auto;
+}
+
+.dialog-container {
+    pointer-events: auto;
+}

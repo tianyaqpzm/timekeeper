@@ -1,4 +1,4 @@
-<div
+<div [class.overflow-hidden]="showEditDialog()"
   class="flex h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-hidden">
 
   <!-- Sidebar -->
@@ -164,11 +164,11 @@
                   <mat-icon>more_horiz</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="editEvent(event); $event.stopPropagation()">
+                  <button mat-menu-item (click)="editEvent(event)">
                     <mat-icon>edit</mat-icon>
                     <span>Edit</span>
                   </button>
-                  <button mat-menu-item (click)="deleteEvent(event.id); $event.stopPropagation()">
+                  <button mat-menu-item (click)="deleteEvent(event.id)">
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                   </button>
@@ -225,4 +225,9 @@
       </div>
     </div>
   </main>
+
+  <!-- Edit Event Dialog Component -->
+  <app-event-edit-dialog [isOpen]="showEditDialog()" [event]="editingEvent()" (save)="saveEditEvent($event)"
+    (cancel)="closeEditDialog()">
+  </app-event-edit-dialog>
 </div>

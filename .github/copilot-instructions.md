@@ -10,10 +10,29 @@
 # 架构与代码规范
 
 ## 1. 文件结构 (严格分离)
-对于每一个请求生成的组件，你必须输出三个独立的文件（假设组件名为 `example-feature`）：
+对于每个新建的组件，你必须输出三个独立的文件（假设组件名为 `example-feature`）：
 - `example-feature.component.ts` (逻辑层)
 - `example-feature.component.html` (展示层/模板)
 - `example-feature.component.css` (样式层)
+### 1.1 禁止事项
+
+❌ **不允许使用内联模板 (`template: \`...\`)`**
+```typescript
+// ❌ 错误做法
+@Component({
+  template: `<div>...</div>`,
+  styles: [`...`]
+})
+```
+
+✅ **必须使用外部模板文件**
+```typescript
+// ✅ 正确做法
+@Component({
+  templateUrl: './component-name.component.html',
+  styleUrls: ['./component-name.component.css']
+})
+```
 
 ## 2. 逻辑与展示解耦
 - **展示型组件优先 (Dumb Components)**: 尽量编写“纯展示组件”，通过 `input()` 接收数据，通过 `output()` 向外派发事件。
