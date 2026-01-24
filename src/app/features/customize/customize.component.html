@@ -1,6 +1,8 @@
-<div class="flex flex-col min-h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-x-hidden">
+<div
+  class="flex flex-col min-h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-x-hidden">
   <!-- Nav -->
-  <header class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+  <header
+    class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
     <div class="flex items-center gap-4">
       <span class="material-symbols-outlined text-primary text-3xl">hourglass_top</span>
       <h2 class="text-lg font-bold">Countdown App</h2>
@@ -10,12 +12,13 @@
       <a class="text-sm font-medium text-primary cursor-pointer">Templates</a>
       <a class="text-sm font-medium hover:text-primary transition-colors cursor-pointer">My Stories</a>
     </div>
-    <div class="size-10 rounded-full bg-gray-700 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA8J8VK9nMGxFX0CeejFyWLBMBvFxuhmji-N08-wgzwjvn7QYfbRfmcqih7q5HLNzvP-zH5fiO35YTp1YmMeSpM1n6yU02YC1ER1ElZ_ruWtM6hBeOzxrULSVxB1v5hOpZ_cKCBPQ7FD-Pzv-0J7WTlXoSBsCypwsZ65NdtwnFPQfi3CVSesO6q25dWbF9e1rWT8J44em8H5Y7Fom8d3ksa31dVKDjBVZqOi9q8AgpJZ4lr9JymWmY0AW_0kXVruS2mZras4jBZHW16')"></div>
+    <div class="size-10 rounded-full bg-gray-700 bg-cover"
+      style="background-image: url('/images/backgrounds/user-profile.jpg')"></div>
   </header>
 
   <main class="flex-grow flex flex-col items-center py-8 px-4 md:px-10 lg:px-20">
     <div class="w-full max-w-[1200px] flex flex-col gap-6">
-      
+
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-gray-500">
         <span>Home</span> <span class="material-symbols-outlined text-sm">chevron_right</span>
@@ -31,16 +34,21 @@
 
       <!-- Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-4">
-        
+
         <!-- Left: Device Preview -->
         <div class="lg:col-span-5 flex justify-center lg:justify-end items-start">
-          <div class="relative w-[320px] sm:w-[340px] aspect-[9/16] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-[#1c1f27] bg-black ring-1 ring-white/10 group">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgZEjoqHUWGNJeEmKYNmzWXJtA6CSDsmbGhpKeIyvvrU2wT9be3nQQNjHsVNB7vKVYxujJgLJnQgkTi1T1PxTgwz8RGZY_EPWeAE_Ngp0Pjmjw0IJzyaOGVN4ct64awEqDSvrJjvFpbYKVAHomDYDiiedIDSAjkRHWJi2jBvTGL-SKwpcPATznobeDjcLljj3SGQ5TnEqIpLyajkEJfhiHsgDSZ7y7bTYB8OrFdiI0mQrXrLvdlFSU38FG7m_tDJvC7ccxVizzPkK6'); filter: brightness(0.85);"></div>
+          <div
+            class="relative w-[320px] sm:w-[340px] aspect-[9/16] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-[#1c1f27] bg-black ring-1 ring-white/10 group">
+            <div class="absolute inset-0 bg-cover bg-center"
+              style="background-image: url('/images/backgrounds/customize-background.jpg'); filter: brightness(0.85);">
+            </div>
             <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80"></div>
-            
+
             <!-- Decorations -->
-            <span class="material-symbols-outlined absolute top-12 left-8 text-yellow-400 text-3xl opacity-80 rotate-12 drop-shadow-lg">celebration</span>
-            <span class="material-symbols-outlined absolute top-20 right-8 text-pink-500 text-2xl opacity-80 -rotate-12 drop-shadow-lg">star</span>
+            <span
+              class="material-symbols-outlined absolute top-12 left-8 text-yellow-400 text-3xl opacity-80 rotate-12 drop-shadow-lg">celebration</span>
+            <span
+              class="material-symbols-outlined absolute top-20 right-8 text-pink-500 text-2xl opacity-80 -rotate-12 drop-shadow-lg">star</span>
 
             <!-- Content Overlay -->
             <div class="absolute inset-0 flex flex-col justify-between p-8 pb-12">
@@ -48,13 +56,15 @@
                 <span class="text-white text-xs font-bold uppercase tracking-wider">Oct 24</span>
               </div>
               <div class="flex flex-col items-center text-center">
-                <div class="size-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-4">
+                <div
+                  class="size-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-4">
                   <span class="material-symbols-outlined text-white text-3xl">cake</span>
                 </div>
                 <h3 class="text-white text-4xl font-black leading-none drop-shadow-xl tracking-tighter">03</h3>
                 <p class="text-white text-xl font-bold uppercase tracking-widest mb-2 opacity-90">Days To Go</p>
                 <div class="h-px w-16 bg-white/40 my-2"></div>
-                <p class="text-white text-2xl font-bold italic leading-tight drop-shadow-md">"Happy Birthday<br/>Sarah!"</p>
+                <p class="text-white text-2xl font-bold italic leading-tight drop-shadow-md">"Happy
+                  Birthday<br />Sarah!"</p>
               </div>
             </div>
 
@@ -74,8 +84,10 @@
           <div class="flex flex-col gap-3">
             <label class="font-bold">Greeting Message</label>
             <div class="flex w-full items-stretch rounded-xl shadow-sm">
-              <input type="text" value="Happy Birthday Sarah!" class="flex-1 bg-white dark:bg-[#1c1f27] border border-gray-200 dark:border-gray-700 rounded-l-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50">
-              <button class="bg-white dark:bg-[#1c1f27] border border-l-0 border-gray-200 dark:border-gray-700 px-4 rounded-r-xl text-gray-500 hover:text-primary">
+              <input type="text" value="Happy Birthday Sarah!"
+                class="flex-1 bg-white dark:bg-[#1c1f27] border border-gray-200 dark:border-gray-700 rounded-l-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50">
+              <button
+                class="bg-white dark:bg-[#1c1f27] border border-l-0 border-gray-200 dark:border-gray-700 px-4 rounded-r-xl text-gray-500 hover:text-primary">
                 <span class="material-symbols-outlined">edit</span>
               </button>
             </div>
@@ -86,12 +98,17 @@
           <div class="flex flex-col gap-3">
             <label class="font-bold">Accent Color</label>
             <div class="flex gap-4">
-              <button class="size-10 rounded-full bg-white border-2 border-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-background-dark relative">
-                <span class="material-symbols-outlined text-primary text-xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">check</span>
+              <button
+                class="size-10 rounded-full bg-white border-2 border-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-background-dark relative">
+                <span
+                  class="material-symbols-outlined text-primary text-xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">check</span>
               </button>
-              <button class="size-10 rounded-full bg-[#FFD700] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
-              <button class="size-10 rounded-full bg-[#FF69B4] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
-              <button class="size-10 rounded-full bg-[#4169E1] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
+              <button
+                class="size-10 rounded-full bg-[#FFD700] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
+              <button
+                class="size-10 rounded-full bg-[#FF69B4] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
+              <button
+                class="size-10 rounded-full bg-[#4169E1] hover:scale-110 transition-transform ring-offset-2 ring-offset-background-dark border border-white/10"></button>
             </div>
           </div>
 
@@ -100,21 +117,31 @@
             <label class="font-bold">Photo Filter</label>
             <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
               <button class="group flex flex-col gap-2 cursor-pointer">
-                <div class="w-full aspect-square rounded-lg overflow-hidden border-2 border-primary ring-2 ring-primary/20 relative">
-                  <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAp_cz5RAnNO9R0wmu6JJkJElz9cm3lyQ4_KAQHmA6qA_LPFVTewmMiYeES2rAIODuPJb8CvhMerUJym1iOf1VKwm-0dPjz9sf0C_hyKf2QhUKgd7Cyo8RtrxZZuTL9WDW4fCpb_QjdYnKBKAOXlh9pxP0I7D9dJ0wRNMeTSZmAiORlOv5Ho6Uc8b91XRw-1NBngY6RiVgLa1lHP5hO8FrPz82eLYZ8JF7SDQIHuyG2qX1MCz_OtASZVVk6Awa9Dof1mg9gmjEIsJ9d')"></div>
-                  <div class="absolute inset-0 bg-primary/20 flex items-center justify-center"><span class="material-symbols-outlined text-white">check_circle</span></div>
+                <div
+                  class="w-full aspect-square rounded-lg overflow-hidden border-2 border-primary ring-2 ring-primary/20 relative">
+                  <div class="w-full h-full bg-cover bg-center"
+                    style="background-image: url('/images/backgrounds/customize-bg1.jpg')">
+                  </div>
+                  <div class="absolute inset-0 bg-primary/20 flex items-center justify-center"><span
+                      class="material-symbols-outlined text-white">check_circle</span></div>
                 </div>
                 <span class="text-sm font-medium text-primary text-center">Original</span>
               </button>
-               <button class="group flex flex-col gap-2 cursor-pointer">
-                <div class="w-full aspect-square rounded-lg overflow-hidden border border-gray-700 group-hover:border-primary transition-colors">
-                  <div class="w-full h-full bg-cover bg-center grayscale contrast-125" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTDxFDm4xUR6UTR2zCgNKlTr2bgAekIgvhrgNqa7sOiW7M5a2MJxpvmpkp1zvD_qX_8lT3bKYdCHvVXuY944leJtmWlXWNus2DVmj_KEKcriRd85sTnoFQ462fK1RzBdnScc-aLXdjvGtqW8QGyI60FyJG5_9HGVFMHPwgNqxefF_CexgiV7Ma05t7fuFxzpdj65MbDsr3YuFT8Mi_hIO7LIeVZ6E79DHG-_AAkJUnyryYBOHEZ4DoOTASRJMtl5QSqEFf61glZ4Yc')"></div>
+              <button class="group flex flex-col gap-2 cursor-pointer">
+                <div
+                  class="w-full aspect-square rounded-lg overflow-hidden border border-gray-700 group-hover:border-primary transition-colors">
+                  <div class="w-full h-full bg-cover bg-center grayscale contrast-125"
+                    style="background-image: url('/images/backgrounds/customize-bg2.jpg')">
+                  </div>
                 </div>
                 <span class="text-sm font-medium text-gray-500 group-hover:text-primary text-center">Noir</span>
               </button>
               <button class="group flex flex-col gap-2 cursor-pointer">
-                <div class="w-full aspect-square rounded-lg overflow-hidden border border-gray-700 group-hover:border-primary transition-colors">
-                  <div class="w-full h-full bg-cover bg-center sepia-[.4]" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUdSERvSVK_Ik3w6AEwF0NESmLv59gbQ0IhNiiAttYj-PDzYDGqTW8onsh5BS9Vis28jOL3XKbiPdKc787O8UG19a3rFiZVZAtHVoAlMGpbiQZwyn6R_YMe-0iUpD69DnjIZXmpFmze--vmdxVfeJSJ0jVUYmgNWJdyb2mFYfc-UMpjfZACzQa6x48p5fmDH9DJGsrVJBbIwimjrzLBuYZnplNdqQ9fQ8EeS1Erv4NIDLJSdDNIPnID5LUk1Oad_i4UQwguIjLvKhE')"></div>
+                <div
+                  class="w-full aspect-square rounded-lg overflow-hidden border border-gray-700 group-hover:border-primary transition-colors">
+                  <div class="w-full h-full bg-cover bg-center sepia-[.4]"
+                    style="background-image: url('/images/backgrounds/customize-bg3.jpg')">
+                  </div>
                 </div>
                 <span class="text-sm font-medium text-gray-500 group-hover:text-primary text-center">Warm</span>
               </button>
@@ -123,7 +150,8 @@
 
           <!-- Action -->
           <div class="pt-6 border-t border-gray-200 dark:border-gray-800">
-            <button class="w-full bg-primary hover:bg-blue-600 text-white font-bold text-lg h-14 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/25">
+            <button
+              class="w-full bg-primary hover:bg-blue-600 text-white font-bold text-lg h-14 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/25">
               <span class="material-symbols-outlined">download</span> Save Image
             </button>
           </div>

@@ -40,7 +40,7 @@
     <div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-800">
       <div class="flex items-center gap-3">
         <div class="size-8 rounded-full bg-cover bg-center"
-          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCchE2eIFWe3pVkBFs1xWq7B1SGArxlezGU6y-Abh13NDJcamo655-5GlEPEVyOLZlk_lEzPadZUMi7gqzisye0NmXYBbCCVs-Jw9TRQwCsffv0NQ48VS7LCFiXC3pdHi5Ni3WAG5rTFJQb0fKzyiFHD0JXat50CbLOe2bQb6wc1mxpqZbusnFWYSI4u-6lMl-0_1q3MTS5Pa3cevCmlXwPnM637FqTycB_SgVpsjdOiq-xNXk6PL7djDKA2tSj5bQWFYfuPS9kebr5')">
+          style="background-image: url('/images/backgrounds/user-profile.jpg')">
         </div>
         <div>
           <p class="text-sm font-semibold dark:text-white">Alex Morgan</p>
@@ -100,7 +100,8 @@
           </div>
           <div
             class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Categories
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total
+              Categories
             </div>
             <div class="text-2xl font-bold dark:text-white">4</div>
           </div>
@@ -109,14 +110,12 @@
         <h3 class="text-lg font-bold mb-5 dark:text-white flex items-center gap-2">
           <span class="material-symbols-outlined text-primary">event_upcoming</span>
           Upcoming Events
-          <button mat-button (click)="filterByCategory(null)" 
-            [class.text-primary]="!selectedCategory()"
+          <button mat-button (click)="filterByCategory(null)" [class.text-primary]="!selectedCategory()"
             class="ml-auto text-xs font-medium">
             All
           </button>
           <button mat-button (click)="filterByCategory('Birthday')"
-            [class.text-primary]="selectedCategory() === 'Birthday'"
-            class="text-xs font-medium">
+            [class.text-primary]="selectedCategory() === 'Birthday'" class="text-xs font-medium">
             Birthdays
           </button>
           <button mat-button (click)="filterByCategory('Anniversary')"
@@ -137,21 +136,21 @@
             class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
             <!-- Background based on category -->
             @switch(event.category) {
-              @case('Holiday') {
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmliEMLmLziPt28jX5B7wlI0MLR47_twyKtalnX_QophPrq_ZhmKW0VZtyfAkXLw9w4XDPHp_RZaW9mUnmpdVpxqTHEr4KRMUeohtpTMRSU1sBmQB74wAqSalGxvFwFcffLxFCc9D3rbUFP3Tp_6UXvJnlyneaSbY6eS8oaf8LST38nzJETm3ytxj3ncs5Ui7wHyoO7YKJh0-2j3a3d8DlbgNe3xtGrQ-4mqyDLh9wP4S9LJ_wU-6lkj-sStDM9q_WKFoPvzl-CTsb')">
-              </div>
-              }
-              @case('Anniversary') {
-              <div
-                class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
-              </div>
-              }
-              @default {
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKQphTZg0bDpe9z0k3icHHrnUDZsFT4fOoZUgaMyPEgauC5T7nz-4Uh_0BtRPl-HEf0VBKUscadYVaDuUkhODAaRtwKmjDAw6ozHuIUNfzSwla3mutt3ZkUxuLWvVXh4ne-l1_Ot-WD-pl0EpqMSa25eOPJMa8QVMc3CP-vwgWu69YymyftP5nh4Dj9JGFksliu6MOcN5-27CzuD1s-kkoD3e7J7_vffFvYqBul3cNJXV4FMi6GZ2MisgiRRlLxxF2GH3w-nbuWmVd')">
-              </div>
-              }
+            @case('Holiday') {
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+              style="background-image: url('/images/backgrounds/holiday-christmas.jpg')">
+            </div>
+            }
+            @case('Anniversary') {
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
+            </div>
+            }
+            @default {
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+              style="background-image: url('/images/backgrounds/birthday-mom.jpg')">
+            </div>
+            }
             }
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
@@ -160,15 +159,16 @@
                   class="inline-flex items-center rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white ring-1 ring-inset ring-white/10">
                   {{ event.category }}
                 </span>
-                <button [matMenuTriggerFor]="menu" class="text-white/70 hover:text-white transition-colors">
+                <button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()"
+                  class="text-white/70 hover:text-white transition-colors">
                   <mat-icon>more_horiz</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="editEvent(event)">
+                  <button mat-menu-item (click)="editEvent(event); $event.stopPropagation()">
                     <mat-icon>edit</mat-icon>
                     <span>Edit</span>
                   </button>
-                  <button mat-menu-item (click)="deleteEvent(event.id)">
+                  <button mat-menu-item (click)="deleteEvent(event.id); $event.stopPropagation()">
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                   </button>

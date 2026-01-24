@@ -12,6 +12,14 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
             "outputPath": {
               "base": "./dist",
               "browser": "."

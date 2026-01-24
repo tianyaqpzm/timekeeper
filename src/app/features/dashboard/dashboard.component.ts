@@ -39,6 +39,11 @@ interface Event {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
+
+  // 1. 将全局 String 对象赋值给一个组件属性
+  // protected readonly 是一种好习惯，表明它只用于模板且不应被修改
+  protected readonly String = String;
+
   // Sample events data
   private sampleEvents: Event[] = [
     {
@@ -68,6 +73,8 @@ export class DashboardComponent {
   allEvents = signal<Event[]>(this.sampleEvents);
   searchQuery = signal('');
   selectedCategory = signal<string | null>(null);
+  editingEvent = signal<Event | null>(null);
+  showEditDialog = signal(false);
 
   // Computed properties
   filteredEvents = computed(() => {
@@ -153,8 +160,23 @@ export class DashboardComponent {
   }
 
   editEvent(event: Event): void {
-    // Navigate to edit page or open edit modal
-    console.log('Edit event:', event);
+    this.editingEvent.set({ ...event });
+    this.showEditDialog.set(true);
+  }
+
+  saveEditEvent(updatedEvent: Event): void {
+    const index = this.allEvents().findIndex(e => e.id === updatedEvent.id);
+    if (index !== -1) {
+      const events = [...this.allEvents()];
+      events[index] = updatedEvent;
+      this.allEvents.set(events);
+    }
+    this.closeEditDialog();
+  }
+
+  closeEditDialog(): void {
+    this.showEditDialog.set(false);
+    this.editingEvent.set(null);
   }
 
   formatDate(date: Date): string {
