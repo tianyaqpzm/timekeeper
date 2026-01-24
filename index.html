@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TimeKeeper Unified</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Angular Material CSS -->
+  <link href="https://ajax.googleapis.com/ajax/libs/angular_material/1.2.5/angular-material.min.css" rel="stylesheet"
+    media="false">
+  <!-- Using a prebuilt theme for Angular Material v18+ via CDN for styles since we can't use npm -->
+  <link href="https://unpkg.com/@angular/material@19.0.0/prebuilt-themes/indigo-pink.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2b6cee",
+            "primary-dark": "#1a4bb0",
+            "neon-cyan": "#00f2ff",
+            "neon-purple": "#bc13fe",
+            "deep-space": "#020617",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+            "surface-dark": "#1e293b",
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"],
+            "body": ["Manrope", "sans-serif"],
+            "jakarta": ["Plus Jakarta Sans", "sans-serif"],
+          },
+          animation: {
+            blob: "blob 10s infinite",
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            blob: {
+              "0%": { transform: "translate(0px, 0px) scale(1)" },
+              "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+              "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+              "100%": { transform: "translate(0px, 0px) scale(1)" }
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Global scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3b4354;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4b5563;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .filled-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Material Overrides for Dark Mode */
+    .dark .mat-mdc-form-field-input-control {
+      color: white !important;
+    }
+
+    .dark .mat-mdc-select-value {
+      color: white !important;
+    }
+
+    .dark .mat-mdc-select-arrow {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .dark .mat-datepicker-toggle {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* Dark Mode Material Popups Overrides */
+    .dark .mat-mdc-dialog-container .mdc-dialog__surface,
+    .dark .mat-datepicker-content,
+    .dark .mat-mdc-select-panel {
+      background-color: #1e293b !important;
+      /* surface-dark */
+      color: white !important;
+    }
+
+    .dark .mat-calendar-body-label,
+    .dark .mat-calendar-body-cell-content,
+    .dark .mat-date-range-input-separator,
+    .dark .mat-mdc-option {
+      color: white !important;
+    }
+
+    .dark .mat-mdc-option:hover,
+    .dark .mat-mdc-option.mdc-list-item--selected {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .dark .mat-calendar-arrow {
+      fill: white !important;
+    }
+
+    .dark .mat-calendar-previous-button,
+    .dark .mat-calendar-next-button {
+      color: white !important;
+    }
+
+    .dark .mat-mdc-form-field-label {
+      color: #9ca3af !important;
+      /* gray-400 */
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
+    "rxjs/operators": "https://esm.sh/rxjs@^7.8.2/operators?conditions=es2015",
+    "rxjs/ajax": "https://esm.sh/rxjs@^7.8.2/ajax?conditions=es2015",
+    "rxjs/webSocket": "https://esm.sh/rxjs@^7.8.2/webSocket?conditions=es2015",
+    "rxjs/testing": "https://esm.sh/rxjs@^7.8.2/testing?conditions=es2015",
+    "rxjs/fetch": "https://esm.sh/rxjs@^7.8.2/fetch?conditions=es2015",
+    "@angular/router": "https://esm.sh/@angular/router@^19.0.0?external=rxjs",
+    "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^19.0.0?external=rxjs",
+    "@angular/platform-browser/animations/async": "https://esm.sh/@angular/platform-browser@^19.0.0/animations/async?external=rxjs,@angular/core",
+    "@angular/compiler": "https://esm.sh/@angular/compiler@^19.0.0?external=rxjs",
+    "@angular/common": "https://esm.sh/@angular/common@^19.0.0?external=rxjs",
+    "@angular/core": "https://esm.sh/@angular/core@^19.0.0?external=rxjs",
+    "@angular/forms": "https://esm.sh/@angular/forms@^19.0.0?external=rxjs,@angular/core,@angular/common",
+    "@angular/animations": "https://esm.sh/@angular/animations@^19.0.0?external=rxjs",
+    "@angular/cdk/portal": "https://esm.sh/@angular/cdk@^19.0.0/portal?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/scrolling": "https://esm.sh/@angular/cdk@^19.0.0/scrolling?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/overlay": "https://esm.sh/@angular/cdk@^19.0.0/overlay?external=rxjs,@angular/core,@angular/common,@angular/cdk/scrolling,@angular/cdk/portal",
+    "@angular/cdk/a11y": "https://esm.sh/@angular/cdk@^19.0.0/a11y?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/platform": "https://esm.sh/@angular/cdk@^19.0.0/platform?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/bidi": "https://esm.sh/@angular/cdk@^19.0.0/bidi?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/coercion": "https://esm.sh/@angular/cdk@^19.0.0/coercion?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/keycodes": "https://esm.sh/@angular/cdk@^19.0.0/keycodes?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/observers": "https://esm.sh/@angular/cdk@^19.0.0/observers?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/layout": "https://esm.sh/@angular/cdk@^19.0.0/layout?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/text-field": "https://esm.sh/@angular/cdk@^19.0.0/text-field?external=rxjs,@angular/core,@angular/common",
+    "@angular/cdk/collections": "https://esm.sh/@angular/cdk@^19.0.0/collections?external=rxjs,@angular/core,@angular/common",
+    "@angular/material/datepicker": "https://esm.sh/@angular/material@^19.0.0/datepicker?external=rxjs,@angular/core,@angular/common,@angular/forms,@angular/platform-browser,@angular/animations,@angular/cdk/overlay,@angular/cdk/portal,@angular/cdk/a11y,@angular/cdk/bidi,@angular/cdk/coercion,@angular/cdk/keycodes,@angular/cdk/platform,@angular/cdk/layout,@angular/cdk/scrolling,@angular/cdk/observers,@angular/cdk/text-field,@angular/cdk/collections",
+    "@angular/material/input": "https://esm.sh/@angular/material@^19.0.0/input?external=rxjs,@angular/core,@angular/common,@angular/forms,@angular/platform-browser,@angular/animations,@angular/cdk/platform,@angular/cdk/text-field,@angular/material/form-field,@angular/material/core",
+    "@angular/material/select": "https://esm.sh/@angular/material@^19.0.0/select?external=rxjs,@angular/core,@angular/common,@angular/forms,@angular/platform-browser,@angular/animations,@angular/cdk/overlay,@angular/cdk/a11y,@angular/cdk/bidi,@angular/cdk/keycodes,@angular/cdk/scrolling,@angular/material/core,@angular/material/form-field",
+    "@angular/material/form-field": "https://esm.sh/@angular/material@^19.0.0/form-field?external=rxjs,@angular/core,@angular/common,@angular/forms,@angular/platform-browser,@angular/animations,@angular/cdk/platform,@angular/cdk/bidi,@angular/cdk/observers,@angular/material/core",
+    "@angular/material/core": "https://esm.sh/@angular/material@^19.0.0/core?external=rxjs,@angular/core,@angular/common,@angular/forms,@angular/platform-browser,@angular/animations,@angular/cdk/platform,@angular/cdk/bidi,@angular/cdk/coercion"
+  }
+}
+</script>
+  <!-- <link rel="stylesheet" href="/index.css"> -->
+</head>
+
+<body class="bg-background-dark text-white font-display overflow-hidden mat-app-background">
+  <app-root></app-root>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<div class="min-h-full w-full bg-zinc-900 flex flex-col items-center font-display relative overflow-hidden">
+
+  <!-- Full Background Image -->
+  <div class="absolute inset-0 w-full h-full">
+    <img
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQE9vU8Q-aaq02U5iibrartVjiQSD5nExJMpwDwxmnUUh7ps4K3BTkIKOWKMcv9Rxmp21l-2k3b6f9PmygRLBGGREg9__-EJsDWHJd5Uebo6iiC6-k0kzXoD8GW3bv1YSMJGha6YOmWm05TKxQmgFEIQXJMK-t7-sNCcz8Sr_qCvzSzQLLDuqjmKbPPO2sjznCQ8feaYOUhTlUgb_3hF4sfuGWKPpgCru_TmZxC4XQcEtxyOXpeSPLp2bc9DuyDVJQGOOZKeOIoD-I"
+      alt="Cake" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/90"></div>
+  </div>
+
+  <!-- Content Container -->
+  <div class="relative z-10 flex flex-col h-full w-full max-w-2xl text-white p-4">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between py-6">
+      <button
+        class="flex items-center justify-center size-12 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-colors">
+        <span class="material-symbols-outlined text-2xl">arrow_back</span>
+      </button>
+      <!-- <button class="flex items-center justify-center size-12 rounded-full backdrop-blur-md transition-all duration-300"
+        [class.bg-white/10]="!isFavorite()" [class.text-white]="!isFavorite()" [class.bg-pink-500/20]="isFavorite()"
+        [class.text-pink-500]="isFavorite()" [class.hover:bg-white/20]="!isFavorite()"
+        [class.hover:bg-pink-500/30]="isFavorite()">
+        <span class="material-symbols-outlined text-2xl" [class.filled-icon]="isFavorite()">
+          {{ isFavorite() ? 'favorite' : 'favorite_border' }}
+        </span>
+      </button> -->
+    </header>
+
+    <!-- Main Info -->
+    <main class="flex-1 flex flex-col justify-center px-4 md:px-12">
+      <div class="mb-12 text-center">
+        <span
+          class="inline-block py-1.5 px-4 rounded-full bg-primary/80 text-sm font-bold uppercase tracking-wider mb-4 backdrop-blur-sm border border-white/10">Birthday</span>
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight drop-shadow-lg">Sarah's 30th
+          Birthday</h1>
+      </div>
+
+      <!-- Timer Grid -->
+      <div class="grid grid-cols-4 gap-4 mb-12">
+        <div class="flex flex-col items-center gap-3 group">
+          <div
+            class="flex flex-col items-center justify-center w-full aspect-square rounded-3xl bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg group-hover:bg-white/20 transition-all duration-300">
+            <span class="text-4xl md:text-5xl font-bold tabular-nums tracking-tighter">03</span>
+          </div>
+          <span class="text-sm font-medium opacity-80 uppercase tracking-widest">Days</span>
+        </div>
+        <div class="flex flex-col items-center gap-3 group">
+          <div
+            class="flex flex-col items-center justify-center w-full aspect-square rounded-3xl bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg group-hover:bg-white/20 transition-all duration-300">
+            <span class="text-4xl md:text-5xl font-bold tabular-nums tracking-tighter">14</span>
+          </div>
+          <span class="text-sm font-medium opacity-80 uppercase tracking-widest">Hours</span>
+        </div>
+        <div class="flex flex-col items-center gap-3 group">
+          <div
+            class="flex flex-col items-center justify-center w-full aspect-square rounded-3xl bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg group-hover:bg-white/20 transition-all duration-300">
+            <span class="text-4xl md:text-5xl font-bold tabular-nums tracking-tighter">22</span>
+          </div>
+          <span class="text-sm font-medium opacity-80 uppercase tracking-widest">Mins</span>
+        </div>
+        <div class="flex flex-col items-center gap-3 group">
+          <div
+            class="flex flex-col items-center justify-center w-full aspect-square rounded-3xl bg-primary/80 backdrop-blur-lg border border-primary/50 shadow-[0_0_15px_rgba(43,108,238,0.4)] group-hover:scale-105 transition-all duration-300">
+            <span class="text-4xl md:text-5xl font-bold tabular-nums tracking-tighter">05</span>
+          </div>
+          <span class="text-sm font-bold text-primary-200 uppercase tracking-widest">Secs</span>
+        </div>
+      </div>
+
+      <div class="text-center px-4 max-w-lg mx-auto">
+        <p class="text-xl font-medium leading-relaxed text-white/90 drop-shadow-md">Counting down the seconds until we
+          celebrate together. Can't wait for the big party! 🎉</p>
+      </div>
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="pb-10 px-4 flex justify-center">
+      <div
+        class="flex justify-between items-center bg-white/10 backdrop-blur-xl border border-white/10 rounded-full p-2 px-8 shadow-2xl gap-8">
+        <button class="p-3 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-3xl">edit</span>
+        </button>
+        <div class="w-px h-8 bg-white/20"></div>
+        <button class="p-3 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-3xl">ios_share</span>
+        </button>
+        <div class="w-px h-8 bg-white/20"></div>
+        <button class="p-3 rounded-full hover:bg-red-500/20 text-white/80 hover:text-red-400 transition-colors">
+          <span class="material-symbols-outlined text-3xl">delete</span>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+</div>

@@ -1,0 +1,236 @@
+<div class="min-h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white overflow-y-auto font-display">
+      
+  <!-- Top Navigation -->
+  <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-surface-dark px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="size-8 text-primary flex items-center justify-center">
+        <span class="material-symbols-outlined text-3xl">hourglass_top</span>
+      </div>
+      <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Countdown App</h2>
+    </div>
+    <div class="flex flex-1 justify-end gap-8">
+      <div class="hidden md:flex items-center gap-9">
+        <a href="javascript:void(0)" class="text-sm font-medium leading-normal hover:text-primary transition-colors">Dashboard</a>
+        <a href="javascript:void(0)" class="text-sm font-medium leading-normal hover:text-primary transition-colors">Events</a>
+        <a href="javascript:void(0)" class="text-sm font-medium leading-normal hover:text-primary transition-colors">Settings</a>
+      </div>
+      <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-primary/20" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuADcD8HXq3WsYAM0PTRu9q9MNkFeWiXutpx2bp8cvVUEkmJWzqO2ZcMdN1yxHMIRz5hz9uUZ3hupvb_SatN2B-9v7NNKEMm29xtTm2T4QoLeOag_UJUlPtXKmfSZiYB2-c3Pc3p-CNrW7UurFBfHmlasCDCKu8T07zqANkfEB_7oMkQbRGGdYYfJRp4mN5nvrh_i1cfoBiigZs7OIola_P8X5LPV740-4fkP6w_NhQJp1d644zi5F7XxPzyjQ8RvPnIpw1qPH44WQOj')"></div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-[1440px] mx-auto p-6 md:p-10 lg:px-20 pb-20">
+    
+    <!-- Header Actions -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-4xl font-black leading-tight tracking-[-0.033em]">Create New Countdown</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-base font-normal">Set up a new event to track visually.</p>
+      </div>
+      
+      <!-- Right Actions -->
+      <div class="flex flex-col items-end gap-3 mt-4 md:mt-0">
+        <button (click)="scrollToPreview()" class="flex items-center gap-2 text-primary font-bold text-sm hover:text-primary-dark transition-colors lg:hidden">
+          <span class="material-symbols-outlined text-[18px]">visibility</span>
+          <span>Live Preview</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <button routerLink="/dashboard" class="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-surface-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-surface-dark transition-colors">Cancel</button>
+          <button class="px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-blue-600 transition-colors shadow-lg shadow-blue-900/20">Save Event</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-12">
+      
+      <!-- Left Column: Form -->
+      <div class="flex-1 flex flex-col gap-8 max-w-3xl">
+        
+        <!-- Event Details -->
+        <div class="flex flex-col gap-6 p-6 rounded-xl border border-gray-200 dark:border-surface-dark bg-white dark:bg-surface-dark/50 shadow-sm">
+          <h2 class="text-xl font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">edit_calendar</span> Event Details
+          </h2>
+          
+          <div class="flex flex-col gap-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Event Title</mat-label>
+              <input matInput placeholder="E.g., Summer Vacation..." [(ngModel)]="title">
+            </mat-form-field>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+             <mat-form-field appearance="outline" class="flex-1 w-full">
+              <mat-label>Date</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="date">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-1 w-full">
+              <mat-label>Time</mat-label>
+              <input matInput type="time" [(ngModel)]="time">
+            </mat-form-field>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 items-start">
+            <div class="flex-1 w-full">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Category</mat-label>
+                <mat-select [value]="selectedCategory()" (selectionChange)="onCategoryChange($event.value)">
+                   @for(category of categories(); track category) {
+                    <mat-option [value]="category">{{category}}</mat-option>
+                  }
+                  <mat-option value="Custom">+ Custom Activity Type</mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              @if (selectedCategory() === 'Custom') {
+                <div class="mt-2">
+                   <mat-form-field appearance="outline" class="w-full animate-pulse-slow">
+                    <mat-label>Custom Activity Name</mat-label>
+                    <input matInput placeholder="Enter name..." [(ngModel)]="customCategoryName">
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+            
+            <div class="flex h-[56px] items-center px-4 rounded-[4px] border border-gray-400/50 dark:border-gray-600 bg-transparent flex-1 sm:flex-none sm:w-48 justify-between">
+              <span class="text-base font-medium">Repeat Yearly</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" value="" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="flex flex-col gap-6 p-6 rounded-xl border border-gray-200 dark:border-surface-dark bg-white dark:bg-surface-dark/50 shadow-sm">
+          <h2 class="text-xl font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">palette</span> Appearance
+          </h2>
+          <div>
+            <!-- Tabs -->
+            <div class="flex gap-6 border-b border-gray-200 dark:border-gray-700 mb-4">
+              <button (click)="setAppearanceType('image')" 
+                      class="pb-2 border-b-2 font-bold text-sm transition-colors"
+                      [class.border-primary]="appearanceType() === 'image'"
+                      [class.text-primary]="appearanceType() === 'image'"
+                      [class.border-transparent]="appearanceType() !== 'image'"
+                      [class.text-gray-500]="appearanceType() !== 'image'">
+                Background Image
+              </button>
+              <button (click)="setAppearanceType('color')" 
+                      class="pb-2 border-b-2 font-bold text-sm transition-colors"
+                      [class.border-primary]="appearanceType() === 'color'"
+                      [class.text-primary]="appearanceType() === 'color'"
+                      [class.border-transparent]="appearanceType() !== 'color'"
+                      [class.text-gray-500]="appearanceType() !== 'color'">
+                Solid Color
+              </button>
+            </div>
+
+            <!-- Image Grid -->
+            @if (appearanceType() === 'image') {
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @for(img of images; track img) {
+                  <button (click)="selectImage(img)" class="relative group aspect-video rounded-lg overflow-hidden ring-2 ring-offset-2 ring-offset-background-dark transition-all"
+                    [class.ring-primary]="selectedImage() === img"
+                    [class.ring-transparent]="selectedImage() !== img">
+                    <img [src]="img" class="w-full h-full object-cover">
+                    @if (selectedImage() === img) {
+                      <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">check_circle</span>
+                      </div>
+                    }
+                  </button>
+                }
+                <button class="flex flex-col items-center justify-center gap-2 aspect-video rounded-lg border border-dashed border-gray-500 bg-gray-50 dark:bg-surface-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
+                  <span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">cloud_upload</span>
+                  <span class="text-xs font-medium text-gray-500 group-hover:text-white transition-colors">Upload</span>
+                </button>
+              </div>
+            }
+
+            <!-- Color Grid -->
+            @if (appearanceType() === 'color') {
+              <div class="grid grid-cols-4 sm:grid-cols-8 gap-4">
+                @for(color of colors; track color) {
+                   <button (click)="selectColor(color)" 
+                           class="size-12 rounded-full ring-2 ring-offset-2 ring-offset-background-dark transition-transform hover:scale-110"
+                           [style.background-color]="color"
+                           [class.ring-white]="selectedColor() === color"
+                           [class.ring-transparent]="selectedColor() !== color">
+                   </button>
+                }
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Preview -->
+      <div id="preview-section" class="lg:w-[480px] flex flex-col gap-4">
+        <div class="sticky top-24 flex flex-col gap-4">
+          <div class="flex items-center justify-between px-1">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">visibility</span> Live Preview
+            </h2>
+          </div>
+          <div class="w-full aspect-[4/5] sm:aspect-square lg:aspect-[3/4] rounded-2xl overflow-hidden relative shadow-2xl group select-none transition-all duration-500">
+            
+            <!-- Dynamic Background -->
+            <div class="absolute inset-0 bg-cover bg-center transition-all duration-700"
+                 [style.background-image]="appearanceType() === 'image' ? 'url(' + selectedImage() + ')' : null"
+                 [style.background-color]="appearanceType() === 'color' ? selectedColor() : null">
+            </div>
+            
+            <!-- Gradient Overlay (Only for image to ensure text readability) -->
+            @if (appearanceType() === 'image') {
+              <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80"></div>
+            }
+
+            <div class="absolute inset-0 p-8 flex flex-col justify-between text-white">
+              <div class="flex justify-between items-start">
+                <div class="bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                  <span class="text-xs font-bold uppercase tracking-wide">{{ displayCategory() }}</span>
+                </div>
+                <div class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/10 cursor-pointer hover:bg-white/20 transition-colors">
+                  <span class="material-symbols-outlined text-xl">share</span>
+                </div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="flex flex-col">
+                  <h3 class="text-3xl md:text-4xl font-black leading-tight drop-shadow-md break-words">{{ title() }}</h3>
+                  <p class="text-white/80 font-medium text-lg drop-shadow-sm mt-1">
+                    {{ date() | date:'mediumDate' }} • {{ time() }}
+                  </p>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mt-6 p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/10">
+                  <div class="flex flex-col items-center">
+                    <span class="text-2xl md:text-3xl font-black font-display">24</span>
+                    <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Days</span>
+                  </div>
+                  <div class="flex flex-col items-center border-l border-white/10">
+                    <span class="text-2xl md:text-3xl font-black font-display">08</span>
+                    <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Hrs</span>
+                  </div>
+                  <div class="flex flex-col items-center border-l border-white/10">
+                    <span class="text-2xl md:text-3xl font-black font-display">42</span>
+                    <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Mins</span>
+                  </div>
+                  <div class="flex flex-col items-center border-l border-white/10">
+                    <span class="text-2xl md:text-3xl font-black font-display text-primary bg-white rounded-md px-1 min-w-[1.5em] text-center shadow-lg">15</span>
+                    <span class="text-[10px] uppercase tracking-wider font-bold opacity-70 mt-1">Secs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+</div>
