@@ -10,24 +10,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { EventEditDialogComponent } from './event-edit-dialog/event-edit-dialog.component';
+import { EventService, TimeLimitedEvent } from '../../core/services/event.service';
 
-interface Event {
-  id: string;
-  title: string;
-  category: 'Birthday' | 'Anniversary' | 'Holiday' | 'Vacation' | 'Concert' | 'Graduation' | 'Retirement' | 'Other' | string;
-  date: Date | string;
-  time?: string;
-  description?: string;
-  appearance?: {
-    type: 'image' | 'color';
-    value: string;
-  };
-  repeatYearly?: boolean;
-  daysUntil?: number;
-  hoursUntil?: number;
-  minutesUntil?: number;
-  secondsUntil?: number;
-}
+
 
 @Component({
   selector: 'app-dashboard',
@@ -52,10 +37,11 @@ interface Event {
 export class DashboardComponent {
   constructor(
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private eventService: EventService
   ) {
-    // Load events from localStorage on initialization
-    this.loadEventsFromStorage();
+    // Load events from backend on initialization
+    this.loadEvents();
 
     // Auto-update countdown every second
     effect(() => {
@@ -74,10 +60,10 @@ export class DashboardComponent {
   protected readonly String = String;
 
   // Signals for state management
-  allEvents = signal<Event[]>([]);
+  allEvents = signal<TimeLimitedEvent[]>([]);
   searchQuery = signal('');
   selectedCategory = signal<string | null>(null);
-  editingEvent = signal<Event | null>(null);
+  editingEvent = signal<TimeLimitedEvent | null>(null);
   showEditDialog = signal(false);
 
   // Computed properties
@@ -136,31 +122,23 @@ export class DashboardComponent {
     return categories.size;
   });
 
-  // Load events from localStorage
-  private loadEventsFromStorage(): void {
-    try {
-      const stored = localStorage.getItem('events');
-      if (stored) {
-        const events = JSON.parse(stored);
-        // Convert date strings back to Date objects
+  // Load events from Backend
+  private loadEvents(): void {
+    this.eventService.getAllEvents().subscribe({
+      next: (events) => {
+        // Convert date strings back to Date objects if needed
+        // Assuming backend returns ISO strings which need conversion
         const parsedEvents = events.map((event: any) => ({
           ...event,
           date: new Date(event.date)
         }));
         this.allEvents.set(parsedEvents);
+      },
+      error: (err) => {
+        console.error('Failed to load events', err);
+        this.snackBar.open('Failed to load events', 'Close', { duration: 3000 });
       }
-    } catch (error) {
-      console.error('Failed to load events from localStorage:', error);
-    }
-  }
-
-  // Save events to localStorage
-  private saveEventsToStorage(): void {
-    try {
-      localStorage.setItem('events', JSON.stringify(this.allEvents()));
-    } catch (error) {
-      console.error('Failed to save events to localStorage:', error);
-    }
+    });
   }
 
   // Methods
@@ -244,28 +222,47 @@ export class DashboardComponent {
   }
 
   deleteEvent(eventId: string): void {
-    this.allEvents.set(this.allEvents().filter(event => event.id !== eventId));
-    this.saveEventsToStorage();
+    this.eventService.deleteEvent(eventId).subscribe({
+      next: () => {
+        this.allEvents.set(this.allEvents().filter(event => event.id !== eventId));
+        this.snackBar.open('Event deleted', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        console.error('Failed to delete event', err);
+        this.snackBar.open('Failed to delete event', 'Close', { duration: 3000 });
+      }
+    });
   }
 
-  editEvent(event: Event): void {
+  editEvent(event: TimeLimitedEvent): void {
     this.editingEvent.set({ ...event });
     this.showEditDialog.set(true);
   }
 
-  saveEditEvent(updatedEvent: Event): void {
+  saveEditEvent(updatedEvent: TimeLimitedEvent): void {
     const index = this.allEvents().findIndex(e => e.id === updatedEvent.id);
     if (index !== -1) {
-      const events = [...this.allEvents()];
-      events[index] = updatedEvent;
-      this.allEvents.set(events);
-      this.saveEventsToStorage();
+      // We map the UI event back to the model expected by service
+      // Ideally we use a mapper, but here we cast or pass as is if compatible
+      this.eventService.updateEvent(updatedEvent.id, updatedEvent as any).subscribe({
+        next: (savedEvent) => {
+          const events = [...this.allEvents()];
+          // Update the local state with the returned event (or kept updatedEvent)
+          events[index] = { ...updatedEvent, date: new Date(updatedEvent.date) };
+          this.allEvents.set(events);
+          this.snackBar.open('Event updated', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          console.error('Failed to update event', err);
+          this.snackBar.open('Failed to update event', 'Close', { duration: 3000 });
+        }
+      });
     }
     this.closeEditDialog();
   }
 
   viewEventDetail(eventId: string): void {
-    this.router.navigate(['/events/detail'], { queryParams: { id: eventId } });
+    this.router.navigate(['/landing/events/detail'], { queryParams: { id: eventId } });
   }
 
   getCategoryIcon(category: string): string {
@@ -281,7 +278,7 @@ export class DashboardComponent {
     return iconMap[category] || 'event';
   }
 
-  getBackgroundStyle(event: Event): any {
+  getBackgroundStyle(event: TimeLimitedEvent): any {
     if (event.appearance) {
       if (event.appearance.type === 'image') {
         return {

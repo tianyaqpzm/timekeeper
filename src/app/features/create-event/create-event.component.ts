@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { TimerService } from '../../core/services/timer.service';
+import { EventService, TimeLimitedEvent } from '../../core/services/event.service';
 
 @Component({
   selector: 'app-create-event',
@@ -39,7 +40,8 @@ export class CreateEventComponent {
   constructor(
     private snackBar: MatSnackBar,
     private router: Router,
-    private timerService: TimerService
+    private timerService: TimerService,
+    private eventService: EventService
   ) {
     // Monitor signal changes for live preview countdown
     effect(() => {
@@ -267,7 +269,7 @@ export class CreateEventComponent {
 
     // Create event object
     const newEvent = {
-      id: Date.now().toString(),
+      // id: Date.now().toString(), // Let backend generate ID
       title: this.title().trim(),
       category: this.selectedCategory() === 'Custom' ? this.customCategoryName().trim() : this.selectedCategory(),
       date: this.date(),
@@ -279,23 +281,28 @@ export class CreateEventComponent {
         value: this.appearanceType() === 'image' ? this.selectedImage() : this.selectedColor()
       },
       createdAt: new Date()
-    };
+    } as TimeLimitedEvent;
 
-    // Save to localStorage
-    const events = JSON.parse(localStorage.getItem('events') || '[]');
-    events.push(newEvent);
-    localStorage.setItem('events', JSON.stringify(events));
+    // Save to Backend
+    this.eventService.createEvent(newEvent).subscribe({
+      next: (savedEvent) => {
+        console.log('Event saved:', savedEvent);
+        // Show success message
+        this.snackBar.open('🎉 Event created successfully!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
 
-    // Show success message
-    this.snackBar.open('🎉 Event created successfully!', 'Close', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
+        // Navigate back to dashboard
+        setTimeout(() => {
+          this.router.navigate(['/landing/dashboard']);
+        }, 500);
+      },
+      error: (err) => {
+        console.error('Error saving event:', err);
+        this.snackBar.open('Failed to create event. Please try again.', 'Close', { duration: 3000 });
+      }
     });
-
-    // Navigate back to dashboard
-    setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 500);
   }
 }

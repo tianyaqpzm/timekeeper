@@ -14,23 +14,23 @@
       </div>
 
       <nav class="flex flex-col gap-2">
-        <a routerLink="/events" routerLinkActive="bg-primary text-white"
+        <a routerLink="/landing/events" routerLinkActive="bg-primary text-white"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer"
           [class.bg-primary]="false" [class.text-white]="false">
           <span class="material-symbols-outlined text-[20px]">dashboard</span>
           <span class="text-sm font-medium">All Events</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'anniversary'}"
+        <a routerLink="/landing/events" [queryParams]="{filter: 'anniversary'}"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">favorite</span>
           <span class="text-sm font-medium">Anniversaries</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'birthday'}"
+        <a routerLink="/landing/events" [queryParams]="{filter: 'birthday'}"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">cake</span>
           <span class="text-sm font-medium">Birthdays</span>
         </a>
-        <a routerLink="/events" [queryParams]="{filter: 'holiday'}"
+        <a routerLink="/landing/events" [queryParams]="{filter: 'holiday'}"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors group cursor-pointer">
           <span class="material-symbols-outlined group-hover:text-primary transition-colors text-[20px]">ac_unit</span>
           <span class="text-sm font-medium">Holidays</span>
@@ -68,7 +68,8 @@
               class="w-full bg-white dark:bg-surface-dark text-sm text-gray-900 dark:text-white rounded-lg pl-10 pr-4 py-2.5 border border-gray-200 dark:border-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-gray-400">
           </label>
         </div>
-        <button mat-raised-button color="primary" routerLink="/create" class="flex items-center justify-center gap-2">
+        <button mat-raised-button color="primary" routerLink="/landing/create-event"
+          class="flex items-center justify-center gap-2">
           <mat-icon>add</mat-icon>
           <span class="hidden sm:inline">Create New</span>
         </button>

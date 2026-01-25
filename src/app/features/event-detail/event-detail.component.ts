@@ -7,19 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TimerService } from '../../core/services/timer.service';
 
-interface Event {
-  id: string;
-  title: string;
-  category: string;
-  date: Date | string;
-  time?: string;
-  description?: string;
-  appearance?: {
-    type: 'image' | 'color';
-    value: string;
-  };
-  repeatYearly?: boolean;
-}
+import { EventService, TimeLimitedEvent } from '../../core/services/event.service';
 
 @Component({
   selector: 'app-event-detail',
@@ -40,7 +28,8 @@ export class EventDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private timerService: TimerService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private eventService: EventService
   ) {
     // Auto-update countdown every second
     effect(() => {
@@ -52,7 +41,7 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  event = signal<Event | null>(null);
+  event = signal<TimeLimitedEvent | null>(null);
   countdown = signal({ days: '00', hours: '00', minutes: '00', seconds: '00' });
   isFavorite = signal(false);
 
@@ -64,33 +53,28 @@ export class EventDetailComponent implements OnInit {
         this.loadEvent(eventId);
       } else {
         // No event ID, redirect to dashboard
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/landing/dashboard']);
       }
     });
   }
 
   private loadEvent(eventId: string): void {
-    try {
-      const stored = localStorage.getItem('events');
-      if (stored) {
-        const events = JSON.parse(stored);
-        const foundEvent = events.find((e: any) => e.id === eventId);
-
-        if (foundEvent) {
-          // Convert date string to Date object
-          foundEvent.date = new Date(foundEvent.date);
-          this.event.set(foundEvent);
-          this.updateCountdown();
-        } else {
-          this.snackBar.open('Event not found', 'Close', { duration: 3000 });
-          this.router.navigate(['/dashboard']);
-        }
+    this.eventService.getEventById(eventId).subscribe({
+      next: (event) => {
+        // Ensure date is a Date object (if backend sends string)
+        const eventWithDate = {
+          ...event,
+          date: new Date(event.date)
+        };
+        this.event.set(eventWithDate);
+        this.updateCountdown();
+      },
+      error: (err) => {
+        console.error('Failed to load event:', err);
+        this.snackBar.open('Failed to load event', 'Close', { duration: 3000 });
+        this.router.navigate(['/landing/dashboard']);
       }
-    } catch (error) {
-      console.error('Failed to load event:', error);
-      this.snackBar.open('Failed to load event', 'Close', { duration: 3000 });
-      this.router.navigate(['/dashboard']);
-    }
+    });
   }
 
   private updateCountdown(): void {
@@ -136,7 +120,7 @@ export class EventDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/landing/dashboard']);
   }
 
   editEvent(): void {
@@ -144,7 +128,7 @@ export class EventDetailComponent implements OnInit {
     if (event) {
       // Navigate to create page with event data for editing
       // For now, just go to dashboard where edit dialog can be used
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/landing/dashboard']);
     }
   }
 
@@ -187,23 +171,19 @@ export class EventDetailComponent implements OnInit {
 
   deleteEvent(): void {
     const event = this.event();
-    if (!event) return;
+    if (!event || !event.id) return;
 
     if (confirm(`Are you sure you want to delete "${event.title}"?`)) {
-      try {
-        const stored = localStorage.getItem('events');
-        if (stored) {
-          const events = JSON.parse(stored);
-          const filteredEvents = events.filter((e: any) => e.id !== event.id);
-          localStorage.setItem('events', JSON.stringify(filteredEvents));
-
+      this.eventService.deleteEvent(event.id).subscribe({
+        next: () => {
           this.snackBar.open('Event deleted successfully', 'Close', { duration: 2000 });
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/landing/dashboard']);
+        },
+        error: (err) => {
+          console.error('Failed to delete event:', err);
+          this.snackBar.open('Failed to delete event', 'Close', { duration: 3000 });
         }
-      } catch (error) {
-        console.error('Failed to delete event:', error);
-        this.snackBar.open('Failed to delete event', 'Close', { duration: 3000 });
-      }
+      });
     }
   }
 }

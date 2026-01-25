@@ -9,19 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
-interface Event {
-    id: string;
-    title: string;
-    category: string;
-    date: Date | string;
-    time?: string;
-    description?: string;
-    appearance?: {
-        type: 'image' | 'color';
-        value: string;
-    };
-    repeatYearly?: boolean;
-}
+import { TimeLimitedEvent } from '../../../core/services/event.service';
 
 @Component({
     selector: 'app-event-edit-dialog',
@@ -44,9 +32,9 @@ interface Event {
 })
 export class EventEditDialogComponent {
     @Input() isOpen = false;
-    @Input() event: Event | null = null;
+    @Input() event: TimeLimitedEvent | null = null;
 
-    @Output() save = new EventEmitter<Event>();
+    @Output() save = new EventEmitter<TimeLimitedEvent>();
     @Output() cancel = new EventEmitter<void>();
 
     onSave(): void {
@@ -59,7 +47,7 @@ export class EventEditDialogComponent {
                 date: this.event.date instanceof Date ? this.event.date : new Date(this.event.date)
             };
             console.log('Emitting updated event:', updatedEvent);
-            this.save.emit(updatedEvent as Event);
+            this.save.emit(updatedEvent as TimeLimitedEvent);
         } else {
             console.log('No event to save!');
         }

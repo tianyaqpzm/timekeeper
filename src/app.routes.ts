@@ -9,9 +9,9 @@ import { LandingComponent } from './app/features/landing/landing.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
   { path: 'landing', component: LandingComponent },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'create', component: CreateEventComponent },
-  { path: 'events', component: EventListComponent },
-  { path: 'events/detail', component: EventDetailComponent },
-  { path: 'customize', component: CustomizeComponent },
+  { path: 'landing/dashboard', component: DashboardComponent },
+  { path: 'landing/create-event', component: CreateEventComponent },
+  { path: 'landing/events', component: EventListComponent },
+  { path: 'landing/events/detail', component: EventDetailComponent },
+  { path: 'landing/customize', component: CustomizeComponent },
 ];
