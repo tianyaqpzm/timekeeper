@@ -1,5 +1,6 @@
-<div [class.overflow-hidden]="showEditDialog()"
-  class="@container flex h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-hidden">
+<div
+  class="@container flex h-full w-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display"
+  [class.overflow-hidden]="!showEditDialog()">
 
   <!-- Sidebar -->
   <div
@@ -80,30 +81,50 @@
 
         <!-- Quick Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div
-            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Events
+          <div (click)="filterByCategory(null)"
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+            <div
+              class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1 group-hover:text-primary transition-colors">
+              Total Events
             </div>
-            <div class="text-2xl font-bold dark:text-white">{{ totalEvents() }}</div>
+            <div class="text-2xl font-bold dark:text-white group-hover:text-primary transition-colors">{{ totalEvents()
+              }}</div>
+            <div class="text-[10px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to
+              view all</div>
           </div>
-          <div
-            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">This Month
+          <div (click)="filterThisMonth()"
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+            <div
+              class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1 group-hover:text-primary transition-colors">
+              This Month
             </div>
-            <div class="text-2xl font-bold dark:text-white">{{ upcomingThisMonth() }}</div>
+            <div class="text-2xl font-bold dark:text-white group-hover:text-primary transition-colors">{{
+              upcomingThisMonth() }}</div>
+            <div class="text-[10px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to
+              filter</div>
           </div>
-          <div
-            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Upcoming
+          <div (click)="goToNextEvent()"
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+            <div
+              class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1 group-hover:text-primary transition-colors">
+              Upcoming
             </div>
-            <div class="text-2xl font-bold text-primary">{{ nextEvent() }}</div>
+            <div class="text-2xl font-bold text-primary group-hover:scale-105 transition-transform">{{ nextEvent() }}
+            </div>
+            <div class="text-[10px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to
+              view details</div>
           </div>
-          <div
-            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent">
-            <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total
+          <div (click)="showCategoryStats()"
+            class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-200 dark:border-transparent cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+            <div
+              class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1 group-hover:text-primary transition-colors">
+              Total
               Categories
             </div>
-            <div class="text-2xl font-bold dark:text-white">4</div>
+            <div class="text-2xl font-bold dark:text-white group-hover:text-primary transition-colors">{{
+              uniqueCategories() }}</div>
+            <div class="text-[10px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to
+              view breakdown</div>
           </div>
         </div>
 
@@ -132,26 +153,12 @@
         @if (filteredEvents().length > 0) {
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
           @for (event of filteredEvents(); track event.id) {
-          <div routerLink="/events/detail"
+          <div (click)="viewEventDetail(event.id)"
             class="cursor-pointer group relative overflow-hidden rounded-2xl bg-surface-dark shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary/30 h-[380px] flex flex-col">
-            <!-- Background based on category -->
-            @switch(event.category) {
-            @case('Holiday') {
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style="background-image: url('/images/backgrounds/holiday-christmas.jpg')">
+            <!-- Dynamic Background -->
+            <div class="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+              [ngStyle]="getBackgroundStyle(event)">
             </div>
-            }
-            @case('Anniversary') {
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-transform duration-700 group-hover:scale-105">
-            </div>
-            }
-            @default {
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style="background-image: url('/images/backgrounds/birthday-mom.jpg')">
-            </div>
-            }
-            }
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20"></div>
             <div class="relative z-10 flex flex-col h-full p-6 justify-between">
               <div class="flex justify-between items-start">

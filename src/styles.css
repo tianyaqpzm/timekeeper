@@ -170,9 +170,6 @@ body {
   /* 去除背景色，防止遮挡 Material 的背景 */
   background-color: transparent !important;
 
-  /* 修复高度和对齐问题 */
-  padding: 0 !important;
-  margin: 0 !important;
 }
 
 /* 2. 针对时间/日期选择器：找回丢失的原生图标（小闹钟/日历） */
@@ -185,11 +182,7 @@ body {
   cursor: pointer;
 }
 
-/* 3. (可选) 如果在暗黑模式下图标看不清，可以反转颜色 */
-.dark .mat-mdc-form-field input[type="time"]::-webkit-calendar-picker-indicator,
-.dark .mat-mdc-form-field input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
+
 
 
 /* 方法 2: 暴力选择器覆盖 (防止变量不生效) 
@@ -285,4 +278,75 @@ html.dark .mat-mdc-form-field .mdc-floating-label {
 html.dark .mat-mdc-form-field.mat-focused .mdc-floating-label {
   color: var(--color-primary) !important;
   /* 聚焦时变蓝 */
+}
+
+
+/* =================================================================
+   5. 🌙 暗黑模式：按钮 (Button) 颜色修复
+   ================================================================= */
+/* 策略：
+   1. :not(:disabled) -> 只有可用时才上色，禁用时保留 Material 默认灰色
+   2. :hover -> 增加悬浮变深效果
+*/
+
+/* Flat & Raised Buttons (实心按钮) */
+html.dark .mat-mdc-raised-button:not(:disabled),
+html.dark .mat-mdc-flat-button:not(:disabled),
+html.dark .mat-mdc-unelevated-button:not(:disabled) {
+  background-color: var(--color-primary) !important;
+  /* 使用 Tailwind 定义的主色 */
+  color: #ffffff !important;
+}
+
+html.dark .mat-mdc-raised-button:not(:disabled):hover,
+html.dark .mat-mdc-flat-button:not(:disabled):hover {
+  background-color: var(--color-primary-dark) !important;
+  /* 悬浮变深 */
+}
+
+/* Stroked Buttons (描边按钮) */
+html.dark .mat-mdc-outlined-button:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* 禁用状态 (Disabled) 保底修复 */
+html.dark .mat-mdc-button-base:disabled {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  /* 深灰背景 */
+  color: rgba(255, 255, 255, 0.38) !important;
+  /* 灰字 */
+}
+
+/* 1. 修复原生图标：放大 + 纯白 + 修复点击区域 */
+.mat-mdc-form-field input::-webkit-calendar-picker-indicator {
+  display: block !important;
+  cursor: pointer;
+
+  /* 放大 1.25 倍，增加左边距 */
+  transform: scale(1.25);
+  margin-left: 8px;
+
+  /* ✨ 关键修改：设置不透明 (1), 这样就是纯亮色了 */
+  opacity: 1 !important;
+}
+
+/* 2. 🌙 暗黑模式核心修复 */
+html.dark .mat-mdc-form-field input {
+  /* 告诉浏览器：这个输入框处于暗黑模式。
+     浏览器会自动做两件事：
+     1. 把下拉弹窗变成深色背景。
+     2. 把小闹钟图标变成白色。
+  */
+  color-scheme: dark;
+}
+
+/* ❌ 注意：我删除了 filter: invert(1)，因为 color-scheme: dark 已经帮我们把图标变白了。
+   如果保留 invert(1)，白色又会被反转成黑色！ 
+*/
+
+/* 保底策略：如果在某些旧浏览器上图标还是黑的，可以使用 brightness 强行提亮 */
+html.dark .mat-mdc-form-field input::-webkit-calendar-picker-indicator {
+  /* 如果上面的 color-scheme 没生效，这行代码会强制把图标亮度拉满变成白色 */
+  filter: brightness(0) invert(1);
 }

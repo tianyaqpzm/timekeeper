@@ -27,6 +27,10 @@
                         <mat-option value="Birthday">Birthday</mat-option>
                         <mat-option value="Anniversary">Anniversary</mat-option>
                         <mat-option value="Holiday">Holiday</mat-option>
+                        <mat-option value="Vacation">Vacation</mat-option>
+                        <mat-option value="Concert">Concert</mat-option>
+                        <mat-option value="Graduation">Graduation</mat-option>
+                        <mat-option value="Retirement">Retirement</mat-option>
                         <mat-option value="Other">Other</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -43,6 +47,13 @@
                 </mat-form-field>
             </div>
 
+            <!-- Time -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Time (Optional)</label>
+                <input type="time" [(ngModel)]="event.time"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1c1f27] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+
             <!-- Description -->
             <div>
                 <label class="block text-sm font-medium mb-2">Description</label>
@@ -54,12 +65,12 @@
 
         <!-- Action Buttons -->
         <div class="flex gap-3 mt-8">
-            <button (click)="onCancel()"
-                class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium">
+            <button type="button" (click)="onCancel()"
+                class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium cursor-pointer">
                 Cancel
             </button>
-            <button (click)="onSave()"
-                class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors font-medium">
+            <button type="button" (click)="onSave()" (mousedown)="$event.preventDefault()" (mouseup)="onSave()"
+                class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 transition-colors font-medium cursor-pointer shadow-md hover:shadow-lg">
                 Save Changes
             </button>
         </div>

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,9 +12,15 @@ import { MatSelectModule } from '@angular/material/select';
 interface Event {
     id: string;
     title: string;
-    category: 'Birthday' | 'Anniversary' | 'Holiday' | 'Other';
-    date: Date;
+    category: string;
+    date: Date | string;
+    time?: string;
     description?: string;
+    appearance?: {
+        type: 'image' | 'color';
+        value: string;
+    };
+    repeatYearly?: boolean;
 }
 
 @Component({
@@ -31,6 +37,7 @@ interface Event {
         MatInputModule,
         MatSelectModule
     ],
+    providers: [provideNativeDateAdapter()],
     templateUrl: './event-edit-dialog.component.html',
     styleUrls: ['./event-edit-dialog.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -43,8 +50,18 @@ export class EventEditDialogComponent {
     @Output() cancel = new EventEmitter<void>();
 
     onSave(): void {
+        console.log('Save button clicked!');
         if (this.event) {
-            this.save.emit(this.event);
+            console.log('Event data:', this.event);
+            // Ensure date is properly formatted
+            const updatedEvent = {
+                ...this.event,
+                date: this.event.date instanceof Date ? this.event.date : new Date(this.event.date)
+            };
+            console.log('Emitting updated event:', updatedEvent);
+            this.save.emit(updatedEvent as Event);
+        } else {
+            console.log('No event to save!');
         }
     }
 

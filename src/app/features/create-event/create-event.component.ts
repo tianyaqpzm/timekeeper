@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
+import { TimerService } from '../../core/services/timer.service';
 
 @Component({
   selector: 'app-create-event',
@@ -35,20 +36,28 @@ import { Router, RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateEventComponent {
-  constructor(private snackBar: MatSnackBar, private router: Router) {
-    // Monitor signal changes
+  constructor(
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private timerService: TimerService
+  ) {
+    // Monitor signal changes for live preview countdown
     effect(() => {
       const currentDate = this.date();
       const currentTime = this.time();
-      // Signals are reactive, any change will trigger this effect
-      console.log('Date/Time updated:', currentDate, currentTime);
+      this.updatePreviewCountdown();
     });
   }
 
   // Form State
   title = signal("Sarah's Birthday Party");
-  date = signal<Date | null>(new Date('2024-12-25'));
+  date = signal<Date | null>(new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000)); // 30 days from now
   time = signal("18:00");
+  description = signal('');
+  repeatYearly = signal(true);
+
+  // Preview countdown
+  previewCountdown = signal({ days: '00', hours: '00', minutes: '00', seconds: '00' });
 
   // Event handlers for form inputs
   onTitleChange(value: string): void {
@@ -68,6 +77,36 @@ export class CreateEventComponent {
 
   onTimeChange(value: string): void {
     this.time.set(value);
+    this.updatePreviewCountdown();
+  }
+
+  onDescriptionChange(value: string): void {
+    this.description.set(value);
+  }
+
+  // Update preview countdown
+  private updatePreviewCountdown(): void {
+    if (this.date() && this.time()) {
+      const targetDate = this.getTargetDateTime();
+      if (targetDate) {
+        const timeParts = this.timerService.getTimeParts(targetDate);
+        this.previewCountdown.set(timeParts);
+      }
+    } else {
+      // Reset to zeros if no valid date/time
+      this.previewCountdown.set({ days: '00', hours: '00', minutes: '00', seconds: '00' });
+    }
+  }
+
+  // Get combined date and time
+  private getTargetDateTime(): Date | null {
+    if (!this.date()) return null;
+
+    const dateValue = new Date(this.date()!);
+    const [hours, minutes] = this.time().split(':').map(Number);
+
+    dateValue.setHours(hours, minutes, 0, 0);
+    return dateValue;
   }
 
   // Format time from Date for Material time input
@@ -100,6 +139,19 @@ export class CreateEventComponent {
       return this.customCategoryName() || 'Custom Event';
     }
     return this.selectedCategory();
+  });
+
+  // Debug: Show validation details
+  validationDetails = computed(() => {
+    return {
+      hasTitle: !!this.title()?.trim(),
+      hasDate: !!this.date(),
+      hasTime: !!this.time(),
+      hasCategory: !!this.selectedCategory(),
+      isFutureDateTime: this.date() && this.time() ?
+        (this.getTargetDateTime()?.getTime() || 0) > Date.now() : false,
+      error: this.getValidationError()
+    };
   });
 
   // Appearance Logic
@@ -153,31 +205,75 @@ export class CreateEventComponent {
     this.appearanceType.set('color');
   }
 
+  toggleRepeatYearly(checked: boolean) {
+    this.repeatYearly.set(checked);
+  }
+
   // Form validation
   isFormValid(): boolean {
-    return !!(
-      this.title() &&
-      this.date() &&
-      this.time() &&
-      this.selectedCategory() &&
-      (this.selectedCategory() !== 'Custom' || this.customCategoryName())
-    );
+    const hasTitle = !!this.title()?.trim();
+    const hasDate = !!this.date();
+    const hasTime = !!this.time();
+    const hasCategory = !!this.selectedCategory() &&
+      (this.selectedCategory() !== 'Custom' || !!this.customCategoryName()?.trim());
+
+    // Check if date and time combination is in the future
+    let isFutureDateTime = false;
+    if (this.date() && this.time()) {
+      const targetDateTime = this.getTargetDateTime();
+      if (targetDateTime) {
+        isFutureDateTime = targetDateTime.getTime() > Date.now();
+      }
+    }
+
+    return hasTitle && hasDate && hasTime && hasCategory && isFutureDateTime;
+  }
+
+  // Get validation error message
+  getValidationError(): string {
+    if (!this.title()?.trim()) return 'Title is required';
+    if (!this.date()) return 'Date is required';
+    if (!this.time()) return 'Time is required';
+    if (!this.selectedCategory()) return 'Category is required';
+    if (this.selectedCategory() === 'Custom' && !this.customCategoryName()?.trim()) {
+      return 'Custom category name is required';
+    }
+    if (this.date() && this.time()) {
+      const targetDateTime = this.getTargetDateTime();
+      if (targetDateTime && targetDateTime.getTime() <= Date.now()) {
+        return 'Date and time must be in the future';
+      }
+    }
+    return '';
   }
 
   // Save event
   saveEvent(): void {
+    console.log('Save button clicked!');
+    console.log('Form validation:', {
+      title: this.title(),
+      date: this.date(),
+      time: this.time(),
+      category: this.selectedCategory(),
+      isValid: this.isFormValid(),
+      error: this.getValidationError()
+    });
+
     if (!this.isFormValid()) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      const error = this.getValidationError();
+      this.snackBar.open(error || 'Please fill in all required fields', 'Close', { duration: 3000 });
       return;
     }
 
     // Create event object
     const newEvent = {
       id: Date.now().toString(),
-      title: this.title(),
-      category: this.selectedCategory() === 'Custom' ? this.customCategoryName() : this.selectedCategory(),
+      title: this.title().trim(),
+      category: this.selectedCategory() === 'Custom' ? this.customCategoryName().trim() : this.selectedCategory(),
       date: this.date(),
       time: this.time(),
+      description: this.description().trim(),
+      repeatYearly: this.repeatYearly(),
       appearance: {
         type: this.appearanceType(),
         value: this.appearanceType() === 'image' ? this.selectedImage() : this.selectedColor()
@@ -191,7 +287,11 @@ export class CreateEventComponent {
     localStorage.setItem('events', JSON.stringify(events));
 
     // Show success message
-    this.snackBar.open('Event created successfully!', 'Close', { duration: 3000 });
+    this.snackBar.open('🎉 Event created successfully!', 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
+    });
 
     // Navigate back to dashboard
     setTimeout(() => {

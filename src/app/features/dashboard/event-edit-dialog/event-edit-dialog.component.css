@@ -1,9 +1,49 @@
 /* 对话框背景遮蔽 */
 .dialog-overlay {
     position: fixed !important;
-    pointer-events: auto;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .dialog-container {
-    pointer-events: auto;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10000 !important;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* 确保按钮可点击 */
+.dialog-container button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 按钮悬停效果 */
+.dialog-container button:hover {
+    transform: translateY(-1px);
+}
+
+.dialog-container button:active {
+    transform: translateY(0);
+}
+
+/* Material form field 样式修复 */
+.dialog-container mat-form-field {
+    display: block;
+    width: 100%;
+}
+
+/* 输入框样式 */
+.dialog-container input,
+.dialog-container textarea {
+    pointer-events: auto !important;
 }

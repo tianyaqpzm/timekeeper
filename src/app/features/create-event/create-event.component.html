@@ -35,17 +35,20 @@
 
       <!-- Right Actions -->
       <div class="flex flex-col items-end gap-3 mt-4 md:mt-0">
-        <button mat-stroked-button (click)="scrollToPreview()" class="lg:hidden">
-          <mat-icon>visibility</mat-icon>
-          <span>Live Preview</span>
-        </button>
         <div class="flex items-center gap-3">
           <button mat-stroked-button routerLink="/dashboard">Cancel</button>
-          <button mat-raised-button color="primary" (click)="saveEvent()" [disabled]="!isFormValid()">
+          <button mat-raised-button color="primary" (click)="saveEvent()" [disabled]="!isFormValid()"
+            [class.opacity-50]="!isFormValid()" [class.cursor-not-allowed]="!isFormValid()">
             <mat-icon>check</mat-icon>
             <span>Save Event</span>
           </button>
         </div>
+        @if (!isFormValid()) {
+        <div class="text-xs text-red-500 dark:text-red-400 mt-2 text-right">
+          <span class="material-symbols-outlined text-sm align-middle">info</span>
+          {{ getValidationError() }}
+        </div>
+        }
       </div>
     </div>
 
@@ -110,12 +113,22 @@
               class="flex h-[56px] items-center px-4 rounded-[4px] border border-gray-400/50 dark:border-gray-600 bg-transparent flex-1 sm:flex-none sm:w-48 justify-between">
               <span class="text-base font-medium">Repeat Yearly</span>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" value="" class="sr-only peer" checked>
+                <input type="checkbox" [checked]="repeatYearly()" (change)="toggleRepeatYearly($event.target.checked)"
+                  class="sr-only peer">
                 <div
                   class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
                 </div>
               </label>
             </div>
+          </div>
+
+          <div class="flex flex-col">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Description (Optional)</mat-label>
+              <textarea matInput placeholder="Add details about your event..." rows="3" [value]="description()"
+                (input)="onDescriptionChange($event.target.value)"></textarea>
+              <mat-hint>Share what makes this event special</mat-hint>
+            </mat-form-field>
           </div>
         </div>
 
@@ -228,20 +241,21 @@
                 <div
                   class="grid grid-cols-4 gap-2 mt-6 p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/10">
                   <div class="flex flex-col items-center">
-                    <span class="text-2xl md:text-3xl font-black font-display">24</span>
+                    <span class="text-2xl md:text-3xl font-black font-display">{{ previewCountdown().days }}</span>
                     <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Days</span>
                   </div>
                   <div class="flex flex-col items-center border-l border-white/10">
-                    <span class="text-2xl md:text-3xl font-black font-display">08</span>
+                    <span class="text-2xl md:text-3xl font-black font-display">{{ previewCountdown().hours }}</span>
                     <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Hrs</span>
                   </div>
                   <div class="flex flex-col items-center border-l border-white/10">
-                    <span class="text-2xl md:text-3xl font-black font-display">42</span>
+                    <span class="text-2xl md:text-3xl font-black font-display">{{ previewCountdown().minutes }}</span>
                     <span class="text-[10px] uppercase tracking-wider font-bold opacity-70">Mins</span>
                   </div>
                   <div class="flex flex-col items-center border-l border-white/10">
                     <span
-                      class="text-2xl md:text-3xl font-black font-display text-primary bg-white rounded-md px-1 min-w-[1.5em] text-center shadow-lg">15</span>
+                      class="text-2xl md:text-3xl font-black font-display text-primary bg-white rounded-md px-1 min-w-[1.5em] text-center shadow-lg">{{
+                      previewCountdown().seconds }}</span>
                     <span class="text-[10px] uppercase tracking-wider font-bold opacity-70 mt-1">Secs</span>
                   </div>
                 </div>
