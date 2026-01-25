@@ -24,6 +24,7 @@ interface Event {
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   imports: [
     CommonModule,
     RouterLink,

@@ -10,7 +10,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "assets": [
               "src/favicon.ico",
@@ -20,12 +20,16 @@
                 "input": "public"
               }
             ],
+            "styles": [
+              "src/styles.css",
+              "@angular/material/prebuilt-themes/indigo-pink.css"
+            ],
             "outputPath": {
               "base": "./dist",
               "browser": "."
             },
             "index": "index.html",
-            "browser": "index.tsx",
+            "browser": "main.ts",
             "tsConfig": "tsconfig.json"
           },
           "configurations": {

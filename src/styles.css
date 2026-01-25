@@ -1,0 +1,288 @@
+/* 1. 引入 Tailwind 核心 */
+@import "tailwindcss";
+
+/* 👇 关键代码：这行代码将 dark 模式的触发条件强制改为“检查 .dark 类名” */
+/* 它的意思是：当父元素(或自身)有 .dark 类时，dark:前缀才会生效 */
+@variant dark (&:where(.dark, .dark *));
+
+/* 1. 引入插件 */
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+/* 2. 在这里配置主题 (替代 tailwind.config.js) */
+@theme {
+  /* --- 颜色配置 --- */
+  /* 语法：--color-{名字}: {色值}; */
+  --color-primary: #2b6cee;
+  --color-primary-dark: #1a4bb0;
+  --color-neon-cyan: #00f2ff;
+  --color-neon-purple: #bc13fe;
+  --color-deep-space: #020617;
+  --color-background-light: #f6f6f8;
+  --color-background-dark: #101622;
+  --color-surface-dark: #1e293b;
+
+  /* --- 字体配置 --- */
+  /* 语法：--font-{名字}: {字体族}; */
+  --font-display: "Manrope", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+
+  /* --- 动画配置 --- */
+  --animate-blob: blob 10s infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+}
+
+/* 3. 暗黑模式设置 */
+/* v4 默认支持 dark:前缀，但如果你想手动控制，可以保留这行 */
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b4354;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 5. 修复 Material Icons 对齐 */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.filled-icon {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* 6. Angular Material 暗黑模式强制覆盖 (保留你原有的逻辑) */
+.dark .mat-mdc-form-field-input-control,
+.dark .mat-mdc-select-value {
+  color: white !important;
+}
+
+.dark .mat-mdc-select-arrow,
+.dark .mat-datepicker-toggle {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark .mat-mdc-dialog-container .mdc-dialog__surface,
+.dark .mat-datepicker-content,
+.dark .mat-mdc-select-panel {
+  background-color: #1e293b !important;
+  color: white !important;
+}
+
+.dark .mat-calendar-body-label,
+.dark .mat-calendar-body-cell-content,
+.dark .mat-date-range-input-separator,
+.dark .mat-mdc-option {
+  color: white !important;
+}
+
+.dark .mat-mdc-option:hover,
+.dark .mat-mdc-option.mdc-list-item--selected {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .mat-calendar-arrow {
+  fill: white !important;
+}
+
+.dark .mat-calendar-previous-button,
+.dark .mat-calendar-next-button {
+  color: white !important;
+}
+
+.dark .mat-mdc-form-field-label {
+  color: #9ca3af !important;
+}
+
+/* 7. 基础重置 */
+/* html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+} */
+
+/* 🛠️ 修复 Tailwind Forms 插件与 Angular Material 的冲突 */
+
+/* 1. 针对所有 Material 输入框：去掉 Tailwind 强加的样式 */
+.mat-mdc-form-field input.mat-mdc-input-element {
+  /* 去除边框和阴影，交还给 Material 控制 */
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+
+  /* 去除背景色，防止遮挡 Material 的背景 */
+  background-color: transparent !important;
+
+  /* 修复高度和对齐问题 */
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 2. 针对时间/日期选择器：找回丢失的原生图标（小闹钟/日历） */
+.mat-mdc-form-field input[type="time"]::-webkit-calendar-picker-indicator,
+.mat-mdc-form-field input[type="date"]::-webkit-calendar-picker-indicator {
+  /* Tailwind Forms 默认把它隐藏了，这里强制显示 */
+  display: block !important;
+
+  /* 确保有足够的点击区域 */
+  cursor: pointer;
+}
+
+/* 3. (可选) 如果在暗黑模式下图标看不清，可以反转颜色 */
+.dark .mat-mdc-form-field input[type="time"]::-webkit-calendar-picker-indicator,
+.dark .mat-mdc-form-field input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+
+/* 方法 2: 暴力选择器覆盖 (防止变量不生效) 
+   针对 "Floating Label" (浮起来的那个小标题)
+*/
+.dark .mat-mdc-form-field .mdc-floating-label {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* 针对 "Focused" (选中状态) 下的 Label */
+.dark .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  /* 选中时变成你的主色 (或纯白) */
+  color: #60a5fa !important;
+  /* 这里的颜色可以换成你的 primary color */
+}
+
+/* 针对 "Outline" (边框) 颜色修复 */
+.dark .mat-mdc-form-field .mdc-notched-outline__leading,
+.dark .mat-mdc-form-field .mdc-notched-outline__notch,
+.dark .mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 选中状态下的边框颜色 */
+.dark .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.dark .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.dark .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #60a5fa !important;
+  /* 你的主色 */
+}
+
+
+
+
+/* =================================================================
+   🔥 终极暴力修复：直接覆盖 Material 组件样式 (无视变量)
+   注意：必须放在文件最底部，使用 html.dark 增加权重
+   ================================================================= */
+
+/* 1. 修复 "Cancel" 按钮 (Text Button) 
+   现象：暗黑模式下文字黑乎乎看不见
+   对策：直接强制把文字改成白色
+*/
+
+/* 确保按钮内部的 label 继承这个白色 */
+html.dark .mat-mdc-button .mdc-button__label {
+  color: inherit !important;
+}
+
+/* 2. 修复 "Save Event" 按钮 (Flat/Raised Button)
+   现象：颜色是 Material 默认的 Indigo，不是你的 Neon Blue
+   对策：直接把背景色改成你的 Tailwind 变量 --color-primary
+*/
+html.dark .mat-mdc-raised-button,
+html.dark .mat-mdc-flat-button,
+html.dark .mat-mdc-unelevated-button {
+  /* 强制背景色为你定义的主色 */
+  background-color: var(--color-primary) !important;
+  /* 强制文字为白色 */
+  color: #ffffff !important;
+}
+
+/* 3. 修复 边框按钮 (Stroked Button)
+   现象：边框和文字看不清
+*/
+html.dark .mat-mdc-outlined-button {
+  /* 边框变浅白 */
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  /* 文字变白 */
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 4. 修复 图标按钮 (Icon Button) 
+   现象：右上角的月亮/太阳图标是黑色的
+*/
+html.dark .mat-mdc-icon-button {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 5. (再次确认) 修复 Form Label 和 Input
+   防止之前的代码没生效，这里再加一道保险
+*/
+html.dark .mat-mdc-form-field-label,
+html.dark .mat-mdc-input-element,
+html.dark .mdc-text-field__input {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+html.dark .mat-mdc-form-field .mdc-floating-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+html.dark .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: var(--color-primary) !important;
+  /* 聚焦时变蓝 */
+}

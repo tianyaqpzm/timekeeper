@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
@@ -9,7 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { RouterLink } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-create-event',
@@ -17,6 +18,7 @@ import { RouterLink } from '@angular/router';
     CommonModule,
     RouterLink,
     FormsModule,
+    ReactiveFormsModule,
     MatDatepickerModule,
     MatInputModule,
     MatFormFieldModule,
@@ -24,7 +26,8 @@ import { RouterLink } from '@angular/router';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule
+    MatCardModule,
+    MatSnackBarModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './create-event.component.html',
@@ -32,11 +35,49 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateEventComponent {
+  constructor(private snackBar: MatSnackBar, private router: Router) {
+    // Monitor signal changes
+    effect(() => {
+      const currentDate = this.date();
+      const currentTime = this.time();
+      // Signals are reactive, any change will trigger this effect
+      console.log('Date/Time updated:', currentDate, currentTime);
+    });
+  }
 
   // Form State
   title = signal("Sarah's Birthday Party");
   date = signal<Date | null>(new Date('2024-12-25'));
   time = signal("18:00");
+
+  // Event handlers for form inputs
+  onTitleChange(value: string): void {
+    this.title.set(value);
+  }
+
+  onDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value) {
+      const selectedDate = new Date(input.value);
+      // Ensure valid date
+      if (!isNaN(selectedDate.getTime())) {
+        this.date.set(selectedDate);
+      }
+    }
+  }
+
+  onTimeChange(value: string): void {
+    this.time.set(value);
+  }
+
+  // Format time from Date for Material time input
+  getTimeFromDate(): string {
+    if (!this.date()) return this.time();
+    const date = this.date();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
 
   // Pre-defined categories
   categories = signal([
@@ -64,12 +105,12 @@ export class CreateEventComponent {
   // Appearance Logic
   appearanceType = signal<'image' | 'color'>('image');
 
-  // Default Images
+  // Default Images (local paths)
   images = [
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuBOWlV08KkBqLG3xtNSj0FHGZvE0qSKr3e3ZyOay4Is9q6OvDXhCcaf9LTVLF105k6kkYY0JlfkGI1cA7hf7-p77sd2q6Ac1Xrp9D-nUZpXmxTvTBXdLvv_E0vsNc1HplwDn12vuvgxrFMLe6_6l-DXm42GqZt5DmqY-mAXNVk3T7uyOlTycdwZDlZ_63PggFrgFz8WAuCcQxf9xaCdJMagcEI9NwNL2YcjVUcDWrXRhgankxsrx_dl5nIKzjlj9obwBoPRH-OYLUlZ',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuADa46j_6tKk6hJygeqtaBtsuARpEtp7eMLHTq1sfb58X3nisb7n2JVyIDs7VI-NPrQQ_DZB_l4tU-btNDvWMbHvReGx39ca2QXgxPDBf_gb-RJ8eXpDlqOLh-78PCJnQKxyvByFp6kCApx6CQB817H8LhKwtU5R9SPyd2IIblhBjQh-vI2q26ETbP-sSpluz3g6iLt8WM0R0YuI-EG6PE8w24o2ZyUs40dbdCHB6M3XIjqm4U2l4XZWg7y0IOJaVU2ph22rSGI1-bb',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuAI_a-_if4eHdIJVWeV1UmdRmQw4uUZVIa9_nBQWDFKjL3KcqQLXhEkyZLOuo3qNlszlfcBXBQRploPz1ZY_y89tS2otXUbf_JmWJrieFYDQAcrVo7nojCGgmnTuwTgqedCeQYoMrb9Fb2_23Xeqmtb51vwVvw_SC9lEe167I8PkXu-hYKdLHkojWnFl6GIPAu08Ly5OehPe_Wlq8t5YW1ELHM-KAA0CgelAtKMOSj75ZEJwPIuTLvR-oA8iocS7Wsi63gTuYdO00w0',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuA67RW7fH9-UYBGb9iJ5Z_CYPbImyBmvB6TOJ-t2Sr69kGGMVb0fl_jvw5SI44TcjsbXM0OgrFBNxAzJi8ZMZOZoBWGEuIldt1YAxUbBk_SLdDzitgqz4cAQOZJobCuKI0nz8zuHSXx0X7C8Zn1c8OHKB2IIzeXS1tNKiCeY9vO5Ep9zJbZZyVoLnhjFh3WbQ03EXJoC6OtEAGEZ6kGKlfxpvXCOJthGsGXJ93FPIz8_rmYZDYOxVJCYgrZQMKVphMcbXKs1sq9g8wN'
+    '/images/backgrounds/customize-bg1.jpg',
+    '/images/backgrounds/customize-bg2.jpg',
+    '/images/backgrounds/customize-bg3.jpg',
+    '/images/backgrounds/birthday-celebration.jpg'
   ];
 
   // Colors
@@ -110,5 +151,51 @@ export class CreateEventComponent {
   selectColor(color: string) {
     this.selectedColor.set(color);
     this.appearanceType.set('color');
+  }
+
+  // Form validation
+  isFormValid(): boolean {
+    return !!(
+      this.title() &&
+      this.date() &&
+      this.time() &&
+      this.selectedCategory() &&
+      (this.selectedCategory() !== 'Custom' || this.customCategoryName())
+    );
+  }
+
+  // Save event
+  saveEvent(): void {
+    if (!this.isFormValid()) {
+      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Create event object
+    const newEvent = {
+      id: Date.now().toString(),
+      title: this.title(),
+      category: this.selectedCategory() === 'Custom' ? this.customCategoryName() : this.selectedCategory(),
+      date: this.date(),
+      time: this.time(),
+      appearance: {
+        type: this.appearanceType(),
+        value: this.appearanceType() === 'image' ? this.selectedImage() : this.selectedColor()
+      },
+      createdAt: new Date()
+    };
+
+    // Save to localStorage
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    events.push(newEvent);
+    localStorage.setItem('events', JSON.stringify(events));
+
+    // Show success message
+    this.snackBar.open('Event created successfully!', 'Close', { duration: 3000 });
+
+    // Navigate back to dashboard
+    setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 500);
   }
 }

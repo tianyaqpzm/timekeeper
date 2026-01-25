@@ -4,7 +4,7 @@
 # 技术栈配置
 - **框架**: Angular 21(使用 Standalone Components 独立组件)。
 - **UI 组件库**: Angular Material。
-- **样式方案**: Tailwind CSS + component-level CSS files。
+- **样式方案**: Tailwind CSS(4.1+) + component-level CSS files。
 - **开发语言**: TypeScript (启用严格模式 Strict Mode)。
 
 # 架构与代码规范
@@ -47,7 +47,7 @@
 ## Architecture & Key Components
 
 ### Core Structure
-- **`index.tsx`**: Bootstrap file - sets up zoneless change detection and hash-based routing
+- **`main.ts`**: Bootstrap file - sets up zoneless change detection and hash-based routing
 - **`src/app.routes.ts`**: All routes defined here (landing, dashboard, create, events, customize)
 - **`src/app.component.ts`**: Root component with RouterOutlet and navigation links
 
