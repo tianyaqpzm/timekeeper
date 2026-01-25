@@ -32,6 +32,10 @@ jobs:
         env:
           NODE_ENV: production
 
+      # 🔍 新增调试步骤：打印 dist 目录结构
+      - name: Debug - List Output Files
+        run: ls -R dist
+        
       # 部署到 Cloudflare Pages
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
