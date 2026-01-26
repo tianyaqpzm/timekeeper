@@ -3,6 +3,9 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     branches: ["master", "dev", "release_/*"]
+  pull_request:
+    branches:
+      - master  # 向主分支发起PR时触发
   workflow_dispatch:
 
 jobs:
@@ -47,4 +50,4 @@ jobs:
           # 动态传入 --branch=${{ github.ref_name }}
           # 如果是 master，CF 会发布到正式环境
           # 如果是 dev，CF 会发布到 dev.timekeeper.pages.dev (测试环境)
-          command: pages deploy dist/timekeeper/browser --project-name=timekeeper --branch=${{ github.ref_name }}
+          command: pages deploy dist --project-name=timekeeper --branch=${{ github.ref_name }}
