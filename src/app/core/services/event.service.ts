@@ -22,9 +22,8 @@ export interface TimeLimitedEvent {
 })
 export class EventService {
     private http = inject(HttpClient);
-    // Assuming the backend is running on default Spring Boot port 8080 or configuring via proxy.
-    // Using direct URL for now, allowing CORS on backend.
-    private apiUrl = 'http://localhost:8080/rest/dark/v1/time-limit-events';
+    // Using relative path for proxying through Vite (dev) or Cloudflare Pages (prod)
+    private apiUrl = '/api/rest/dark/v1/time-limit-events';
 
     createEvent(event: TimeLimitedEvent): Observable<TimeLimitedEvent> {
         return this.http.post<TimeLimitedEvent>(this.apiUrl, event);

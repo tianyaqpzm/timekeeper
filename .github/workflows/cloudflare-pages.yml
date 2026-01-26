@@ -2,7 +2,7 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["master", "dev", "release_/*"]
   workflow_dispatch:
 
 jobs:
@@ -32,6 +32,10 @@ jobs:
         env:
           NODE_ENV: production
 
+      # 🔍 新增调试步骤：打印 dist 目录结构
+      - name: Debug - List Output Files
+        run: ls -R dist
+        
       # 部署到 Cloudflare Pages
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
@@ -39,5 +43,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # 根据 angular.json 配置，构建输出在 dist 目录
-          # 项目名称：timekeeper
-          command: pages deploy dist --project-name=timekeeper
+          # 项目名称：timekeeper 
+          # 动态传入 --branch=${{ github.ref_name }}
+          # 如果是 master，CF 会发布到正式环境
+          # 如果是 dev，CF 会发布到 dev.timekeeper.pages.dev (测试环境)
+          command: pages deploy dist/timekeeper/browser --project-name=timekeeper --branch=${{ github.ref_name }}
