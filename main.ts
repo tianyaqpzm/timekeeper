@@ -11,7 +11,8 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { apiUrlInterceptor } from './src/app/core/intercepotors/base-url.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -24,7 +25,14 @@ bootstrapApplication(AppComponent, {
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'outline' } // 全局生效
-    }
+    },
+    // --- 核心配置 ---
+    provideHttpClient(
+      // 1. 启用 fetch API (Angular 新版默认推荐，性能更好，与 Vite 兼容性更佳)
+      withFetch(),
+      // 2. 注册你的函数式拦截器 (可以放多个，按顺序执行)
+      withInterceptors([apiUrlInterceptor])
+    )
   ]
 }).catch((err) => console.error(err));
 
