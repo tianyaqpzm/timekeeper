@@ -1,0 +1,18 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./out-tsc/app",
+        "types": [
+            "vite/client"
+        ] // 👈 只有 App 代码需要 Vite 类型，测试可能不需要
+    },
+    "files": [
+        "src/main.ts",
+    ],
+    "include": [
+        "src/**/*.d.ts" //  vite-env.d.ts 的类型定义
+    ],
+    "exclude": [
+        "src/**/*.spec.ts" // 👈 关键！打包时要把测试文件剔除出去
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "/rest": {
+        "target": "http://pei.work.gd:8080",
+        "secure": false,
+        "changeOrigin": true,
+        "logLevel": "debug"
+    }
+}

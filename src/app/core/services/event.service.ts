@@ -23,7 +23,7 @@ export interface TimeLimitedEvent {
 export class EventService {
     private http = inject(HttpClient);
     // Using relative path for proxying through Vite (dev) or Cloudflare Pages (prod)
-    private apiUrl = '/api/rest/dark/v1/time-limit-events';
+    private apiUrl = '/rest/dark/v1/time-limit-events';
 
     createEvent(event: TimeLimitedEvent): Observable<TimeLimitedEvent> {
         return this.http.post<TimeLimitedEvent>(this.apiUrl, event);
