@@ -1,6 +1,6 @@
 {
     "/rest": {
-        "target": "http://pei.work.gd:8080",
+        "target": "https://api.122577.xyz:8443",
         "secure": false,
         "changeOrigin": true,
         "logLevel": "debug"
