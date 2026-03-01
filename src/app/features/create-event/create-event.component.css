@@ -1,1 +1,28 @@
 /* Create Event styles */
+
+/* Fix Material form-field compatibility with Tailwind forms plugin */
+mat-form-field {
+  display: block;
+  width: 100%;
+}
+
+/* Ensure time input works properly with Material */
+input[type="time"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Remove Tailwind's default input styles that conflict with Material */
+mat-form-field input {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fix input focus states for Material form fields */
+mat-form-field input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}

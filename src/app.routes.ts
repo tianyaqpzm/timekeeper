@@ -5,6 +5,7 @@ import { DashboardComponent } from './app/features/dashboard/dashboard.component
 import { EventDetailComponent } from './app/features/event-detail/event-detail.component';
 import { EventListComponent } from './app/features/event-list/event-list.component';
 import { LandingComponent } from './app/features/landing/landing.component';
+import { ChatComponent } from './app/features/chat/chat.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -14,4 +15,5 @@ export const routes: Routes = [
   { path: 'landing/events', component: EventListComponent },
   { path: 'landing/events/detail', component: EventDetailComponent },
   { path: 'landing/customize', component: CustomizeComponent },
+  { path: 'chat', component: ChatComponent },
 ];

@@ -1,0 +1,214 @@
+<div
+    class="flex h-screen bg-white dark:bg-[#131314] text-gray-900 dark:text-[#e3e3e3] font-sans overflow-hidden transition-colors duration-300">
+
+    <!-- Sidebar -->
+    <aside
+        class="flex-shrink-0 bg-gray-50 dark:bg-[#1e1f20] transition-all duration-300 ease-in-out border-r border-gray-200 dark:border-[#444746]"
+        [class.w-72]="isSidebarOpen()" [class.w-0]="!isSidebarOpen()" [class.overflow-hidden]="!isSidebarOpen()">
+        <div class="p-4 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <button mat-icon-button (click)="toggleSidebar()"
+                    class="text-gray-500 dark:text-[#c4c7c5] hover:bg-gray-200 dark:hover:bg-[#333537] rounded-full">
+                    <mat-icon>menu</mat-icon>
+                </button>
+                <span class="text-lg font-medium tracking-tight" *ngIf="isSidebarOpen()">Timekeeper AI</span>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-2">
+                <div class="px-3 py-2 text-xs font-medium text-gray-500 dark:text-[#8e918f] uppercase tracking-wider">
+                    Recent</div>
+                <!-- Mock History Items -->
+                <button
+                    class="w-full text-left px-3 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333537] text-sm/5 truncate text-gray-700 dark:text-[#e3e3e3] transition-colors flex items-center gap-3 group">
+                    <mat-icon class="text-base/4 w-4 h-4 !text-[18px]">chat_bubble_outline</mat-icon>
+                    <span class="truncate">Project Planning</span>
+                </button>
+                <button
+                    class="w-full text-left px-3 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333537] text-sm/5 truncate text-gray-700 dark:text-[#e3e3e3] transition-colors flex items-center gap-3">
+                    <mat-icon class="text-base/4 w-4 h-4 !text-[18px]">chat_bubble_outline</mat-icon>
+                    <span class="truncate">Code Review</span>
+                </button>
+            </div>
+
+            <div class="mt-auto pt-4 border-t border-gray-200 dark:border-[#444746] space-y-2">
+                <!-- Theme Toggle -->
+                <button (click)="toggleTheme()"
+                    class="w-full text-left px-3 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333537] text-sm text-gray-700 dark:text-[#e3e3e3] flex items-center gap-3 transition-colors">
+                    <mat-icon class="text-base/4 w-4 h-4 !text-[18px]">{{ isDarkMode() ? 'light_mode' : 'dark_mode'
+                        }}</mat-icon>
+                    {{ isDarkMode() ? 'Light Mode' : 'Dark Mode' }}
+                </button>
+
+                <button
+                    class="w-full text-left px-3 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333537] text-sm text-gray-700 dark:text-[#e3e3e3] flex items-center gap-3 transition-colors">
+                    <mat-icon class="text-base/4 w-4 h-4 !text-[18px]">settings</mat-icon>
+                    Settings
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative">
+
+        <!-- Header (Mobile/Collapsed Sidebar Trigger) -->
+        <header class="absolute top-0 left-0 p-4 z-10" *ngIf="!isSidebarOpen()">
+            <button mat-icon-button (click)="toggleSidebar()"
+                class="text-gray-500 dark:text-[#c4c7c5] hover:bg-gray-200 dark:hover:bg-[#333537] rounded-full bg-white/50 dark:bg-[#1e1f20]/50 backdrop-blur-sm">
+                <mat-icon>menu</mat-icon>
+            </button>
+        </header>
+
+        <!-- Chat Area -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
+            <div class="w-full max-w-4xl space-y-8 pb-32">
+
+                <!-- Welcome Message -->
+                @if (messages().length === 0) {
+                <div class="flex flex-col items-center justify-center h-[50vh] text-center space-y-4 opacity-0 animate-fade-in-up"
+                    style="animation-fill-mode: forwards;">
+                    <div
+                        class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 via-purple-400 to-red-400 blur-sm">
+                    </div>
+                    <h1
+                        class="text-4xl md:text-5xl font-medium bg-gradient-to-r from-[#4285f4] via-[#9b72cb] to-[#d96570] bg-clip-text text-transparent">
+                        Hello, Traveler</h1>
+                    <p class="text-xl text-gray-500 dark:text-[#c4c7c5]">How can I help you manage your time today?</p>
+                </div>
+                }
+
+                <!-- Messages Loop -->
+                @for (msg of messages(); track $index) {
+                <div class="flex gap-4 fade-in" [ngClass]="{'justify-end': msg.role === 'user'}">
+
+                    <!-- Model Icon -->
+                    @if (msg.role === 'model') {
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center flex-shrink-0 mt-1">
+                        <mat-icon
+                            class="text-white text-sm w-4 h-4 !text-[16px] !w-4 !h-4 flex items-center justify-center">auto_awesome</mat-icon>
+                    </div>
+                    }
+
+                    <div class="max-w-[80%] md:max-w-[70%]">
+                        @if (msg.role === 'user') {
+                        <div
+                            class="bg-gray-100 dark:bg-[#2a2b2d] px-5 py-3 rounded-2xl rounded-tr-sm text-gray-900 dark:text-[#e3e3e3] leading-relaxed whitespace-pre-wrap">
+                            {{ msg.content }}
+                        </div>
+                        } @else {
+                        <div
+                            class="bg-transparent px-0 py-3 text-gray-900 dark:text-[#e3e3e3] leading-relaxed markdown-body">
+                            {{ msg.content }}
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div
+            class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white dark:from-[#131314] dark:via-[#131314] to-transparent pt-10 pb-6 px-4 pointer-events-none">
+            <div class="max-w-4xl mx-auto pointer-events-auto">
+
+                <!-- File Previews -->
+                @if (selectedFiles().length > 0) {
+                <div class="flex gap-2 mb-2 overflow-x-auto pb-1">
+                    @for (file of selectedFiles(); track $index) {
+                    <div
+                        class="flex items-center gap-2 bg-gray-100 dark:bg-[#2a2b2d] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#444746] animate-fade-in-up">
+                        <mat-icon
+                            class="text-gray-500 dark:text-[#c4c7c5] text-sm !w-4 !h-4 !text-[16px]">description</mat-icon>
+                        <span class="text-xs text-gray-700 dark:text-[#e3e3e3] truncate max-w-[150px]">{{ file.name
+                            }}</span>
+                        <button (click)="removeFile($index)"
+                            class="text-gray-400 hover:text-red-500 transition-colors -mr-1">
+                            <mat-icon class="text-sm !w-4 !h-4 !text-[16px]">close</mat-icon>
+                        </button>
+                    </div>
+                    }
+                </div>
+                }
+
+                <div
+                    class="bg-gray-100 dark:bg-[#1e1f20] rounded-[28px] p-2 flex items-end gap-2 border border-transparent focus-within:border-gray-300 dark:focus-within:border-[#444746] focus-within:bg-white dark:focus-within:bg-[#2a2b2d] transition-colors relative shadow-lg">
+
+                    <!-- Hidden File Input -->
+                    <input type="file" #fileInput multiple hidden (change)="onFileSelected($event)">
+
+                    <!-- Menu Trigger -->
+                    <button mat-icon-button [matMenuTriggerFor]="uploadMenu"
+                        class="text-gray-500 dark:text-[#c4c7c5] hover:text-gray-900 dark:hover:text-[#e3e3e3] mb-1 ml-1"
+                        matTooltip="Add file or photo">
+                        <mat-icon>add_circle</mat-icon>
+                    </button>
+
+                    <!-- Upload Menu -->
+                    <mat-menu #uploadMenu="matMenu">
+                        <button mat-menu-item (click)="fileInput.click()">
+                            <mat-icon>upload_file</mat-icon>
+                            <span>Upload File</span>
+                        </button>
+                        <button mat-menu-item (click)="openCamera()">
+                            <mat-icon>photo_camera</mat-icon>
+                            <span>Take Photo</span>
+                        </button>
+                    </mat-menu>
+
+                    <textarea [(ngModel)]="userInput" (keydown.enter)="$event.preventDefault(); sendMessage()"
+                        placeholder="Ask anything..."
+                        class="w-full bg-transparent border-none text-gray-900 dark:text-[#e3e3e3] placeholder-gray-500 dark:placeholder-[#8e918f] resize-none py-3 px-2 max-h-32 focus:ring-0 text-base custom-scrollbar"
+                        rows="1" style="min-height: 48px;" #inputField></textarea>
+
+                    <div class="flex items-center gap-1 mb-1 mr-1">
+                        <button mat-icon-button
+                            class="text-gray-500 dark:text-[#c4c7c5] hover:text-gray-900 dark:hover:text-[#e3e3e3]"
+                            *ngIf="!userInput()" (click)="toggleRecording()"
+                            [matTooltip]="isRecording() ? 'Stop recording' : 'Use microphone'"
+                            [class.text-red-500]="isRecording()" [class.animate-pulse]="isRecording()">
+                            <mat-icon>{{ isRecording() ? 'stop_circle' : 'mic' }}</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="sendMessage()"
+                            [disabled]="!userInput() && selectedFiles().length === 0"
+                            class="transition-all duration-200"
+                            [ngClass]="(userInput() || selectedFiles().length > 0) ? 'text-white bg-[#004a77] hover:bg-[#005c94]' : 'text-gray-400 dark:text-[#444746]'">
+                            <mat-icon>send</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-center mt-2 text-xs text-gray-500 dark:text-[#8e918f]">
+                    Timekeeper AI may display inaccurate info, including about people, so double-check its responses.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Camera Overlay -->
+    <div *ngIf="isCameraOpen()"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in-up">
+        <div class="relative w-full max-w-2xl bg-black rounded-lg overflow-hidden border border-gray-800">
+            <!-- Close Button -->
+            <button mat-icon-button (click)="closeCamera()"
+                class="absolute top-4 right-4 z-10 text-white bg-black/50 hover:bg-black/70 rounded-full">
+                <mat-icon>close</mat-icon>
+            </button>
+
+            <!-- Video Preview -->
+            <video #videoElement autoplay playsinline class="w-full h-auto max-h-[70vh] object-contain"></video>
+            <canvas #canvasElement class="hidden"></canvas>
+
+            <!-- Controls -->
+            <div
+                class="absolute bottom-0 left-0 w-full p-6 flex justify-center bg-gradient-to-t from-black/80 to-transparent">
+                <button mat-fab color="primary" (click)="capturePhoto()"
+                    class="!w-16 !h-16 !bg-white !text-black flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+                    matTooltip="Capture">
+                    <mat-icon class="!text-3xl !w-8 !h-8 !text-[28px]">camera</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

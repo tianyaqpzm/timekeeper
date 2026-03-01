@@ -4,14 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip'; // 👈 必须补上这行！
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet, MatToolbarModule, MatButtonModule, MatIconModule, MatTooltipModule,
-    RouterLink,
-    RouterLinkActive,
     CommonModule,
     MatToolbarModule,
     MatButtonModule,
