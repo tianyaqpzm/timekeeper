@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Inject, OnInit, signal } from '@angular/core';
+import { Component, inject, Inject, OnDestroy, OnInit, signal, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
-import { Topic } from '../../../../core/domain/knowledge/knowledge.model';
-import { KnowledgeUseCase } from '../../../../core/use-cases/knowledge/knowledge.usecase';
-import { SidebarService } from '../../../../core/infrastructure/services/sidebar.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Topic } from '../../../../core/domain/knowledge/knowledge.model';
+import { SidebarService } from '../../../../core/infrastructure/services/sidebar.service';
+import { KnowledgeUseCase } from '../../../../core/use-cases/knowledge/knowledge.usecase';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -37,26 +37,105 @@ export class ConfirmDialogComponent {
   imports: [CommonModule, FormsModule, RouterModule, MatDialogModule, TranslateModule],
   templateUrl: './knowledge.component.html'
 })
-export class KnowledgeComponent implements OnInit {
+export class KnowledgeComponent implements OnInit, OnDestroy {
   protected useCase = inject(KnowledgeUseCase);
   private sidebarService = inject(SidebarService);
   private dialog = inject(MatDialog);
   private translate = inject(TranslateService);
 
   protected get isSidebarOpen() { return this.sidebarService.isOpen; }
-  
+
   toggleSidebar() {
     this.sidebarService.toggle();
   }
 
+  // Recipe Build Task states
+  private pollingInterval: any = null;
+  buildTaskId = signal<string | null>(null);
+  buildStatus = signal<string>('IDLE'); // IDLE, RUNNING, SUCCESS, FAILED
+  totalCount = signal<number>(0);
+  processedCount = signal<number>(0);
+  currentItemName = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
+  buildPercent = signal<number>(0);
+
   // UI-only states
   editingTopicId = signal<string | null>(null);
   isCreateModalOpen = signal<boolean>(false);
-  
+
   newTopicName = signal('');
   newTopicDesc = signal('');
   newTopicVisibility = signal('全员公开');
   newTopicTemplate = signal('空白模板');
+
+  ngOnDestroy() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+  }
+
+  async startRecipeBuild() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+
+    this.buildStatus.set('RUNNING');
+    this.totalCount.set(0);
+    this.processedCount.set(0);
+    this.currentItemName.set('正在连接调度服务...');
+    this.errorMessage.set(null);
+    this.buildPercent.set(0);
+
+    try {
+      const res = await this.useCase.triggerRecipeBuild();
+      if (res && res.taskId) {
+        this.buildTaskId.set(res.taskId);
+        this.startPollingProgress(res.taskId);
+      } else {
+        throw new Error('未获取到任务ID');
+      }
+    } catch (e: any) {
+      this.buildStatus.set('FAILED');
+      this.errorMessage.set(e.message || '启动向量构建任务失败');
+      this.currentItemName.set(null);
+    }
+  }
+
+  private startPollingProgress(taskId: string) {
+    this.pollingInterval = setInterval(async () => {
+      try {
+        const progress = await this.useCase.getBuildProgress(taskId);
+        if (progress) {
+          this.buildStatus.set(progress.status);
+          this.totalCount.set(progress.totalCount || 0);
+          this.processedCount.set(progress.processedCount || 0);
+          this.currentItemName.set(progress.currentItemName || null);
+          this.errorMessage.set(progress.errorMessage || null);
+
+          const total = progress.totalCount || 0;
+          const processed = progress.processedCount || 0;
+          if (total > 0) {
+            this.buildPercent.set(Math.round((processed / total) * 100));
+          } else {
+            this.buildPercent.set(0);
+          }
+
+          if (progress.status === 'SUCCESS' || progress.status === 'FAILED') {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+            // Refresh topics
+            this.useCase.refreshTopics();
+            const currentTopicId = this.selectedTopicId();
+            if (currentTopicId) {
+              this.useCase.selectTopic(currentTopicId);
+            }
+          }
+        }
+      } catch (e: any) {
+        console.error('Error polling recipe build progress:', e);
+      }
+    }, 15000);
+  }
 
   // Delegated states for template access
   topics = this.useCase.topics;
@@ -68,8 +147,71 @@ export class KnowledgeComponent implements OnInit {
   isUploading = this.useCase.isUploading;
   searchQuery = this.useCase.searchQuery;
 
+  // Pagination states delegated to UseCase
+  currentPage = this.useCase.currentPage;
+  pageSize = this.useCase.pageSize;
+  pageSizeOptions = [5, 10, 20, 50];
+
+  paginatedDocuments = computed(() => {
+    return this.filteredDocuments();
+  });
+
+  totalDocuments = this.useCase.totalDocuments;
+  
+  totalPages = computed(() => {
+    const total = this.totalDocuments();
+    const size = this.pageSize();
+    return Math.ceil(total / size) || 1;
+  });
+
+  startIndex = computed(() => this.currentPage() * this.pageSize() + 1);
+  endIndex = computed(() => {
+    const end = (this.currentPage() + 1) * this.pageSize();
+    const total = this.totalDocuments();
+    return end > total ? total : end;
+  });
+
+  visiblePages = computed(() => {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    const pages: number[] = [];
+    
+    const delta = 1;
+    const left = current - delta;
+    const right = current + delta;
+    
+    for (let i = 0; i < total; i++) {
+      if (i === 0 || i === total - 1 || (i >= left && i <= right)) {
+        pages.push(i);
+      }
+    }
+    
+    const visible: (number | null)[] = [];
+    let prev: number | null = null;
+    for (const p of pages) {
+      if (prev !== null && p - prev > 1) {
+        visible.push(null);
+      }
+      visible.push(p);
+      prev = p;
+    }
+    return visible;
+  });
+
+  constructor() {
+    // Reset page to 0 when search query changes
+    effect(() => {
+      this.searchQuery();
+      this.currentPage.set(0);
+    });
+  }
+
   ngOnInit() {
     this.useCase.refreshTopics();
+    const currentTopicId = this.selectedTopicId();
+    if (currentTopicId) {
+      this.useCase.selectTopic(currentTopicId);
+    }
   }
 
   selectTopic(id: string) {

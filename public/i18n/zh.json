@@ -69,6 +69,10 @@
     "TAKE_PHOTO": "拍照",
     "ATTACH_FILE": "添加文件或图片",
     "SELECT_KB": "选择知识库 (RAG)",
+    "COOK_PLACEHOLDER": "描述你想吃的或让 AI 为你推荐...",
+    "STOP_RECORDING": "停止录音",
+    "USE_MICROPHONE": "使用麦克风",
+    "CAPTURE": "拍摄",
     "NO_KB": "不使用知识库",
     "KNOWLEDGE_BASE": "知识库",
     "REFERENCE_SOURCES": "参考来源",
@@ -165,6 +169,29 @@
       "SAVE_CREATE": "确认创建",
       "SAVE_EDIT": "确认修改",
       "CANCEL": "取消"
+    },
+    "RECIPE_BUILD": {
+      "TITLE": "菜谱向量知识库构建中心",
+      "STATUS_RUNNING": "正在向量化...",
+      "STATUS_SUCCESS": "构建成功",
+      "STATUS_FAILED": "构建失败",
+      "DESC": "支持增量追加。自动扫描挂载路径，利用 BAAI/bge-small-zh-v1.5 大模型计算 Embedding 并入库 PostgreSQL (pgvector)。",
+      "CURRENT": "当前：",
+      "PROCESSED": "已处理",
+      "SUCCESS_MSG": "构建任务全部成功！已导入/更新 {{count}} 个菜谱文档。",
+      "FAILED_MSG": "构建出错：{{error}}",
+      "UNKNOWN_ERROR": "发生未知错误，请检查后端服务",
+      "BTN_RUNNING": "正在执行向量构建...",
+      "BTN_SUCCESS": "重新构建向量索引",
+      "BTN_START": "一键构建菜谱知识库",
+      "LOADING": "加载中..."
+    },
+    "PAGINATION": {
+      "SHOWING": "显示第",
+      "TO": "至",
+      "OF": "个，共",
+      "ENTRIES": "条记录",
+      "PAGE_SIZE": "每页显示："
     }
   },
   "COUNTDOWN": {

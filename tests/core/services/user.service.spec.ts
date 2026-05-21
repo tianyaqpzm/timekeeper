@@ -52,7 +52,7 @@ describe('UserService (TU-01 ~ TU-03)', () => {
 
         await service.initialize();
 
-        expect(http.get).toHaveBeenCalledWith('/rest/dark/v1/user/me');
+        expect(http.get).toHaveBeenCalledWith('/rest/biz/v1/user/me');
         expect(service.currentUser()).toEqual(mockUser);
     });
 

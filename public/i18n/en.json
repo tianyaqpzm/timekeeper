@@ -69,6 +69,10 @@
     "TAKE_PHOTO": "Take Photo",
     "ATTACH_FILE": "Add file or photo",
     "SELECT_KB": "Select Knowledge Base (RAG)",
+    "COOK_PLACEHOLDER": "Describe what you want to eat or let AI recommend...",
+    "STOP_RECORDING": "Stop recording",
+    "USE_MICROPHONE": "Use microphone",
+    "CAPTURE": "Capture",
     "NO_KB": "No Knowledge Base",
     "KNOWLEDGE_BASE": "Knowledge Base",
     "REFERENCE_SOURCES": "Reference Sources",
@@ -165,6 +169,29 @@
       "SAVE_CREATE": "Confirm Creation",
       "SAVE_EDIT": "Confirm Edit",
       "CANCEL": "Cancel"
+    },
+    "RECIPE_BUILD": {
+      "TITLE": "Recipe Vector KB Builder",
+      "STATUS_RUNNING": "Vectorizing...",
+      "STATUS_SUCCESS": "Success",
+      "STATUS_FAILED": "Failed",
+      "DESC": "Supports incremental updates. Automatically scans path, utilizes BAAI/bge-small-zh-v1.5 model to compute embeddings, and saves to PostgreSQL (pgvector).",
+      "CURRENT": "Current: ",
+      "PROCESSED": "Processed",
+      "SUCCESS_MSG": "Build task completed successfully! Imported/Updated {{count}} recipe documents.",
+      "FAILED_MSG": "Build failed: {{error}}",
+      "UNKNOWN_ERROR": "An unknown error occurred. Please check the backend service.",
+      "BTN_RUNNING": "Building Vector Index...",
+      "BTN_SUCCESS": "Rebuild Vector Index",
+      "BTN_START": "Build Recipe Knowledge Base",
+      "LOADING": "Loading..."
+    },
+    "PAGINATION": {
+      "SHOWING": "Showing",
+      "TO": "to",
+      "OF": "of",
+      "ENTRIES": "entries",
+      "PAGE_SIZE": "Page size:"
     }
   },
   "COUNTDOWN": {

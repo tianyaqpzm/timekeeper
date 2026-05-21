@@ -18,7 +18,13 @@ describe('KnowledgeUseCase', () => {
   beforeEach(() => {
     adapterMock = {
       getTopics: jest.fn().mockResolvedValue(mockTopics),
-      getDocuments: jest.fn().mockResolvedValue(mockDocs),
+      getDocuments: jest.fn().mockResolvedValue({
+        records: mockDocs,
+        total: 1,
+        size: 10,
+        current: 1,
+        pages: 1
+      }),
       createTopic: jest.fn(),
       updateTopic: jest.fn(),
       deleteTopic: jest.fn().mockResolvedValue(undefined),
@@ -47,8 +53,10 @@ describe('KnowledgeUseCase', () => {
 
   it('should select topic and load documents', async () => {
     await useCase.selectTopic('t1');
+    TestBed.flushEffects();
+    await new Promise(resolve => setTimeout(resolve, 0));
     expect(useCase.selectedTopicId()).toBe('t1');
-    expect(adapterMock.getDocuments).toHaveBeenCalledWith('t1');
+    expect(adapterMock.getDocuments).toHaveBeenCalledWith('t1', 1, 10);
     expect(useCase.documents().length).toBe(1);
   });
 

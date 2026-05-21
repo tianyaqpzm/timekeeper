@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { KnowledgeDocument, KnowledgeRepository, Topic } from '../../domain/knowledge/knowledge.model';
+import { KnowledgeDocument, KnowledgeRepository, PageResult, Topic } from '../../domain/knowledge/knowledge.model';
 import { URLConfig } from '../../infrastructure/constants/url.config';
 
 @Injectable({
@@ -37,9 +37,14 @@ export class KnowledgeApiAdapter implements KnowledgeRepository {
     return firstValueFrom(this.http.delete<void>(`${this.baseUrl}/topics/${id}`));
   }
 
-  async getDocuments(topicId: string): Promise<KnowledgeDocument[]> {
-    const docs = await firstValueFrom(this.http.get<KnowledgeDocument[]>(`${this.baseUrl}/documents?topicId=${topicId}`));
-    return docs.map(doc => ({ ...doc, id: String(doc.id) }));
+  async getDocuments(topicId: string, page: number, size: number): Promise<PageResult<KnowledgeDocument>> {
+    const result = await firstValueFrom(
+      this.http.get<PageResult<KnowledgeDocument>>(`${this.baseUrl}/documents?topicId=${topicId}&page=${page}&size=${size}`)
+    );
+    return {
+      ...result,
+      records: result.records.map(doc => ({ ...doc, id: String(doc.id) }))
+    };
   }
 
   async uploadDocument(topicId: string, file: File): Promise<KnowledgeDocument> {
@@ -55,6 +60,24 @@ export class KnowledgeApiAdapter implements KnowledgeRepository {
 
   async startIngestTask(documentId: string, configPayload: any): Promise<any> {
     return firstValueFrom(this.http.post(`${this.baseUrl}/documents/${documentId}/ingest`, configPayload));
+  }
+
+  async triggerRecipeBuild(): Promise<{ status: string, taskId: string }> {
+    return firstValueFrom(this.http.post<{ status: string, taskId: string }>(URLConfig.KNOWLEDGE.BUILD_RECIPE, {}));
+  }
+
+  async getBuildProgress(taskId: string): Promise<{
+    id: string;
+    taskType: string;
+    status: string;
+    totalCount: number;
+    processedCount: number;
+    currentItemName: string | null;
+    errorMessage: string | null;
+    createTime: string;
+    updateTime: string;
+  }> {
+    return firstValueFrom(this.http.get<any>(URLConfig.KNOWLEDGE.TASK_PROGRESS(taskId)));
   }
 
   getDocumentPreviewUrl(documentId: string): string {

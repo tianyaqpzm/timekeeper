@@ -61,4 +61,36 @@ describe('KnowledgeApiAdapter', () => {
     const res = await promise;
     expect(res.status).toBe('ok');
   });
+
+  it('triggerRecipeBuild should post to build recipe URL', async () => {
+    const promise = adapter.triggerRecipeBuild();
+
+    const req = httpMock.expectOne(URLConfig.KNOWLEDGE.BUILD_RECIPE);
+    expect(req.request.method).toBe('POST');
+    req.flush({ status: 'RUNNING', taskId: 'task-123' });
+
+    const res = await promise;
+    expect(res.status).toBe('RUNNING');
+    expect(res.taskId).toBe('task-123');
+  });
+
+  it('getBuildProgress should fetch from task progress URL', async () => {
+    const promise = adapter.getBuildProgress('task-123');
+
+    const req = httpMock.expectOne(URLConfig.KNOWLEDGE.TASK_PROGRESS('task-123'));
+    expect(req.request.method).toBe('GET');
+    req.flush({
+      id: 'task-123',
+      taskType: 'RECIPE_BUILD',
+      status: 'RUNNING',
+      totalCount: 10,
+      processedCount: 4,
+      currentItemName: 'curry.md'
+    });
+
+    const res = await promise;
+    expect(res.id).toBe('task-123');
+    expect(res.processedCount).toBe(4);
+    expect(res.currentItemName).toBe('curry.md');
+  });
 });

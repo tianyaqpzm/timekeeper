@@ -41,7 +41,7 @@ describe('ChatApiAdapter', () => {
       done();
     });
 
-    const req = httpMock.expectOne(r => r.url === '/rest/dark/v1/history' && r.params.get('sessionId') === sessionId);
+    const req = httpMock.expectOne(r => r.url === '/rest/biz/v1/history' && r.params.get('sessionId') === sessionId);
     expect(req.request.method).toBe('GET');
     req.flush(mockHistory);
   });
@@ -54,7 +54,7 @@ describe('ChatApiAdapter', () => {
       done();
     });
 
-    const req = httpMock.expectOne('/rest/dark/v1/history/sessions');
+    const req = httpMock.expectOne('/rest/biz/v1/history/sessions');
     req.flush(mockSessions);
   });
 });

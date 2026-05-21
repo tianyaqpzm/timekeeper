@@ -315,7 +315,7 @@
 
                         <textarea [(ngModel)]="userInput" [ngModelOptions]="{ debounce: 300 }"
                             (keydown.enter)="$event.preventDefault(); sendMessage(inputField.value)"
-                            [placeholder]="isCookMode() ? '描述你想吃的或让 AI 为你推荐...' : ('CHAT.PLACEHOLDER' | translate)"
+                            [placeholder]="isCookMode() ? ('CHAT.COOK_PLACEHOLDER' | translate) : ('CHAT.PLACEHOLDER' | translate)"
                             class="w-full bg-transparent border-none text-gray-900 dark:text-[#e3e3e3] placeholder-gray-500 dark:placeholder-[#8e918f] placeholder:text-sm resize-none py-2 px-3 max-h-48 focus:ring-0 text-base custom-scrollbar"
                             rows="1" style="min-height: 40px;" #inputField></textarea>
                     </div>
@@ -334,7 +334,7 @@
                             <div class="flex items-center">
                                 <button mat-icon-button [matMenuTriggerFor]="kbMenu"
                                     class="!w-10 !h-10 text-gray-500 dark:text-[#c4c7c5] hover:text-gray-900 dark:hover:text-[#e3e3e3]"
-                                    matTooltip="选择知识库 (RAG)">
+                                    [matTooltip]="'CHAT.SELECT_KB' | translate">
                                     <mat-icon class="!text-[20px]">library_books</mat-icon>
                                 </button>
 
@@ -382,7 +382,7 @@
                             <button mat-icon-button
                                 class="!w-10 !h-10 !flex !items-center !justify-center text-gray-500 dark:text-[#c4c7c5] hover:text-gray-900 dark:hover:text-[#e3e3e3]"
                                 *ngIf="!userInput()" (click)="toggleRecording()"
-                                [matTooltip]="isRecording() ? 'Stop recording' : 'Use microphone'"
+                                [matTooltip]="isRecording() ? ('CHAT.STOP_RECORDING' | translate) : ('CHAT.USE_MICROPHONE' | translate)"
                                 [class.text-red-500]="isRecording()" [class.animate-pulse]="isRecording()">
                                 <mat-icon class="!text-[22px]">{{ isRecording() ? 'stop_circle' : 'mic' }}</mat-icon>
                             </button>
@@ -423,7 +423,7 @@
                 class="absolute bottom-0 left-0 w-full p-6 flex justify-center bg-gradient-to-t from-black/80 to-transparent">
                 <button mat-fab color="primary" (click)="capturePhoto()"
                     class="!w-16 !h-16 !bg-white !text-black !flex !items-center !justify-center shadow-lg hover:scale-105 transition-transform"
-                    matTooltip="Capture">
+                    [matTooltip]="'CHAT.CAPTURE' | translate">
                     <mat-icon class="!text-3xl !text-[28px] !flex !items-center !justify-center">camera</mat-icon>
                 </button>
             </div>

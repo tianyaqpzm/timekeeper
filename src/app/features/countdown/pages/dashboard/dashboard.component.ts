@@ -36,7 +36,6 @@ import { MsHeaderComponent } from '../../../../shared/components/ms-header/ms-he
     MatTooltipModule,
     MatDialogModule,
     EventEditDialogComponent,
-    SettingsDialogComponent,
     MsHeaderComponent,
     TranslateModule
   ],

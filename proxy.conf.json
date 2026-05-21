@@ -1,10 +1,4 @@
 {
-    "/rest/dark/v1/agent/chat": {
-        "target": "http://127.0.0.1:8181",
-        "secure": false,
-        "changeOrigin": true,
-        "logLevel": "debug"
-    },
     "/rest": {
         "target": "http://127.0.0.1:8281",
         "secure": false,

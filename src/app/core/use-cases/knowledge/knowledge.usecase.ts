@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { KnowledgeApiAdapter } from '../../adapters/knowledge/knowledge-api.adapter';
 import { KnowledgeDocument, Topic } from '../../domain/knowledge/knowledge.model';
 
@@ -27,6 +27,45 @@ export class KnowledgeUseCase {
   isUploading = signal<boolean>(false);
   /** 搜索关键词 */
   searchQuery = signal<string>('');
+
+  // Pagination State
+  currentPage = signal<number>(0);
+  pageSize = signal<number>(10);
+  totalDocuments = signal<number>(0);
+
+  constructor() {
+    // Reset page to 0 when selected topic changes
+    effect(() => {
+      this.selectedTopicId();
+      this.currentPage.set(0);
+    });
+
+    // Fetch documents whenever topic, page, or page size changes
+    effect(() => {
+      const topicId = this.selectedTopicId();
+      const page = this.currentPage();
+      const size = this.pageSize();
+      
+      if (topicId) {
+        this.fetchDocuments(topicId, page + 1, size);
+      } else {
+        this.documents.set([]);
+        this.totalDocuments.set(0);
+      }
+    });
+  }
+
+  async fetchDocuments(topicId: string, page: number, size: number) {
+    try {
+      const pageResult = await this.adapter.getDocuments(topicId, page, size);
+      this.documents.set(pageResult.records);
+      this.totalDocuments.set(pageResult.total);
+    } catch (e) {
+      console.error('Failed to load documents', e);
+      this.documents.set([]);
+      this.totalDocuments.set(0);
+    }
+  }
 
   // Computed
   selectedTopic = computed(() => {
@@ -64,12 +103,6 @@ export class KnowledgeUseCase {
   async selectTopic(id: string) {
     this.selectedTopicId.set(id);
     this.searchQuery.set('');
-    try {
-      const docs = await this.adapter.getDocuments(id);
-      this.documents.set(docs);
-    } catch (e) {
-      console.error('Failed to load documents', e);
-    }
   }
 
   /**
@@ -115,8 +148,9 @@ export class KnowledgeUseCase {
    */
   async deleteDocument(documentId: string) {
     await this.adapter.deleteDocument(documentId);
-    if (this.selectedTopicId()) {
-      await this.selectTopic(this.selectedTopicId()!);
+    const topicId = this.selectedTopicId();
+    if (topicId) {
+      await this.fetchDocuments(topicId, this.currentPage() + 1, this.pageSize());
     }
   }
 
@@ -139,10 +173,20 @@ export class KnowledgeUseCase {
     this.isUploading.set(true);
     try {
       await this.adapter.uploadDocument(topicId, file);
-      await this.selectTopic(topicId);
+      if (topicId) {
+        await this.fetchDocuments(topicId, this.currentPage() + 1, this.pageSize());
+      }
     } finally {
       this.isUploading.set(false);
     }
+  }
+
+  async triggerRecipeBuild(): Promise<{ status: string, taskId: string }> {
+    return this.adapter.triggerRecipeBuild();
+  }
+
+  async getBuildProgress(taskId: string): Promise<any> {
+    return this.adapter.getBuildProgress(taskId);
   }
 
   /**

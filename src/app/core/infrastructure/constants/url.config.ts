@@ -4,16 +4,18 @@
  */
 export const URLConfig = {
     CHAT: {
-        HISTORY: '/rest/dark/v1/history',
-        SESSIONS: '/rest/dark/v1/history/sessions',
-        AGENT_CHAT: '/rest/dark/v1/agent/chat'
+        HISTORY: '/rest/biz/v1/history',
+        SESSIONS: '/rest/biz/v1/history/sessions',
+        AGENT_CHAT: '/rest/agent/v1/chat'
     },
     KNOWLEDGE: {
-        BASE: '/rest/dark/v1/knowledge',
-        UPLOAD: '/rest/dark/v1/upload/knowledge'
+        BASE: '/rest/biz/v1/knowledge',
+        UPLOAD: '/rest/biz/v1/upload/knowledge',
+        BUILD_RECIPE: '/rest/agent/v1/knowledge/build',
+        TASK_PROGRESS: (id: string) => `/rest/biz/v1/tasks/${id}`
     },
     EVENTS: {
-        BASE: '/rest/dark/v1/time-limit-events'
+        BASE: '/rest/biz/v1/time-limit-events'
     },
     PROMPT: {
         TEMPLATES: '/rest/biz/v1/prompts/templates',

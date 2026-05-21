@@ -48,7 +48,7 @@ export class UserService {
      */
     async getCurrentUser(): Promise<UserProfile> {
         return await firstValueFrom(
-            this.http.get<UserProfile>('/rest/dark/v1/user/me')
+            this.http.get<UserProfile>('/rest/biz/v1/user/me')
         );
     }
 }
