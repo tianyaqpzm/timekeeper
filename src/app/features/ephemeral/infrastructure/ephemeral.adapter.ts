@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { RxStomp } from '@stomp/rx-stomp';
+import { environment } from '@/environments/environment';
 import { URLConfig } from '../../../core/infrastructure/constants/url.config';
 import { 
   CreateRoomRequest, 
@@ -66,26 +67,38 @@ export class EphemeralAdapter {
   }
 
   /**
+   * 从环境变量或本地主机动态解析 WebSocket 连接 URL
+   */
+  private getWsUrl(): string {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost) {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      return `${protocol}//${host}${URLConfig.EPHEMERAL.WS_ENDPOINT}`;
+    } else {
+      // 生产环境或预览分支，解析外部 API 网关域名
+      const apiUrl = environment.VITE_API_URL;
+      const wsProtocol = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
+      const wsHost = apiUrl.replace(/^https?:\/\//, '');
+      return `${wsProtocol}//${wsHost}${URLConfig.EPHEMERAL.WS_ENDPOINT}`;
+    }
+  }
+
+  /**
    * 初始化 WebSocket (STOMP)
    */
   connectWebSocket(): void {
     if (this.rxStomp) return;
 
     this.rxStomp = new RxStomp();
-    
-    // 获取当前域名构建 ws url
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // 在开发环境，如果是 4200 端口，可能需要连接网关
-    // URLConfig 中定义的是相对路径 /ws/ephemeral，这里需要拼绝对路径给 STOMP
-    const host = window.location.host; 
-    const wsUrl = `${protocol}//${host}${URLConfig.EPHEMERAL.WS_ENDPOINT}`;
+    const wsUrl = this.getWsUrl();
 
     this.rxStomp.configure({
       brokerURL: wsUrl,
-      reconnectDelay: 2000,
+      reconnectDelay: 8000,
       heartbeatIncoming: 0,
-      heartbeatOutgoing: 20000,
-      debug: (msg: string) => console.log('STOMP: ', msg)
+      heartbeatOutgoing: 20000
     });
     
     this.rxStomp.activate();
