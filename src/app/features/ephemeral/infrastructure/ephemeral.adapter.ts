@@ -96,10 +96,9 @@ export class EphemeralAdapter {
 
     this.rxStomp.configure({
       brokerURL: wsUrl,
-      reconnectDelay: 2000,
+      reconnectDelay: 8000,
       heartbeatIncoming: 0,
-      heartbeatOutgoing: 20000,
-      debug: (msg: string) => console.log('STOMP: ', msg)
+      heartbeatOutgoing: 20000
     });
     
     this.rxStomp.activate();

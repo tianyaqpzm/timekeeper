@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -36,7 +36,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   isVerifying = signal(false);
 
   newMessage = '';
-  isBlurred = signal(false);
 
   private intervalId: any;
   timeLeft = signal<string>('');
@@ -120,28 +119,4 @@ export class RoomComponent implements OnInit, OnDestroy {
     return this.timeLeft();
   }
 
-  // L2 隐私防护：页面失去焦点或隐藏时模糊内容
-  @HostListener('document:visibilitychange')
-  onVisibilityChange() {
-    this.isBlurred.set(document.hidden);
-  }
-
-  @HostListener('window:blur')
-  onBlur() {
-    // 移动端失焦也进行模糊
-    this.isBlurred.set(true);
-  }
-
-  @HostListener('window:focus')
-  onFocus() {
-    this.isBlurred.set(false);
-  }
-
-  // 恢复显示
-  @HostListener('click')
-  onClick() {
-    if (this.isBlurred()) {
-      this.isBlurred.set(false);
-    }
-  }
 }
