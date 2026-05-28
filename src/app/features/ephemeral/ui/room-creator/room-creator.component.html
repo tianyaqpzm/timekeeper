@@ -1,0 +1,47 @@
+<div class="flex items-center justify-center h-full bg-mesh-light dark:bg-[#101622] text-gray-900 dark:text-white relative overflow-hidden">
+  <!-- 动态背景光晕 -->
+  <div class="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-blue-400/20 blur-[100px] animate-blob hidden dark:block"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-purple-400/20 blur-[100px] animate-blob hidden dark:block" style="animation-delay: 2s"></div>
+
+  <div class="w-full max-w-md p-8 space-y-6 glass-panel rounded-3xl relative z-10 animate-fade-in-up">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/20 mb-4 animate-float shadow-inner">
+        <mat-icon class="!text-[42px] !h-[42px] !w-[42px] text-transparent bg-clip-text bg-gradient-to-br from-red-500 to-orange-500" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">local_fire_department</mat-icon>
+      </div>
+      <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">{{ 'EPHEMERAL.CREATOR.TITLE' | translate }}</h2>
+      <p class="text-gray-500 dark:text-gray-400 mt-2 font-medium">{{ 'EPHEMERAL.CREATOR.SUBTITLE' | translate }}</p>
+    </div>
+
+    <form (ngSubmit)="createRoom()" class="space-y-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ 'EPHEMERAL.CREATOR.ROOM_NAME' | translate }}</mat-label>
+        <input matInput [(ngModel)]="title" name="title" required [placeholder]="'EPHEMERAL.CREATOR.ROOM_NAME_PLACEHOLDER' | translate">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ 'EPHEMERAL.CREATOR.TTL' | translate }}</mat-label>
+        <mat-select [(ngModel)]="ttlSeconds" name="ttlSeconds" required>
+          <mat-option [value]="3600">{{ 'EPHEMERAL.CREATOR.TTL_1H' | translate }}</mat-option>
+          <mat-option [value]="21600">{{ 'EPHEMERAL.CREATOR.TTL_6H' | translate }}</mat-option>
+          <mat-option [value]="86400">{{ 'EPHEMERAL.CREATOR.TTL_24H' | translate }}</mat-option>
+          <mat-option [value]="604800">{{ 'EPHEMERAL.CREATOR.TTL_7D' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" class="w-full !py-6 !text-lg" [disabled]="isCreating()">
+        {{ isCreating() ? ('EPHEMERAL.CREATOR.CREATING' | translate) : ('EPHEMERAL.CREATOR.CREATE_BTN' | translate) }}
+      </button>
+    </form>
+
+    <div *ngIf="createdCode()" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ 'EPHEMERAL.CREATOR.SUCCESS_MSG' | translate }}</p>
+      <div class="flex items-center gap-2">
+        <input matInput readonly [value]="getShareLink()" class="flex-1 p-2 bg-gray-200 dark:bg-gray-800 rounded text-sm text-green-700 dark:text-green-400">
+        <button mat-icon-button (click)="copyLink()">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </div>
+      <button mat-stroked-button class="w-full mt-4" (click)="goToRoom()">{{ 'EPHEMERAL.CREATOR.ENTER_ROOM' | translate }}</button>
+    </div>
+  </div>
+</div>

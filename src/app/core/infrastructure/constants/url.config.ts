@@ -29,6 +29,15 @@ export const URLConfig = {
     DEVICES: {
         // Future placeholders
     },
+    EPHEMERAL: {
+        ROOMS: '/rest/biz/v1/ephemeral/rooms',
+        ROOM_INFO: (code: string) => `/rest/biz/v1/ephemeral/rooms/${code}`,
+        JOIN: (roomId: string) => `/rest/biz/v1/ephemeral/rooms/${roomId}/join`,
+        MESSAGES: (roomId: string) => `/rest/biz/v1/ephemeral/rooms/${roomId}/messages`,
+        ME: (roomId: string) => `/rest/biz/v1/ephemeral/rooms/${roomId}/me`,
+        DESTROY: (roomId: string) => `/rest/biz/v1/ephemeral/rooms/${roomId}`,
+        WS_ENDPOINT: '/ws/ephemeral/websocket'
+    },
     EXTERNAL: {
         CASDOOR_ACCOUNT: '/account?application=ai-agent'
     }
