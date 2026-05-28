@@ -30,4 +30,12 @@ export const routes: Routes = [
     loadComponent: () => import('./app/features/mcp-market/mcp-market.component').then(m => m.McpMarketComponent),
     canActivate: [authGuard] 
   },
+  {
+    path: 'ephemeral/create',
+    loadComponent: () => import('./app/features/ephemeral/ui/room-creator/room-creator.component').then(m => m.RoomCreatorComponent)
+  },
+  {
+    path: 'room/:code',
+    loadComponent: () => import('./app/features/ephemeral/ui/room/room.component').then(m => m.RoomComponent)
+  }
 ];

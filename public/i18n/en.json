@@ -235,5 +235,48 @@
       "CANCEL": "Cancel",
       "SAVE": "Save Changes"
     }
+  },
+  "EPHEMERAL": {
+    "CREATOR": {
+      "TITLE": "Ephemeral Room",
+      "SUBTITLE": "Create temporary, encrypted private communication rooms",
+      "ROOM_NAME": "Room Name (Public, do not include sensitive info)",
+      "ROOM_NAME_PLACEHOLDER": "e.g. Q3 Financial Data Discussion",
+      "TTL": "Maximum Time To Live (TTL)",
+      "TTL_1H": "1 Hour",
+      "TTL_6H": "6 Hours",
+      "TTL_24H": "24 Hours",
+      "TTL_7D": "7 Days",
+      "CREATING": "Creating...",
+      "CREATE_BTN": "Create Now",
+      "SUCCESS_MSG": "Room created successfully! Please copy the short link and set your offline password:",
+      "ENTER_ROOM": "Enter Room",
+      "CREATE_FAILED": "Failed to create, please try again later",
+      "COPY_SUCCESS": "Short link copied to clipboard. Please send it along with the password to participants!"
+    },
+    "ROOM": {
+      "HIDDEN_TITLE": "Content Hidden",
+      "HIDDEN_SUB": "Click the page to restore display",
+      "DESTROYED_TITLE": "Room Destroyed or Expired",
+      "DESTROYED_SUB": "The content of this ephemeral space has been completely erased and cannot be recovered.",
+      "BACK_HOME": "Back to Home",
+      "PWD_DESC": "Please enter the room password shared by the creator to decrypt the content",
+      "PWD_LABEL": "Room Password",
+      "VERIFYING": "Decrypting...",
+      "ENTER_BTN": "Enter Room",
+      "TIME_LEFT": "Time Left",
+      "PARTICIPANTS": "Participants",
+      "LEAVE_BTN": "Leave & Delete My Messages",
+      "DESTROY_BTN": "Destroy Room",
+      "INPUT_PLACEHOLDER": "Enter encrypted message...",
+      "PWD_ERROR": "Incorrect password or cannot decrypt ciphertext",
+      "SERVER_ERROR": "An error occurred, please try again",
+      "LEAVE_CONFIRM": "After leaving, all messages you sent will be immediately deleted. Are you sure?",
+      "DESTROY_CONFIRM": "WARNING: This action will immediately destroy the entire room, and all messages from everyone will be permanently deleted! Are you sure you want to destroy it?",
+      "EXPIRED": "Expired",
+      "MIN": "m",
+      "SEC": "s",
+      "USER_PREFIX": "User"
+    }
   }
 }

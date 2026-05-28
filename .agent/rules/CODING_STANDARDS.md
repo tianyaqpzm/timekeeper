@@ -65,7 +65,7 @@ trigger: always_on
 - **属性与方法**: 统一使用 `camelCase` (例: `isLoading`, `sendMessage()`)。
 
 ### 2. 结构与声明
-- **三文件分离**: 严禁内联模板或样式。
+- **关注点分离 (Separation of Concerns, SoC)**: 组件必须使用外部模板与样式 (External Templates & Styles)，实现 TS、HTML、CSS 的严格分离。严禁使用内联模板 (`template:`) 或内联样式 (`styles:`)。
 - **独立组件**: 必须设置 `standalone: true`。
 - **变更检测**: 必须设置 `changeDetection: ChangeDetectionStrategy.OnPush`。
 
@@ -100,6 +100,11 @@ trigger: always_on
 - **Signal Mocking**: Mock 对象必须显式提供 `signal(value)` 而非原始值，以确保模板调用 `signal()` 不报错。
 - **HttpClient 测试**: 严禁使用已弃用的 `HttpClientTestingModule`，必须使用 `provideHttpClientTesting()` 配套 `provideHttpClient()`。
 
+### 3. 测试驱动开发 (TDD - Test-Driven Development)
+- **强制 TDD**: 前端核心逻辑（特别是 Use Case 层业务编排、状态管理 Signals 以及 Adapter 层的复杂逻辑）必须遵循 TDD（测试驱动开发）。
+- **流程**: 在开发或修改核心业务代码之前，必须先编写 Jest 测试用例，确保测试用例覆盖正常路径与关键异常。不允许出现核心逻辑完全没有测试用例的裸奔代码。
+
+
 ---
 
 ---
@@ -115,8 +120,9 @@ trigger: always_on
 ## 八、 业务特性规范 (Feature Specifics)
 
 ### 1. 国际化 (i18n)
+- **强制执行**: 所有新增模块中的可见文本（含 HTML 模板、JS 弹窗 `alert`/`confirm`、提示语 `SnackBar` 等）必须严格遵循已有的国际化机制，严禁硬编码中文文本。
 - 使用 `provideTranslateService` 和 `provideTranslateHttpLoader` 函数式 Provider。
-- 路径配置指向 `./i18n/` (对应 `public/i18n`)。
+- 路径配置指向 `./i18n/` (对应 `public/i18n`)，代码中通过 `{{ 'KEY' | translate }}` 或 `this.translate.instant('KEY')` 进行映射。
 
 ### 2. 认证与令牌
 - 兼容 `HashLocationStrategy`。从 URL 提取 Token 时需同时检查 `search` 和 `hash` 参数。

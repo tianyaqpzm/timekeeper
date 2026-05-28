@@ -235,5 +235,48 @@
       "CANCEL": "取消",
       "SAVE": "保存更改"
     }
+  },
+  "EPHEMERAL": {
+    "CREATOR": {
+      "TITLE": "阅后即焚空间",
+      "SUBTITLE": "创建临时、加密的私密通讯房间",
+      "ROOM_NAME": "房间名称（公开，勿包含敏感信息）",
+      "ROOM_NAME_PLACEHOLDER": "如：第三季度财务数据讨论",
+      "TTL": "最大存活时间 (TTL)",
+      "TTL_1H": "1 小时",
+      "TTL_6H": "6 小时",
+      "TTL_24H": "24 小时",
+      "TTL_7D": "7 天",
+      "CREATING": "创建中...",
+      "CREATE_BTN": "立即创建",
+      "SUCCESS_MSG": "房间创建成功！请复制短链并设定您的线下密码：",
+      "ENTER_ROOM": "进入房间",
+      "CREATE_FAILED": "创建失败，请稍后重试",
+      "COPY_SUCCESS": "短链已复制到剪贴板，请连同密码一起发送给参与者！"
+    },
+    "ROOM": {
+      "HIDDEN_TITLE": "内容已隐藏",
+      "HIDDEN_SUB": "点击页面恢复显示",
+      "DESTROYED_TITLE": "房间已销毁或已过期",
+      "DESTROYED_SUB": "该阅后即焚空间的内容已被彻底清除，无法找回。",
+      "BACK_HOME": "返回首页",
+      "PWD_DESC": "请输入创建者分享的房间密码以解密内容",
+      "PWD_LABEL": "房间密码",
+      "VERIFYING": "解密中...",
+      "ENTER_BTN": "进入房间",
+      "TIME_LEFT": "剩余时间",
+      "PARTICIPANTS": "参与者",
+      "LEAVE_BTN": "退出并删除我的消息",
+      "DESTROY_BTN": "销毁房间",
+      "INPUT_PLACEHOLDER": "输入加密消息...",
+      "PWD_ERROR": "密码错误或密文无法解密",
+      "SERVER_ERROR": "发生异常，请重试",
+      "LEAVE_CONFIRM": "退出后，您发送的所有消息将被立即删除。确定吗？",
+      "DESTROY_CONFIRM": "警告：此操作将立刻销毁整个房间，所有人的所有消息将被永久删除！确定要销毁吗？",
+      "EXPIRED": "已过期",
+      "MIN": "分",
+      "SEC": "秒",
+      "USER_PREFIX": "User"
+    }
   }
 }

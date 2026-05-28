@@ -1,0 +1,126 @@
+<div class="flex flex-col h-full bg-mesh-light dark:bg-[#101622] text-gray-900 dark:text-white relative overflow-hidden">
+  
+  <!-- 动态背景光晕 (聊天层) -->
+  <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-300/20 dark:bg-blue-600/10 blur-[120px] animate-blob hidden dark:block pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-purple-300/20 dark:bg-purple-600/10 blur-[120px] animate-blob hidden dark:block pointer-events-none" style="animation-delay: 2s"></div>
+  
+  <!-- Privacy Blur Overlay (L2 Protection) -->
+  <div *ngIf="isBlurred()" class="absolute inset-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-black/80 flex items-center justify-center">
+    <div class="text-center">
+      <mat-icon class="!text-[64px] !h-16 !w-16 text-gray-500 dark:text-gray-400 mb-4">visibility_off</mat-icon>
+      <h2 class="text-2xl font-bold">{{ 'EPHEMERAL.ROOM.HIDDEN_TITLE' | translate }}</h2>
+      <p class="text-gray-500 dark:text-gray-400">{{ 'EPHEMERAL.ROOM.HIDDEN_SUB' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- State: Loading or Destroyed -->
+  <div *ngIf="isDestroyed()" class="flex-1 flex items-center justify-center">
+    <div class="text-center space-y-4">
+      <mat-icon class="!text-[64px] !h-16 !w-16 text-red-600">delete_forever</mat-icon>
+      <h2 class="text-3xl font-bold text-red-600 dark:text-red-500">{{ 'EPHEMERAL.ROOM.DESTROYED_TITLE' | translate }}</h2>
+      <p class="text-gray-600 dark:text-gray-400">{{ 'EPHEMERAL.ROOM.DESTROYED_SUB' | translate }}</p>
+      <button mat-flat-button color="primary" routerLink="/">{{ 'EPHEMERAL.ROOM.BACK_HOME' | translate }}</button>
+    </div>
+  </div>
+
+  <!-- State: Loaded, but Need Password -->
+  <div *ngIf="!isDestroyed() && room() && !isPasswordValid()" class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm p-8 glass-panel rounded-3xl text-center relative z-10 animate-fade-in-up">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-50 dark:bg-yellow-900/30 mb-4 animate-float shadow-inner">
+        <mat-icon class="!text-[40px] !h-[40px] !w-[40px] text-yellow-600 dark:text-yellow-500">lock_person</mat-icon>
+      </div>
+      <h2 class="text-2xl font-bold mb-2 tracking-tight">{{ room()?.title }}</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">{{ 'EPHEMERAL.ROOM.PWD_DESC' | translate }}</p>
+      
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ 'EPHEMERAL.ROOM.PWD_LABEL' | translate }}</mat-label>
+        <input matInput type="password" [(ngModel)]="password" (keyup.enter)="verifyPassword()">
+      </mat-form-field>
+
+      <p *ngIf="passwordError()" class="text-red-500 text-sm mb-4 font-medium">{{ passwordError() }}</p>
+
+      <button mat-flat-button color="primary" class="w-full !py-6 !text-lg !rounded-xl transition-transform hover:scale-[1.02] active:scale-[0.98]" (click)="verifyPassword()" [disabled]="isVerifying()">
+        {{ isVerifying() ? ('EPHEMERAL.ROOM.VERIFYING' | translate) : ('EPHEMERAL.ROOM.ENTER_BTN' | translate) }}
+      </button>
+    </div>
+  </div>
+
+  <!-- State: Inside Room -->
+  <div *ngIf="isPasswordValid()" class="flex-1 flex flex-col h-full">
+    <!-- Header (Glassmorphism) -->
+    <header class="h-14 sm:h-16 bg-white/70 dark:bg-[#1a1b1e]/70 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/10 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 shrink-0">
+      <div class="flex flex-col justify-center">
+        <h1 class="font-bold text-base sm:text-lg flex items-center gap-1 sm:gap-2 tracking-tight">
+          <mat-icon class="text-red-500 animate-pulse-slow !text-[20px] sm:!text-[24px]">local_fire_department</mat-icon>
+          <span class="truncate max-w-[120px] sm:max-w-[200px]">{{ room()?.title }}</span>
+        </h1>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2">
+          <span class="flex items-center gap-1"><mat-icon class="!text-[14px]">timer</mat-icon>{{ getTimeLeft() }}</span>
+          <span class="flex items-center gap-1"><mat-icon class="!text-[14px]">group</mat-icon>{{ room()?.participantCount }}</span>
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button mat-icon-button color="warn" (click)="destroyRoom()" class="sm:hidden" [matTooltip]="'EPHEMERAL.ROOM.DESTROY_BTN' | translate">
+          <mat-icon>warning</mat-icon>
+        </button>
+        <button mat-icon-button (click)="leaveRoom()" class="sm:hidden" [matTooltip]="'EPHEMERAL.ROOM.LEAVE_BTN' | translate">
+          <mat-icon>logout</mat-icon>
+        </button>
+        <button mat-stroked-button class="hidden sm:inline-flex !rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" (click)="leaveRoom()">{{ 'EPHEMERAL.ROOM.LEAVE_BTN' | translate }}</button>
+        <button mat-flat-button color="warn" class="hidden sm:inline-flex !rounded-full shadow-lg shadow-red-500/20" (click)="destroyRoom()">
+          <mat-icon>warning</mat-icon> {{ 'EPHEMERAL.ROOM.DESTROY_BTN' | translate }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages Area (L4 Watermark conceptually here via CSS background or overlay) -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10 no-scrollbar relative" id="message-container">
+      <!-- TODO: Add dynamic participantId watermark -->
+      
+      @for (msg of messages(); track msg.id || $index) {
+        <!-- System Message -->
+        @if (msg.isSystem) {
+          <div class="flex justify-center my-4 animate-fade-in-up">
+            <span class="text-[11px] font-medium bg-gray-200/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 px-4 py-1.5 rounded-full backdrop-blur-sm border border-gray-300/30 dark:border-gray-700/30">{{ msg.plainText }}</span>
+          </div>
+        } @else {
+          <!-- Chat Bubble -->
+          <div class="flex animate-fade-in-up" [ngClass]="{'justify-end': msg.isSelf, 'justify-start': !msg.isSelf}">
+            <div class="flex flex-col max-w-[85%] sm:max-w-[70%]" [ngClass]="msg.isSelf ? 'items-end' : 'items-start'">
+              <div class="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 px-2" *ngIf="!msg.isSelf">{{ 'EPHEMERAL.ROOM.USER_PREFIX' | translate }} {{ msg.senderId.substring(0,4) }}</div>
+              
+              <div class="px-4 py-2.5 text-[15px] leading-relaxed shadow-sm"
+                   [ngClass]="msg.isSelf 
+                     ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl rounded-tr-sm shadow-blue-500/20' 
+                     : 'bg-white dark:bg-[#1e2330] text-gray-800 dark:text-gray-200 rounded-2xl rounded-tl-sm border border-gray-100 dark:border-white/5'">
+                <div class="break-words whitespace-pre-wrap">{{ msg.plainText }}</div>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </main>
+
+    <!-- Input Area (Bottom docked) -->
+    <footer class="p-3 sm:p-4 bg-white/70 dark:bg-[#1a1b1e]/70 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10 shrink-0 z-20 pb-safe">
+      <div class="flex items-center gap-3 max-w-4xl mx-auto">
+        <div class="flex-1 bg-gray-100/80 dark:bg-black/40 rounded-full border border-gray-200 dark:border-gray-800 px-4 py-2 flex items-center transition-colors focus-within:bg-white dark:focus-within:bg-black focus-within:border-blue-400 dark:focus-within:border-blue-500 shadow-inner">
+          <input 
+            class="flex-1 bg-transparent border-none outline-none text-[15px] placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white" 
+            [placeholder]="'EPHEMERAL.ROOM.INPUT_PLACEHOLDER' | translate" 
+            [(ngModel)]="newMessage" 
+            (keyup.enter)="sendMessage()" 
+            autocomplete="off">
+        </div>
+        <button 
+          class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full text-white transition-all shadow-md active:scale-90"
+          [ngClass]="newMessage.trim() ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-blue-500/30 cursor-pointer hover:scale-105' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'"
+          (click)="sendMessage()" 
+          [disabled]="!newMessage.trim()">
+          <mat-icon class="!text-[20px] sm:!text-[24px]">send</mat-icon>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+</div>
