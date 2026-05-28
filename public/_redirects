@@ -2,7 +2,9 @@
 # 用于处理 Angular 单页应用的路由
 
 # API 代理
-/api/*  http://pei.work.gd:8080/:splat  200
+/rest/*  https://dark.122577.xyz/rest/:splat  200
+/s/*     https://dark.122577.xyz/s/:splat  200
+/ws/ephemeral/*  https://dark.122577.xyz/ws/ephemeral/:splat  200
 
 # 所有非文件请求都重定向到 index.html，让 Angular 路由处理
 /*    /index.html   200
