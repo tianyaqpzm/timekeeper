@@ -107,6 +107,15 @@
     "STREAM_ANIMATION": "Enable streaming output animation",
     "DONE": "Done"
   },
+  "AI_DEV": {
+    "DELETE_TITLE": "Delete Task",
+    "DELETE_CONFIRM": "Are you sure you want to delete this board task and all its messages? This action cannot be undone.",
+    "CREATE_TASK": "New Development Task",
+    "DESC_LABEL": "Task Requirement Description",
+    "DESC_PLACEHOLDER": "Describe your development requirement, the AI team will automatically analyze, design, code, and test your request...",
+    "SUBMIT": "Launch Task",
+    "SUBMITTING": "Submitting..."
+  },
   "COMMON": {
     "BACK": "Back",
     "CANCEL": "Cancel",

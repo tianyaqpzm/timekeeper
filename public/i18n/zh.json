@@ -107,6 +107,15 @@
     "STREAM_ANIMATION": "开启流式输出动画",
     "DONE": "完成"
   },
+  "AI_DEV": {
+    "DELETE_TITLE": "删除任务",
+    "DELETE_CONFIRM": "确定要删除该看板任务及其所有聊天记录吗？此操作不可恢复。",
+    "CREATE_TASK": "新建开发任务",
+    "DESC_LABEL": "任务需求描述",
+    "DESC_PLACEHOLDER": "描述您的开发需求，AI 团队将自动分析、设计、编码和测试您的需求...",
+    "SUBMIT": "立即提交",
+    "SUBMITTING": "提交中..."
+  },
   "COMMON": {
     "BACK": "返回",
     "CANCEL": "取消",

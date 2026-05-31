@@ -1,0 +1,40 @@
+<div class="p-6 dark:bg-[#1e1f20] dark:text-[#e3e3e3] w-[500px] max-w-full flex flex-col gap-4">
+  <h2 mat-dialog-title class="!flex !items-center !gap-2.5 !text-xl !font-bold !m-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+    <mat-icon class="!text-blue-500 !w-6 !h-6 !text-[24px]">rocket_launch</mat-icon>
+    {{ 'AI_DEV.CREATE_TASK' | translate }}
+  </h2>
+  
+  <p class="text-xs text-slate-500 dark:text-slate-400 -mt-2">
+    由 ms-ai-devops 常驻服务驱动，AI 团队将自动分析、设计、编码并测试您的需求。
+  </p>
+
+  <mat-dialog-content class="!p-0 !my-2">
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+        {{ 'AI_DEV.DESC_LABEL' | translate }}
+      </label>
+      <textarea
+        [(ngModel)]="taskDescription"
+        rows="4"
+        [placeholder]="'AI_DEV.DESC_PLACEHOLDER' | translate"
+        class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        (keydown.enter)="$event.preventDefault(); taskDescription.trim() && onSubmit()"
+      ></textarea>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="!p-0 !mt-2 !gap-3">
+    <button mat-button class="!rounded-xl" (click)="onCancel()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button
+      mat-flat-button
+      class="!rounded-xl !bg-gradient-to-br !from-blue-500 !to-purple-600 !text-white !font-medium !shadow-md !shadow-blue-500/20"
+      [disabled]="!taskDescription.trim()"
+      (click)="onSubmit()"
+    >
+      <mat-icon class="!text-[16px] !w-4 !h-4 !mr-1">send</mat-icon>
+      {{ 'AI_DEV.SUBMIT' | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

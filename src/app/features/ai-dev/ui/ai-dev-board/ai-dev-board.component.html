@@ -1,0 +1,176 @@
+<div class="h-full flex flex-col bg-slate-50 dark:bg-[#131314] text-slate-900 dark:text-[#e3e3e3] p-6 overflow-hidden transition-colors duration-300">
+  <div class="flex justify-between items-center mb-6 gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">AI Dev Team Dashboard</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">由 ms-ai-devops 常驻服务驱动，自动监听并执行任务</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <span *ngIf="useCase.isLoading()" class="text-sm text-slate-500 dark:text-gray-400">Syncing...</span>
+      <span *ngIf="useCase.error()" class="text-sm text-red-500">{{ useCase.error() }}</span>
+      <button
+        (click)="openCreateTaskDialog()"
+        [disabled]="isCreating"
+        class="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-medium flex items-center gap-2 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-blue-500/20"
+      >
+        <mat-icon class="!text-[18px] !w-[18px] !h-[18px]">rocket_launch</mat-icon>
+        {{ isCreating ? ('AI_DEV.SUBMITTING' | translate) : ('AI_DEV.CREATE_TASK' | translate) }}
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-1 space-x-6 overflow-x-auto pb-4">
+    
+    <!-- Planning Column: shows PENDING + PLANNING tasks -->
+    <div class="flex flex-col w-80 bg-slate-100/70 dark:bg-[#1e1f20] border border-slate-200/80 dark:border-[#444746] rounded-xl shrink-0">
+      <div class="p-4 font-semibold border-b border-slate-200/80 dark:border-[#444746] bg-slate-200/40 dark:bg-black/10 rounded-t-xl text-slate-800 dark:text-gray-200 flex justify-between items-center">
+        <span>Planning</span>
+        <span class="text-xs bg-slate-200 text-slate-700 dark:bg-[#333537] dark:text-gray-300 px-2.5 py-0.5 rounded-full font-medium">{{ getTasksByStatus(AiDevTaskStatus.PLANNING).length + getTasksByStatus(AiDevTaskStatus.PENDING).length }}</span>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        <!-- PENDING tasks: waiting to be picked up by ms-ai-devops -->
+        @for (task of getTasksByStatus(AiDevTaskStatus.PENDING); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-dashed border-slate-300 dark:border-[#555] p-4 rounded-lg shadow-sm relative group/card border-l-2 border-l-slate-300 dark:border-l-slate-600">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500 animate-pulse"></span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Pending pickup</span>
+            </div>
+            <h3 class="font-medium text-sm truncate pr-6 text-slate-700 dark:text-slate-300" [title]="task.title">{{ task.title }}</h3>
+            <p class="text-xs text-slate-500 dark:text-[#8e918f] mt-1 line-clamp-2">{{ task.description }}</p>
+          </div>
+        }
+        <!-- PLANNING tasks: ms-ai-devops actively working -->
+        @for (task of getTasksByStatus(AiDevTaskStatus.PLANNING); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-slate-200/60 dark:border-[#444746]/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative group/card border-l-2 border-l-slate-400 dark:border-l-slate-500">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <h3 class="font-medium text-sm truncate pr-6 text-slate-900 dark:text-white" [title]="task.title">{{ task.title }}</h3>
+            <p class="text-xs text-slate-500 dark:text-[#8e918f] mt-1 line-clamp-2">{{ task.description }}</p>
+            <div class="mt-3 flex justify-between text-xs text-slate-500 dark:text-[#8e918f] mb-3">
+              <span>Cost: ${{ task.totalCost | number:'1.2-4' }}</span>
+            </div>
+            <div class="flex">
+              <button (click)="openChat(task.id)" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white text-xs py-1.5 rounded transition-colors flex items-center justify-center gap-1 border border-slate-200/60 dark:border-transparent">
+                <mat-icon class="!text-[14px]">chat</mat-icon> Chat
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Generating Column -->
+    <div class="flex flex-col w-80 bg-slate-100/70 dark:bg-[#1e1f20] border border-slate-200/80 dark:border-[#444746] rounded-xl shrink-0">
+      <div class="p-4 font-semibold border-b border-slate-200/80 dark:border-[#444746] bg-slate-200/40 dark:bg-black/10 rounded-t-xl text-slate-800 dark:text-gray-200 flex justify-between items-center">
+        <span>Generating</span>
+        <span class="text-xs bg-slate-200 text-slate-700 dark:bg-[#333537] dark:text-gray-300 px-2.5 py-0.5 rounded-full font-medium">{{ getTasksByStatus(AiDevTaskStatus.GENERATING).length }}</span>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        @for (task of getTasksByStatus(AiDevTaskStatus.GENERATING); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-slate-200/60 dark:border-[#444746]/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative group/card border-l-2 border-l-blue-500 dark:border-l-blue-400">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <h3 class="font-medium text-sm truncate pr-6 text-slate-900 dark:text-white" [title]="task.title">{{ task.title }}</h3>
+            <p class="text-xs text-slate-500 dark:text-[#8e918f] mt-1">Branch: <span class="text-blue-500 dark:text-blue-300 font-mono">{{ task.branchName }}</span></p>
+            <div class="mt-3 flex justify-between text-xs text-slate-500 dark:text-[#8e918f] mb-3">
+              <span>Cost: ${{ task.totalCost | number:'1.2-4' }}</span>
+            </div>
+            <div class="flex">
+              <button (click)="openChat(task.id)" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white text-xs py-1.5 rounded transition-colors flex items-center justify-center gap-1 border border-slate-200/60 dark:border-transparent">
+                <mat-icon class="!text-[14px]">chat</mat-icon> Chat
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Waiting on Approval Column -->
+    <div class="flex flex-col w-80 bg-slate-100/70 dark:bg-[#1e1f20] border border-slate-200/80 dark:border-[#444746] rounded-xl shrink-0">
+      <div class="p-4 font-semibold border-b border-slate-200/80 dark:border-[#444746] bg-slate-200/40 dark:bg-black/10 rounded-t-xl text-yellow-600 dark:text-yellow-400 flex justify-between items-center">
+        <span>Requires Approval</span>
+        <span class="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-300 px-2.5 py-0.5 rounded-full font-medium">{{ getTasksByStatus(AiDevTaskStatus.WAITING_ON_APPROVAL).length }}</span>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        @for (task of getTasksByStatus(AiDevTaskStatus.WAITING_ON_APPROVAL); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-slate-200/60 dark:border-[#444746]/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative group/card border-l-2 border-l-yellow-500 dark:border-l-yellow-400">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <h3 class="font-medium text-sm truncate pr-6 text-slate-900 dark:text-white" [title]="task.title">{{ task.title }}</h3>
+            <p class="text-xs text-slate-500 dark:text-[#8e918f] mt-1 line-clamp-2">{{ task.description }}</p>
+            <div class="mt-3 flex justify-between text-xs text-slate-500 dark:text-[#8e918f] mb-3">
+              <span>Cost: ${{ task.totalCost | number:'1.2-4' }}</span>
+            </div>
+            <div class="flex space-x-2">
+              <button (click)="openChat(task.id)" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white text-xs py-1.5 rounded transition-colors flex items-center justify-center gap-1 border border-slate-200/60 dark:border-transparent">
+                <mat-icon class="!text-[14px]">chat</mat-icon> Chat
+              </button>
+              <button (click)="onRollback(task.id)" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs py-1.5 rounded transition-colors">
+                Reject
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Completed Column -->
+    <div class="flex flex-col w-80 bg-slate-100/70 dark:bg-[#1e1f20] border border-slate-200/80 dark:border-[#444746] rounded-xl shrink-0">
+      <div class="p-4 font-semibold border-b border-slate-200/80 dark:border-[#444746] bg-slate-200/40 dark:bg-black/10 rounded-t-xl text-green-600 dark:text-green-400 flex justify-between items-center">
+        <span>Completed</span>
+        <span class="text-xs bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 px-2.5 py-0.5 rounded-full font-medium">{{ getTasksByStatus(AiDevTaskStatus.COMPLETED).length }}</span>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        @for (task of getTasksByStatus(AiDevTaskStatus.COMPLETED); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-slate-200/60 dark:border-[#444746]/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative group/card border-l-2 border-l-green-500 dark:border-l-green-400">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <h3 class="font-medium text-sm truncate pr-6 text-slate-900 dark:text-white" [title]="task.title">{{ task.title }}</h3>
+            <p class="text-xs text-slate-500 dark:text-[#8e918f] mt-1">Branch: <span class="text-blue-500 dark:text-blue-300 font-mono">{{ task.branchName }}</span></p>
+            <div class="mt-3 flex justify-between text-xs text-slate-500 dark:text-[#8e918f]">
+              <span>Cost: ${{ task.totalCost | number:'1.2-4' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Rolled Back Column -->
+    <div class="flex flex-col w-80 bg-slate-100/70 dark:bg-[#1e1f20] border border-slate-200/80 dark:border-[#444746] rounded-xl shrink-0 opacity-70">
+      <div class="p-4 font-semibold border-b border-slate-200/80 dark:border-[#444746] bg-slate-200/40 dark:bg-black/10 rounded-t-xl text-red-600 dark:text-red-400 flex justify-between items-center">
+        <span>Rolled Back</span>
+        <span class="text-xs bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 px-2.5 py-0.5 rounded-full font-medium">{{ getTasksByStatus(AiDevTaskStatus.ROLLED_BACK).length }}</span>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        @for (task of getTasksByStatus(AiDevTaskStatus.ROLLED_BACK); track task.id) {
+          <div class="bg-white dark:bg-[#2a2b2d] border border-slate-200/60 dark:border-[#444746]/50 p-4 rounded-lg shadow-sm relative group/card border-l-2 border-l-red-500 dark:border-l-red-400">
+            <button mat-icon-button (click)="onDeleteTask(task.id, $event)"
+              class="!absolute right-2 top-2 opacity-0 group-hover/card:opacity-100 transition-opacity !w-7 !h-7 text-slate-400 hover:!text-red-500 rounded-full hover:bg-slate-100 dark:hover:bg-[#444746]"
+              [title]="'COMMON.DELETE' | translate">
+              <mat-icon class="!text-[16px]">delete_outline</mat-icon>
+            </button>
+            <h3 class="font-medium text-sm truncate pr-6 line-through text-slate-400 dark:text-slate-500" [title]="task.title">{{ task.title }}</h3>
+            <div class="mt-3 flex justify-between text-xs text-slate-400 dark:text-slate-500">
+              <span>Cost: ${{ task.totalCost | number:'1.2-4' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+</div>

@@ -40,5 +40,10 @@ export const URLConfig = {
     },
     EXTERNAL: {
         CASDOOR_ACCOUNT: '/account?application=ai-agent'
+    },
+    AI_DEV: {
+        TASKS: '/rest/biz/v1/ai-dev/tasks',
+        RESUME: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/resume`,
+        ROLLBACK: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/rollback`
     }
 };
