@@ -10,11 +10,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DeleteConfirmDialogComponent } from '../../../chat/delete-confirm-dialog.component';
 import { CreateTaskDialogComponent } from './create-task-dialog.component';
+import { DevopsConfigDialogComponent } from './devops-config-dialog.component';
 
 @Component({
   selector: 'app-ai-dev-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, MatIconModule, MatButtonModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    MatIconModule,
+    MatButtonModule,
+    MatDialogModule,
+    DevopsConfigDialogComponent
+  ],
   templateUrl: './ai-dev-board.component.html',
   styleUrls: ['./ai-dev-board.component.css']
 })
@@ -27,14 +36,21 @@ export class AiDevBoardComponent implements OnInit, OnDestroy {
   public AiDevTaskStatus = AiDevTaskStatus;
 
   isCreating = false;
+  devopsPath = '';
+  devopsUrl = '';
 
   private pollInterval: any;
 
   ngOnInit(): void {
     this.useCase.loadTasks();
+    this.devopsPath = this.useCase.msAiDevopsPath();
+    this.devopsUrl = this.useCase.msAiDevopsUrl();
+    this.useCase.checkDevopsConnection();
+    
     // Poll every 15 seconds
     this.pollInterval = setInterval(() => {
       this.useCase.loadTasks();
+      this.useCase.checkDevopsConnection();
     }, 15000);
   }
 
@@ -42,6 +58,23 @@ export class AiDevBoardComponent implements OnInit, OnDestroy {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
     }
+  }
+
+  openDevopsConfigDialog(): void {
+    const dialogRef = this.dialog.open(DevopsConfigDialogComponent, {
+      width: '500px',
+      panelClass: ['custom-dialog-container', 'animate-fade-in-up'],
+      data: {
+        path: this.useCase.msAiDevopsPath(),
+        url: this.useCase.msAiDevopsUrl()
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: { path: string; url: string }) => {
+      if (result) {
+        this.useCase.updateDevopsConfig(result.path, result.url);
+      }
+    });
   }
 
   getTasksByStatus(status: AiDevTaskStatus): AiDevTask[] {

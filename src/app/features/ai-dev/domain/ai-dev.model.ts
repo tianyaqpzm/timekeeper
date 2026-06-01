@@ -17,6 +17,16 @@ export interface AiDevChatMessage {
   createTime: string;
 }
 
+export interface AiDevAgentProfile {
+  id?: string;
+  roleName: string;
+  baseUrl: string;
+  apiToken: string;
+  modelName: string;
+  avatar: string;
+  systemPrompt: string;
+}
+
 export enum AiDevTaskStatus {
   PENDING = 'PENDING',               // 已创建，等待 ms-ai-devops 拾取
   RUNNING = 'RUNNING',               // 已被常驻服务拾取，执行中

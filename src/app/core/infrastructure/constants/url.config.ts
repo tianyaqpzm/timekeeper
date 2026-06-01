@@ -43,6 +43,7 @@ export const URLConfig = {
     },
     AI_DEV: {
         TASKS: '/rest/biz/v1/ai-dev/tasks',
+        PROFILES: '/rest/biz/v1/ai-dev/profiles',
         RESUME: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/resume`,
         ROLLBACK: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/rollback`
     }

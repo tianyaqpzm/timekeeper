@@ -1,28 +1,24 @@
-import { Component, OnInit, Signal, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, Signal, inject, DestroyRef, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { ActivatedRoute } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 import { AiDevUseCase } from '../../application/ai-dev.usecase';
-import { AiDevChatMessage } from '../../domain/ai-dev.model';
+import { AiDevChatMessage, AiDevAgentProfile } from '../../domain/ai-dev.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatDialog } from '@angular/material/dialog';
+import { AgentProfileDialogComponent } from './agent-profile-dialog.component';
 
-interface AgentNode {
-  id: string;
-  name: string;
-  role: string;
-  status: 'online' | 'busy' | 'offline';
-  description: string;
-  memory: string;
-}
+
 
 @Component({
   selector: 'app-ai-dev-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatInputModule, MarkdownModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatInputModule, MarkdownModule, TextFieldModule],
   template: `
     <div class="flex h-screen w-full bg-slate-50 dark:bg-[#131314] text-slate-900 dark:text-[#e3e3e3]">
       
@@ -37,7 +33,7 @@ interface AgentNode {
         </div>
         
         <div class="flex-1 overflow-y-auto p-4 space-y-3">
-          @for (node of nodes; track node.id) {
+          @for (node of profiles(); track node.id) {
             <div 
               class="p-3 rounded-lg border cursor-pointer transition-all duration-200 flex flex-col gap-2"
               [ngClass]="{
@@ -48,23 +44,18 @@ interface AgentNode {
               
               <div class="flex items-center justify-between">
                 <div class="font-medium text-sm flex items-center gap-2">
-                  {{ node.name }}
-                  <span class="w-2 h-2 rounded-full" 
-                    [ngClass]="{
-                      'bg-green-500': node.status === 'online',
-                      'bg-yellow-500': node.status === 'busy',
-                      'bg-slate-400': node.status === 'offline'
-                    }"></span>
+                  <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
+                  {{ node.roleName }}
                 </div>
-                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                  {{ node.role }}
-                </span>
+                <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure">
+                  <mat-icon class="!text-[14px]">settings</mat-icon>
+                </button>
               </div>
               
               <div *ngIf="selectedNode?.id === node.id" class="text-xs text-slate-600 dark:text-slate-300 mt-2 border-t border-slate-200 dark:border-[#444746] pt-2">
-                <p><strong>Responsibility:</strong> {{ node.description }}</p>
-                <p class="mt-1 font-mono text-[10px] bg-slate-100 dark:bg-black/20 p-1.5 rounded text-slate-500 dark:text-slate-400">
-                  Memory: {{ node.memory }}
+                <p><strong>Model:</strong> {{ node.modelName }}</p>
+                <p class="mt-1 font-mono text-[10px] bg-slate-100 dark:bg-black/20 p-1.5 rounded text-slate-500 dark:text-slate-400 line-clamp-3">
+                  {{ node.systemPrompt }}
                 </p>
               </div>
             </div>
@@ -86,7 +77,7 @@ interface AgentNode {
           </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div #scrollContainer class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth custom-scrollbar">
           <div *ngIf="messages().length === 0" class="flex flex-col items-center justify-center h-full text-slate-400">
             <mat-icon class="!w-12 !h-12 !text-[48px] mb-4 opacity-50">forum</mat-icon>
             <p>No messages yet. Start clarifying the requirements!</p>
@@ -100,8 +91,8 @@ interface AgentNode {
                 {{ msg.senderRole }}
               </span>
               <div class="px-5 py-3 rounded-2xl max-w-[80%] shadow-sm" 
-                   [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'">
-                <markdown [data]="msg.content"></markdown>
+                   [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'"
+                   [innerHTML]="highlightMentions(msg.content) | markdown | async">
               </div>
               <span class="text-[10px] text-slate-400 mt-1 mx-2">{{ msg.createTime | date:'shortTime' }}</span>
             </div>
@@ -109,13 +100,46 @@ interface AgentNode {
         </div>
 
         <div class="p-4 border-t border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20]">
-          <div class="flex items-center gap-3 max-w-5xl mx-auto">
-            <mat-form-field appearance="outline" class="flex-1 hide-subscript">
-              <input matInput [(ngModel)]="newMessage" placeholder="Type a message or approval to clarify requirements..." (keyup.enter)="sendMessage()">
-            </mat-form-field>
-            <button mat-fab extended color="primary" (click)="sendMessage()" [disabled]="!newMessage.trim()" class="!h-14">
-              <mat-icon>send</mat-icon> Send
+          <div class="flex items-end gap-2 max-w-5xl mx-auto relative bg-slate-50 dark:bg-[#131314] rounded-2xl border border-slate-200 dark:border-[#444746] shadow-sm focus-within:border-blue-400 dark:focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-400 transition-all p-2 pl-4">
+            <label class="flex-1 flex flex-col justify-center py-2 cursor-text">
+              <textarea 
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="6"
+                [(ngModel)]="newMessage" 
+                placeholder="Type a message..." 
+                (input)="onInput($event)" 
+                (keydown)="onKeyDown($event)"
+                class="w-full bg-transparent border-none focus:ring-0 resize-none p-0 text-slate-800 dark:text-slate-200 text-sm outline-none m-0 leading-5 overflow-hidden block"
+              ></textarea>
+            </label>
+            <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="!newMessage.trim()" class="shrink-0 bg-blue-600 !text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:!text-slate-400 transition-colors" style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <mat-icon class="!text-[18px] m-0">arrow_upward</mat-icon>
             </button>
+
+            <!-- Mention Suggestions Overlay -->
+            @if (showMentionSuggestions) {
+              <div class="absolute bottom-[calc(100%+8px)] left-0 w-64 bg-white dark:bg-[#1e1f20] rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-200 dark:border-[#444746] overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <div class="px-3 py-2 text-xs font-semibold text-slate-500 border-b border-slate-100 dark:border-[#444746] bg-slate-50 dark:bg-black/20">
+                  Mention an Agent
+                </div>
+                <div class="max-h-48 overflow-y-auto p-1">
+                  @for (agent of filteredAgents(); track agent.id; let i = $index) {
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
+                         [ngClass]="i === selectedMentionIndex ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'hover:bg-slate-50 dark:hover:bg-[#2a2b2d]'"
+                         (click)="selectMention(agent)">
+                      <mat-icon class="!w-4 !h-4 !text-[16px] opacity-70">{{ agent.avatar || 'smart_toy' }}</mat-icon>
+                      <span class="text-sm font-medium">{{ agent.roleName }}</span>
+                    </div>
+                  }
+                  @if (filteredAgents().length === 0) {
+                    <div class="px-3 py-4 text-center text-sm text-slate-400">
+                      No agents found
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
           <div class="mt-3 flex justify-center gap-3">
             <button mat-stroked-button (click)="approve()" [disabled]="!canApprove()" class="text-green-600 border-green-600">
@@ -150,57 +174,67 @@ interface AgentNode {
     .dark ::ng-deep markdown pre {
       background-color: rgba(0, 0, 0, 0.3);
     }
+    
+    /* Elegant Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(156, 163, 175, 0.4);
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(156, 163, 175, 0.6);
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(100, 116, 139, 0.4);
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(100, 116, 139, 0.6);
+    }
   `]
 })
 export class AiDevChatComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private useCase = inject(AiDevUseCase);
   private destroyRef = inject(DestroyRef);
+  private dialog = inject(MatDialog);
   
   taskId: string = '';
   messages: Signal<AiDevChatMessage[]>;
+  profiles: Signal<AiDevAgentProfile[]>;
   newMessage: string = '';
 
-  // Mock data for nodes
-  nodes: AgentNode[] = [
-    {
-      id: 'node-orch',
-      name: 'Orchestrator',
-      role: 'Master',
-      status: 'online',
-      description: 'Coordinates tasks, manages Kanban board, and delegates subtasks to other nodes.',
-      memory: 'State: Waiting for User Approval. Subtasks: 3 completed.'
-    },
-    {
-      id: 'node-plan',
-      name: 'Planner',
-      role: 'Analyst',
-      status: 'online',
-      description: 'Understands requirements, generates plan.md, and creates system design.',
-      memory: 'Last output: plan.md (v2). Context: FE001-ai-dev-team.md.'
-    },
-    {
-      id: 'node-gen',
-      name: 'Generator',
-      role: 'Coder',
-      status: 'busy',
-      description: 'Writes code, implements features, follows TDD on feature branch.',
-      memory: 'Active branch: feat/task-102. Current file: app.routes.ts.'
-    },
-    {
-      id: 'node-eval',
-      name: 'Evaluator',
-      role: 'Reviewer',
-      status: 'online',
-      description: 'Reviews code, runs tests in Docker sandbox, checks for regressions.',
-      memory: 'Tests passed: 42/42. No critical issues found.'
-    }
-  ];
+  selectedNode: AiDevAgentProfile | null = null;
+  
+  showMentionSuggestions = false;
+  mentionSearchQuery = '';
+  selectedMentionIndex = 0;
 
-  selectedNode: AgentNode | null = null;
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   constructor() {
     this.messages = this.useCase.currentMessages;
+    this.profiles = this.useCase.agentProfiles;
+    
+    // Auto-scroll to bottom when new messages arrive
+    effect(() => {
+      const msgs = this.messages();
+      if (msgs && msgs.length > 0) {
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+    });
+  }
+
+  scrollToBottom(): void {
+    try {
+      if (this.scrollContainer) {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+      }
+    } catch(err) { }
   }
 
   ngOnInit() {
@@ -209,10 +243,11 @@ export class AiDevChatComponent implements OnInit {
       if (id) {
         this.taskId = id;
         this.useCase.loadMessages(this.taskId);
+        this.useCase.loadProfiles();
         
         // Auto select first node
-        if (this.nodes.length > 0) {
-          this.selectedNode = this.nodes[0];
+        if (this.profiles().length > 0) {
+          this.selectedNode = this.profiles()[0];
         }
 
         // Poll messages every 3 seconds to keep receiving updates
@@ -227,14 +262,104 @@ export class AiDevChatComponent implements OnInit {
     });
   }
 
-  selectNode(node: AgentNode) {
+  selectNode(node: AiDevAgentProfile) {
     this.selectedNode = node;
+  }
+
+  configureRole(node: AiDevAgentProfile, event: Event) {
+    event.stopPropagation();
+    const dialogRef = this.dialog.open(AgentProfileDialogComponent, {
+      data: node,
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.useCase.updateProfile(node.roleName, result);
+      }
+    });
+  }
+
+  highlightMentions(content: string): string {
+    if (!content) return content;
+    return content.replace(/@([a-zA-Z0-9_-]+)/g, (match, name) => {
+      return `<span class="text-blue-600 dark:text-blue-400 font-medium bg-blue-100/60 dark:bg-blue-900/40 px-1.5 py-0.5 rounded-md mx-0.5 cursor-pointer hover:bg-blue-200/60 dark:hover:bg-blue-800/60 transition-colors">@${name}</span>`;
+    });
+  }
+
+  filteredAgents(): AiDevAgentProfile[] {
+    const query = this.mentionSearchQuery.toLowerCase();
+    return this.profiles().filter(p => p.roleName.toLowerCase().includes(query));
+  }
+
+  onInput(event: any) {
+    const input = event.target as HTMLTextAreaElement;
+    const cursor = input.selectionStart || 0;
+    const textBeforeCursor = input.value.substring(0, cursor);
+    
+    const match = textBeforeCursor.match(/(?:^|\s)@([a-zA-Z0-9_-]*)$/);
+    if (match) {
+      this.showMentionSuggestions = true;
+      this.mentionSearchQuery = match[1];
+      this.selectedMentionIndex = 0;
+    } else {
+      this.showMentionSuggestions = false;
+    }
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (this.showMentionSuggestions) {
+      const agents = this.filteredAgents();
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.selectedMentionIndex = (this.selectedMentionIndex + 1) % Math.max(agents.length, 1);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.selectedMentionIndex = (this.selectedMentionIndex - 1 + agents.length) % Math.max(agents.length, 1);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        if (agents.length > 0) {
+          this.selectMention(agents[this.selectedMentionIndex]);
+        }
+      } else if (event.key === 'Escape') {
+        this.showMentionSuggestions = false;
+      }
+    } else if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  selectMention(agent: AiDevAgentProfile) {
+    const inputElement = document.querySelector('textarea') as HTMLTextAreaElement;
+    const cursor = inputElement ? (inputElement.selectionStart || this.newMessage.length) : this.newMessage.length;
+    const textBeforeCursor = this.newMessage.substring(0, cursor);
+    const textAfterCursor = this.newMessage.substring(cursor);
+    
+    const match = textBeforeCursor.match(/(?:^|\s)@([a-zA-Z0-9_-]*)$/);
+    
+    if (match) {
+      const replaceStart = textBeforeCursor.substring(0, textBeforeCursor.length - match[0].length + (match[0].startsWith(' ') || match[0].startsWith('\n') ? 1 : 0));
+      this.newMessage = `${replaceStart}@${agent.roleName} ${textAfterCursor}`;
+      
+      this.showMentionSuggestions = false;
+      setTimeout(() => {
+        if (inputElement) {
+          inputElement.focus();
+          const newCursorPos = replaceStart.length + agent.roleName.length + 2;
+          inputElement.setSelectionRange(newCursorPos, newCursorPos);
+        }
+      });
+    } else {
+      this.showMentionSuggestions = false;
+    }
   }
 
   sendMessage() {
     if (this.newMessage.trim() && this.taskId) {
       this.useCase.sendMessage(this.taskId, this.newMessage);
       this.newMessage = '';
+      this.showMentionSuggestions = false;
     }
   }
 

@@ -1,0 +1,39 @@
+<h2 mat-dialog-title class="flex items-center gap-2 text-slate-800 dark:text-gray-200">
+  <mat-icon class="text-blue-500">manage_accounts</mat-icon>
+  Configure Role: {{ profile.roleName }}
+</h2>
+
+<mat-dialog-content class="!pt-4 min-w-[400px]">
+  <div class="flex flex-col gap-4">
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>Avatar Icon (Material Icon)</mat-label>
+      <input matInput [(ngModel)]="profile.avatar" placeholder="e.g., smart_toy, psychology">
+      <mat-icon matSuffix class="text-slate-400">{{ profile.avatar || 'smart_toy' }}</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>Model Name</mat-label>
+      <input matInput [(ngModel)]="profile.modelName" placeholder="e.g., claude-3-5-sonnet-20240620">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>API Base URL (Optional)</mat-label>
+      <input matInput [(ngModel)]="profile.baseUrl" placeholder="https://api.openai.com/v1">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>API Token (Optional)</mat-label>
+      <input matInput [(ngModel)]="profile.apiToken" type="password" placeholder="sk-...">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>System Prompt</mat-label>
+      <textarea matInput [(ngModel)]="profile.systemPrompt" rows="4" placeholder="You are a helpful assistant..."></textarea>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="!px-6 !pb-6 border-t border-slate-100 dark:border-slate-800 !pt-4 mt-2">
+  <button mat-stroked-button (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()">Save</button>
+</mat-dialog-actions>

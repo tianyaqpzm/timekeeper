@@ -19,10 +19,17 @@ export const apiUrlInterceptor: HttpInterceptorFn = (req, next) => {
         console.warn('【Interceptor】No token found for request:', req.url);
     }
 
-    // 2. 克隆请求，注入 BaseURL 并添加 Authorization Header
+    // 2. 克隆请求，仅在向主 API 或网关请求时，添加 Authorization Header
     let apiReq = req;
     const headers: { [key: string]: string } = {};
-    if (token) {
+    
+    // 判断是否是发往我们自己后端服务或网关的请求
+    const isTargetedToApp = 
+        (req.url.startsWith('/') && !req.url.startsWith('/assets')) ||
+        req.url.startsWith(baseUrl) ||
+        req.url.startsWith(environment.VITE_GATEWAY_URL);
+
+    if (token && isTargetedToApp) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 

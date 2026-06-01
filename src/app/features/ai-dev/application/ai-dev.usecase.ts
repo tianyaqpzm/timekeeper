@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AiDevTask, AiDevChatMessage } from '../domain/ai-dev.model';
+import { AiDevTask, AiDevChatMessage, AiDevAgentProfile } from '../domain/ai-dev.model';
 import { AiDevRepository } from '../adapter/ai-dev.repository';
 
 @Injectable({
@@ -10,10 +10,25 @@ export class AiDevUseCase {
   
   public readonly tasks = signal<AiDevTask[]>([]);
   public readonly currentMessages = signal<AiDevChatMessage[]>([]);
+  public readonly agentProfiles = signal<AiDevAgentProfile[]>([]);
   public readonly isLoading = signal<boolean>(false);
   public readonly error = signal<string | null>(null);
 
-  constructor(private repository: AiDevRepository) {}
+  // ms-ai-devops 相关的配置与连接状态
+  public readonly msAiDevopsPath = signal<string>('/Users/pei/projects/ms-ai-devops');
+  public readonly msAiDevopsUrl = signal<string>('http://localhost:9000');
+  public readonly devopsConnectionStatus = signal<'CONNECTED' | 'DISCONNECTED' | 'CONNECTING'>('DISCONNECTED');
+
+  constructor(private repository: AiDevRepository) {
+    const savedPath = localStorage.getItem('ms-ai-devops-path');
+    const savedUrl = localStorage.getItem('ms-ai-devops-url');
+    if (savedPath) {
+      this.msAiDevopsPath.set(savedPath);
+    }
+    if (savedUrl) {
+      this.msAiDevopsUrl.set(savedUrl);
+    }
+  }
 
   async loadTasks(): Promise<void> {
     this.isLoading.set(true);
@@ -25,6 +40,25 @@ export class AiDevUseCase {
       this.error.set(err.message || 'Failed to load tasks');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async loadProfiles(): Promise<void> {
+    try {
+      const profiles = await firstValueFrom(this.repository.getProfiles());
+      this.agentProfiles.set(profiles);
+    } catch (err: any) {
+      this.error.set(err.message || 'Failed to load agent profiles');
+    }
+  }
+
+  async updateProfile(roleName: string, profile: Partial<AiDevAgentProfile>): Promise<void> {
+    try {
+      await firstValueFrom(this.repository.updateProfile(roleName, profile));
+      await this.loadProfiles();
+    } catch (err: any) {
+      this.error.set(err.message || 'Failed to update agent profile');
+      throw err;
     }
   }
 
@@ -96,6 +130,24 @@ export class AiDevUseCase {
       await this.loadTasks(); // refresh after delete
     } catch (err: any) {
       this.error.set(err.message || 'Failed to delete task');
+    }
+  }
+
+  updateDevopsConfig(path: string, url: string): void {
+    this.msAiDevopsPath.set(path);
+    this.msAiDevopsUrl.set(url);
+    localStorage.setItem('ms-ai-devops-path', path);
+    localStorage.setItem('ms-ai-devops-url', url);
+    this.checkDevopsConnection();
+  }
+
+  async checkDevopsConnection(): Promise<void> {
+    this.devopsConnectionStatus.set('CONNECTING');
+    try {
+      await firstValueFrom(this.repository.checkHealth(this.msAiDevopsUrl()));
+      this.devopsConnectionStatus.set('CONNECTED');
+    } catch (err) {
+      this.devopsConnectionStatus.set('DISCONNECTED');
     }
   }
 }

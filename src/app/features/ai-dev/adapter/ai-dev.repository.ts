@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { URLConfig } from '../../../core/infrastructure/constants/url.config';
-import { AiDevTask, AiDevChatMessage } from '../domain/ai-dev.model';
+import { AiDevTask, AiDevChatMessage, AiDevAgentProfile } from '../domain/ai-dev.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,14 @@ export class AiDevRepository {
 
   getTasks(): Observable<AiDevTask[]> {
     return this.http.get<AiDevTask[]>(URLConfig.AI_DEV.TASKS);
+  }
+
+  getProfiles(): Observable<AiDevAgentProfile[]> {
+    return this.http.get<AiDevAgentProfile[]>(URLConfig.AI_DEV.PROFILES);
+  }
+
+  updateProfile(roleName: string, profile: Partial<AiDevAgentProfile>): Observable<AiDevAgentProfile> {
+    return this.http.put<AiDevAgentProfile>(`${URLConfig.AI_DEV.PROFILES}/${roleName}`, profile);
   }
 
   /** 创建新任务，由 ms-ai-devops 常驻服务自动拾取执行 */
@@ -38,5 +46,10 @@ export class AiDevRepository {
 
   addChatMessage(taskId: string, content: string): Observable<AiDevChatMessage> {
     return this.http.post<AiDevChatMessage>(`${URLConfig.AI_DEV.TASKS}/${taskId}/messages`, { content });
+  }
+
+  /** 健康检查本地 ms-ai-devops 服务连接 */
+  checkHealth(url: string): Observable<any> {
+    return this.http.get<any>(`${url}/health`);
   }
 }

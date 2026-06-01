@@ -17,7 +17,7 @@
         [(ngModel)]="taskDescription"
         rows="4"
         [placeholder]="'AI_DEV.DESC_PLACEHOLDER' | translate"
-        class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all"
         (keydown.enter)="$event.preventDefault(); taskDescription.trim() && onSubmit()"
       ></textarea>
     </div>

@@ -214,8 +214,9 @@ body {
 
 /* 🛠️ 修复 Tailwind Forms 插件与 Angular Material 的冲突 */
 
-/* 1. 针对所有 Material 输入框：去掉 Tailwind 强加的样式 */
-.mat-mdc-form-field input.mat-mdc-input-element {
+/* 1. 针对所有 Material 输入框与文本域：去掉 Tailwind 强加的样式 */
+.mat-mdc-form-field input.mat-mdc-input-element,
+.mat-mdc-form-field textarea.mat-mdc-input-element {
   /* 去除边框和阴影，交还给 Material 控制 */
   border: none !important;
   box-shadow: none !important;
@@ -223,7 +224,13 @@ body {
 
   /* 去除背景色，防止遮挡 Material 的背景 */
   background-color: transparent !important;
+}
 
+/* 2. 🛠️ 最小化重置：针对声明了 border-none/border-0 的输入框，聚焦时隐藏 Tailwind Forms 强加的框和阴影 */
+.border-none:focus,
+.border-0:focus {
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 /* 2. 针对时间/日期选择器：找回丢失的原生图标（小闹钟/日历） */

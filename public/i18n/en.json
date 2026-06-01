@@ -114,7 +114,19 @@
     "DESC_LABEL": "Task Requirement Description",
     "DESC_PLACEHOLDER": "Describe your development requirement, the AI team will automatically analyze, design, code, and test your request...",
     "SUBMIT": "Launch Task",
-    "SUBMITTING": "Submitting..."
+    "SUBMITTING": "Submitting...",
+    "DEVOPS_CONFIG": "ms-ai-devops Config",
+    "DEVOPS_PATH": "Local Project Path",
+    "DEVOPS_URL": "Service API URL",
+    "DEVOPS_STATUS": "Daemon Service Status",
+    "DEVOPS_CONNECTED": "Connected",
+    "DEVOPS_DISCONNECTED": "Disconnected",
+    "DEVOPS_CONNECTING": "Connecting",
+    "DEVOPS_SAVE_SUCCESS": "Config saved successfully",
+    "DEVOPS_CHECK_FAIL": "Connection failed, please ensure service is running",
+    "DEVOPS_TEST_BTN": "Test Connection",
+    "DEVOPS_URL_PLACEHOLDER": "e.g., http://localhost:9000",
+    "DEVOPS_PATH_PLACEHOLDER": "e.g., /Users/pei/projects/ms-ai-devops"
   },
   "COMMON": {
     "BACK": "Back",
