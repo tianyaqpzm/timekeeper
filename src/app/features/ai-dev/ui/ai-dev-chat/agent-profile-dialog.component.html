@@ -27,8 +27,9 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-full">
-      <mat-label>System Prompt</mat-label>
-      <textarea matInput [(ngModel)]="profile.systemPrompt" rows="4" placeholder="You are a helpful assistant..."></textarea>
+      <mat-label>SOUL (System Prompt)</mat-label>
+      <textarea matInput [(ngModel)]="profile.systemPrompt" rows="8" placeholder="# Role: ...&#10;&#10;Describe the agent's identity, mission, responsibilities, and constraints.&#10;Synced with ~/.hermes/profiles/<role>/SOUL.md"></textarea>
+      <mat-hint>与本地 <code>~/.hermes/profiles/{{ profile.roleName | lowercase }}/SOUL.md</code> 双向同步</mat-hint>
     </mat-form-field>
   </div>
 </mat-dialog-content>

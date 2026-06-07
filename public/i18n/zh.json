@@ -126,7 +126,17 @@
     "DEVOPS_CHECK_FAIL": "连接失败，请确认服务已启动",
     "DEVOPS_TEST_BTN": "测试连接",
     "DEVOPS_URL_PLACEHOLDER": "例如: http://localhost:9000",
-    "DEVOPS_PATH_PLACEHOLDER": "例如: /Users/pei/projects/ms-ai-devops"
+    "DEVOPS_PATH_PLACEHOLDER": "例如: /Users/pei/projects/ms-ai-devops",
+    "TASK_GOAL": "任务目标",
+    "EXPAND": "展开",
+    "COLLAPSE": "收起",
+    "TASK_DETAILS": "任务详情",
+    "TASK_ID": "任务 ID",
+    "TASK_STATUS": "任务状态",
+    "BRANCH_NAME": "分支名称",
+    "TOTAL_COST": "消耗成本",
+    "CREATE_TIME": "创建时间",
+    "UPDATE_TIME": "更新时间"
   },
   "COMMON": {
     "BACK": "返回",

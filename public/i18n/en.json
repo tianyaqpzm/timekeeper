@@ -126,7 +126,17 @@
     "DEVOPS_CHECK_FAIL": "Connection failed, please ensure service is running",
     "DEVOPS_TEST_BTN": "Test Connection",
     "DEVOPS_URL_PLACEHOLDER": "e.g., http://localhost:9000",
-    "DEVOPS_PATH_PLACEHOLDER": "e.g., /Users/pei/projects/ms-ai-devops"
+    "DEVOPS_PATH_PLACEHOLDER": "e.g., /Users/pei/projects/ms-ai-devops",
+    "TASK_GOAL": "Task Goal",
+    "EXPAND": "Expand",
+    "COLLAPSE": "Collapse",
+    "TASK_DETAILS": "Task Details",
+    "TASK_ID": "Task ID",
+    "TASK_STATUS": "Status",
+    "BRANCH_NAME": "Branch Name",
+    "TOTAL_COST": "Total Cost",
+    "CREATE_TIME": "Created At",
+    "UPDATE_TIME": "Updated At"
   },
   "COMMON": {
     "BACK": "Back",

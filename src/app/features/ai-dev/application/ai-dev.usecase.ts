@@ -133,6 +133,21 @@ export class AiDevUseCase {
     }
   }
 
+  /**
+   * 更新任务的头脑风暴配置参数并刷新任务列表。
+   * @param taskId 任务 ID
+   * @param maxBrainstormingRounds 最大讨论轮数
+   * @param contextSlidingWindow 滑动窗口历史条数
+   */
+  async updateTaskConfig(taskId: string, maxBrainstormingRounds: number, contextSlidingWindow: number): Promise<void> {
+    try {
+      await firstValueFrom(this.repository.updateTaskConfig(taskId, maxBrainstormingRounds, contextSlidingWindow));
+      await this.loadTasks();
+    } catch (err: any) {
+      this.error.set(err.message || 'Failed to update task config');
+    }
+  }
+
   updateDevopsConfig(path: string, url: string): void {
     this.msAiDevopsPath.set(path);
     this.msAiDevopsUrl.set(url);

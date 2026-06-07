@@ -1,9 +1,10 @@
-import { Component, OnInit, Signal, inject, DestroyRef, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, OnInit, Signal, inject, DestroyRef, ViewChild, ElementRef, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { ActivatedRoute } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
@@ -12,65 +13,160 @@ import { AiDevChatMessage, AiDevAgentProfile } from '../../domain/ai-dev.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentProfileDialogComponent } from './agent-profile-dialog.component';
-
-
+import { TranslateModule } from '@ngx-translate/core';
+import { SidebarService } from '../../../../core/infrastructure/services/sidebar.service';
+import { TaskDetailDialogComponent } from './task-detail-dialog.component';
 
 @Component({
   selector: 'app-ai-dev-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatInputModule, MarkdownModule, TextFieldModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    MatInputModule, 
+    MatSliderModule,
+    MarkdownModule, 
+    TextFieldModule, 
+    TranslateModule
+  ],
   template: `
-    <div class="flex h-screen w-full bg-slate-50 dark:bg-[#131314] text-slate-900 dark:text-[#e3e3e3]">
+    <div class="flex h-screen w-full bg-slate-50 dark:bg-[#131314] text-slate-900 dark:text-[#e3e3e3] overflow-hidden">
       
-      <!-- Left Sidebar: Online Nodes -->
-      <div class="w-80 border-r border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] flex flex-col">
-        <div class="p-4 border-b border-slate-200 dark:border-[#444746]">
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <mat-icon class="text-blue-500">group_work</mat-icon>
-            AI Dev Team
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Online Agents & Roles</p>
-        </div>
+      <!-- Global Backdrop (Overlay) for mobile -->
+      <div *ngIf="isSidebarOpen()" (click)="toggleSidebar()"
+          class="fixed inset-0 bg-black/40 dark:bg-black/60 z-40 animate-fade-in backdrop-blur-[2px] md:hidden">
+      </div>
+
+      <!-- Left Sidebar: Task Goal & Online Nodes -->
+      <aside 
+        class="fixed md:relative h-full z-50 flex-shrink-0 bg-white dark:bg-[#1e1f20] transition-all duration-300 ease-in-out border-r border-slate-200 dark:border-[#444746] shadow-2xl md:shadow-none"
+        [class.w-80]="isSidebarOpen()" [class.w-0]="!isSidebarOpen()" [class.-translate-x-full]="!isSidebarOpen()"
+        [class.translate-x-0]="isSidebarOpen()" [class.md:translate-x-0]="true"
+        [class.overflow-visible]="true">
         
-        <div class="flex-1 overflow-y-auto p-4 space-y-3">
-          @for (node of profiles(); track node.id) {
-            <div 
-              class="p-3 rounded-lg border cursor-pointer transition-all duration-200 flex flex-col gap-2"
-              [ngClass]="{
-                'border-blue-500 bg-blue-50 dark:bg-blue-900/20': selectedNode?.id === node.id,
-                'border-slate-200 dark:border-[#444746] hover:border-blue-300 dark:hover:border-blue-700': selectedNode?.id !== node.id
-              }"
-              (click)="selectNode(node)">
-              
-              <div class="flex items-center justify-between">
-                <div class="font-medium text-sm flex items-center gap-2">
-                  <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
-                  {{ node.roleName }}
-                </div>
-                <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure">
-                  <mat-icon class="!text-[14px]">settings</mat-icon>
-                </button>
-              </div>
-              
-              <div *ngIf="selectedNode?.id === node.id" class="text-xs text-slate-600 dark:text-slate-300 mt-2 border-t border-slate-200 dark:border-[#444746] pt-2">
-                <p><strong>Model:</strong> {{ node.modelName }}</p>
-                <p class="mt-1 font-mono text-[10px] bg-slate-100 dark:bg-black/20 p-1.5 rounded text-slate-500 dark:text-slate-400 line-clamp-3">
-                  {{ node.systemPrompt }}
-                </p>
+        <div class="p-4 h-full flex flex-col w-80" [class.hidden]="!isSidebarOpen()">
+          
+          <!-- Task Goal Section -->
+          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+              <span class="flex items-center gap-1.5">
+                <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">gps_fixed</mat-icon>
+                {{ 'AI_DEV.TASK_GOAL' | translate }}
+              </span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 normal-case font-normal border border-slate-200 dark:border-slate-700">
+                {{ currentTask()?.status }}
+              </span>
+            </div>
+            
+            <div (click)="openTaskDetails()" class="p-3 rounded-lg border border-slate-200 dark:border-[#444746] bg-slate-50 dark:bg-black/10 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-all duration-200 group">
+              <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate mb-1">
+                {{ currentTask()?.title }}
+              </h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                {{ currentTask()?.description }}
+              </p>
+              <div class="mt-2 flex items-center justify-end text-[10px] text-blue-600 dark:text-blue-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>查看详情</span>
+                <mat-icon class="!w-3 !h-3 !text-[12px] ml-0.5">chevron_right</mat-icon>
               </div>
             </div>
-          }
+          </div>
+
+          <!-- Brainstorm Config Section -->
+          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-3">
+            <div class="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+              <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">psychology</mat-icon>
+              头脑风暴配置
+            </div>
+
+            <!-- Max Brainstorming Rounds -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-600 dark:text-slate-400">最大讨论轮数</span>
+                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ brainstormRounds }}</span>
+              </div>
+              <mat-slider min="1" max="10" step="1" class="w-full" discrete>
+                <input matSliderThumb [(ngModel)]="brainstormRounds" (change)="onConfigChange()" />
+              </mat-slider>
+            </div>
+
+            <!-- Context Sliding Window -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-600 dark:text-slate-400">滑动窗口条数</span>
+                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ contextWindow }}</span>
+              </div>
+              <mat-slider min="1" max="5" step="1" class="w-full" discrete>
+                <input matSliderThumb [(ngModel)]="contextWindow" (change)="onConfigChange()" />
+              </mat-slider>
+            </div>
+          </div>
+
+          <!-- AI Dev Team Section -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <div class="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 border-b border-slate-100 dark:border-[#444746] pb-2">
+              <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">group_work</mat-icon>
+              <span>AI Dev Team</span>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+              @for (node of profiles(); track node.id) {
+                <div 
+                  class="p-3 rounded-lg border cursor-pointer transition-all duration-200 flex flex-col gap-2"
+                  [ngClass]="{
+                    'border-blue-500 bg-blue-50 dark:bg-blue-900/20': selectedNode?.id === node.id,
+                    'border-slate-200 dark:border-[#444746] hover:border-blue-300 dark:hover:border-blue-700': selectedNode?.id !== node.id
+                  }"
+                  (click)="selectNode(node)">
+                  
+                  <div class="flex items-center justify-between">
+                    <div class="font-medium text-sm flex items-center gap-2">
+                      <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
+                      {{ node.roleName }}
+                    </div>
+                    <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure">
+                      <mat-icon class="!text-[14px]">settings</mat-icon>
+                    </button>
+                  </div>
+                  
+                  <div *ngIf="selectedNode?.id === node.id" class="text-xs text-slate-600 dark:text-slate-300 mt-2 border-t border-slate-200 dark:border-[#444746] pt-2">
+                    <p><strong>Model:</strong> {{ node.modelName }}</p>
+                    <p class="mt-1 font-mono text-[10px] bg-slate-100 dark:bg-black/20 p-1.5 rounded text-slate-500 dark:text-slate-400 line-clamp-3">
+                      {{ node.systemPrompt }}
+                    </p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
         </div>
-      </div>
+
+        <!-- Sidebar Toggle Handle (Desktop) -->
+        <div class="absolute top-1/2 -right-3 -translate-y-1/2 z-50 hidden md:flex">
+          <button (click)="toggleSidebar()" 
+              class="flex items-center justify-center w-6 h-12 rounded-r-xl bg-white dark:bg-[#1e1f20] border border-l-0 border-slate-200 dark:border-[#444746] shadow-sm hover:shadow-md transition-all group cursor-pointer outline-none">
+              <mat-icon class="!text-[20px] text-gray-500 group-hover:text-blue-500 transition-transform" 
+                  [class.rotate-180]="!isSidebarOpen()">chevron_left</mat-icon>
+          </button>
+        </div>
+      </aside>
 
       <!-- Main Chat Area -->
       <div class="flex-1 flex flex-col h-full bg-slate-50 dark:bg-[#131314]">
         <div class="p-4 border-b border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] flex justify-between items-center shadow-sm z-10">
-          <div>
-            <h2 class="text-lg font-medium m-0 flex items-center gap-2">
-              <mat-icon>chat</mat-icon> Task Discussion
-            </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" *ngIf="taskId">Task ID: {{ taskId }}</p>
+          <div class="flex items-center gap-2">
+            <button mat-icon-button (click)="toggleSidebar()" title="Toggle Sidebar" class="md:hidden">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <div>
+              <h2 class="text-lg font-medium m-0 flex items-center gap-2">
+                <mat-icon>chat</mat-icon> Task Discussion
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" *ngIf="taskId">Task ID: {{ taskId }}</p>
+            </div>
           </div>
           <button mat-icon-button (click)="closePage()" title="Close Tab">
             <mat-icon>close</mat-icon>
@@ -202,6 +298,7 @@ export class AiDevChatComponent implements OnInit {
   private useCase = inject(AiDevUseCase);
   private destroyRef = inject(DestroyRef);
   private dialog = inject(MatDialog);
+  private sidebarService = inject(SidebarService);
   
   taskId: string = '';
   messages: Signal<AiDevChatMessage[]>;
@@ -214,12 +311,44 @@ export class AiDevChatComponent implements OnInit {
   mentionSearchQuery = '';
   selectedMentionIndex = 0;
 
+  protected get isSidebarOpen() { return this.sidebarService.isOpen; }
+
+  currentTask = computed(() => this.useCase.tasks().find(t => t.id === this.taskId));
+
+  /** 头脑风暴配置 Slider 本地状态，随 currentTask 同步初始化 */
+  brainstormRounds = 5;
+  contextWindow = 3;
+
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+
+  toggleSidebar() {
+    this.sidebarService.toggle();
+  }
+
+  openTaskDetails() {
+    const task = this.currentTask();
+    if (task) {
+      this.dialog.open(TaskDetailDialogComponent, {
+        data: task,
+        width: '600px',
+        panelClass: ['custom-dialog-container', 'animate-fade-in-up']
+      });
+    }
+  }
 
   constructor() {
     this.messages = this.useCase.currentMessages;
     this.profiles = this.useCase.agentProfiles;
     
+    // 当 currentTask 加载完毕时，同步 Slider 初始值
+    effect(() => {
+      const task = this.currentTask();
+      if (task) {
+        this.brainstormRounds = task.maxBrainstormingRounds ?? 5;
+        this.contextWindow = task.contextSlidingWindow ?? 3;
+      }
+    });
+
     // Auto-scroll to bottom when new messages arrive
     effect(() => {
       const msgs = this.messages();
@@ -244,6 +373,7 @@ export class AiDevChatComponent implements OnInit {
         this.taskId = id;
         this.useCase.loadMessages(this.taskId);
         this.useCase.loadProfiles();
+        this.useCase.loadTasks();
         
         // Auto select first node
         if (this.profiles().length > 0) {
@@ -378,5 +508,16 @@ export class AiDevChatComponent implements OnInit {
   closePage() {
     window.close();
   }
+
+  /**
+   * 当用户调整头脑风暴配置 Slider 时触发，将最新值持久化到后端。
+   */
+  onConfigChange() {
+    if (this.taskId) {
+      this.useCase.updateTaskConfig(this.taskId, this.brainstormRounds, this.contextWindow);
+    }
+  }
 }
+
+
 

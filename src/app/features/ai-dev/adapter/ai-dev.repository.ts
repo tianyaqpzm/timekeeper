@@ -48,6 +48,16 @@ export class AiDevRepository {
     return this.http.post<AiDevChatMessage>(`${URLConfig.AI_DEV.TASKS}/${taskId}/messages`, { content });
   }
 
+  /**
+   * 更新任务的头脑风暴配置参数
+   * @param taskId 任务 ID
+   * @param maxBrainstormingRounds 最大讨论轮数
+   * @param contextSlidingWindow 滑动窗口历史条数
+   */
+  updateTaskConfig(taskId: string, maxBrainstormingRounds: number, contextSlidingWindow: number): Observable<void> {
+    return this.http.put<void>(URLConfig.AI_DEV.CONFIG(taskId), { maxBrainstormingRounds, contextSlidingWindow });
+  }
+
   /** 健康检查本地 ms-ai-devops 服务连接 */
   checkHealth(url: string): Observable<any> {
     return this.http.get<any>(`${url}/health`);

@@ -7,6 +7,10 @@ export interface AiDevTask {
   totalCost: number;
   createTime: string;
   updateTime: string;
+  /** 头脑风暴最大讨论轮数 */
+  maxBrainstormingRounds: number;
+  /** 滑动窗口历史消息条数 */
+  contextSlidingWindow: number;
 }
 
 export interface AiDevChatMessage {
@@ -32,6 +36,7 @@ export enum AiDevTaskStatus {
   RUNNING = 'RUNNING',               // 已被常驻服务拾取，执行中
   STARTING = 'STARTING',
   PLANNING = 'PLANNING',
+  BRAINSTORMING = 'BRAINSTORMING',   // 多智能体头脑风暴讨论中
   WAITING_ON_APPROVAL = 'WAITING_ON_APPROVAL',
   WAITING_RESUME = 'WAITING_RESUME', // HITL 节点，等待人类批准后继续
   GENERATING = 'GENERATING',
@@ -41,3 +46,4 @@ export enum AiDevTaskStatus {
   ROLLED_BACK = 'ROLLED_BACK',
   FAILED = 'FAILED'
 }
+
