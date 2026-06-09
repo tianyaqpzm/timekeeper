@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { URLConfig } from '../../../core/infrastructure/constants/url.config';
-import { AiDevTask, AiDevChatMessage, AiDevAgentProfile } from '../domain/ai-dev.model';
+import { AiDevTask, AiDevChatMessage, AiDevAgentProfile, TokenSummary } from '../domain/ai-dev.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +23,8 @@ export class AiDevRepository {
   }
 
   /** 创建新任务，由 ms-ai-devops 常驻服务自动拾取执行 */
-  createTask(description: string): Observable<AiDevTask> {
-    return this.http.post<AiDevTask>(URLConfig.AI_DEV.TASKS, { description });
+  createTask(description: string, relatedWorkspaces: string[]): Observable<AiDevTask> {
+    return this.http.post<AiDevTask>(URLConfig.AI_DEV.TASKS, { description, relatedWorkspaces });
   }
 
   resumeTask(taskId: string, feedback?: string): Observable<void> {
@@ -34,6 +34,10 @@ export class AiDevRepository {
 
   rollbackTask(taskId: string): Observable<void> {
     return this.http.post<void>(URLConfig.AI_DEV.ROLLBACK(taskId), {});
+  }
+
+  reopenTask(taskId: string): Observable<void> {
+    return this.http.post<void>(URLConfig.AI_DEV.REOPEN(taskId), {});
   }
 
   deleteTask(taskId: string): Observable<void> {
@@ -61,5 +65,10 @@ export class AiDevRepository {
   /** 健康检查本地 ms-ai-devops 服务连接 */
   checkHealth(url: string): Observable<any> {
     return this.http.get<any>(`${url}/health`);
+  }
+
+  /** 获取任务的 Token 消耗聚合报告 */
+  getTokenSummary(taskId: string): Observable<TokenSummary> {
+    return this.http.get<TokenSummary>(`${URLConfig.AI_DEV.TASKS}/${taskId}/token-summary`);
   }
 }

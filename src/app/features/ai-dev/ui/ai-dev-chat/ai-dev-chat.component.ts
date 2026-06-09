@@ -9,13 +9,15 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { ActivatedRoute } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 import { AiDevUseCase } from '../../application/ai-dev.usecase';
-import { AiDevChatMessage, AiDevAgentProfile } from '../../domain/ai-dev.model';
+import { AiDevChatMessage, AiDevAgentProfile, AiDevTaskStatus } from '../../domain/ai-dev.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentProfileDialogComponent } from './agent-profile-dialog.component';
+import { TaskTimelineComponent } from '../task-timeline/task-timeline.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { SidebarService } from '../../../../core/infrastructure/services/sidebar.service';
 import { TaskDetailDialogComponent } from './task-detail-dialog.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ai-dev-chat',
@@ -29,7 +31,8 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
     MatSliderModule,
     MarkdownModule, 
     TextFieldModule, 
-    TranslateModule
+    TranslateModule,
+    TaskTimelineComponent
   ],
   template: `
     <div class="flex h-screen w-full bg-slate-50 dark:bg-[#131314] text-slate-900 dark:text-[#e3e3e3] overflow-hidden">
@@ -87,8 +90,8 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
                 <span class="text-xs text-slate-600 dark:text-slate-400">最大讨论轮数</span>
                 <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ brainstormRounds }}</span>
               </div>
-              <mat-slider min="1" max="10" step="1" class="w-full" discrete>
-                <input matSliderThumb [(ngModel)]="brainstormRounds" (change)="onConfigChange()" />
+              <mat-slider min="1" max="10" step="1" class="w-full" discrete [disabled]="isReadOnly()">
+                <input matSliderThumb [(ngModel)]="brainstormRounds" (change)="onConfigChange()" [disabled]="isReadOnly()" />
               </mat-slider>
             </div>
 
@@ -98,10 +101,15 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
                 <span class="text-xs text-slate-600 dark:text-slate-400">滑动窗口条数</span>
                 <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ contextWindow }}</span>
               </div>
-              <mat-slider min="1" max="5" step="1" class="w-full" discrete>
-                <input matSliderThumb [(ngModel)]="contextWindow" (change)="onConfigChange()" />
+              <mat-slider min="1" max="5" step="1" class="w-full" discrete [disabled]="isReadOnly()">
+                <input matSliderThumb [(ngModel)]="contextWindow" (change)="onConfigChange()" [disabled]="isReadOnly()" />
               </mat-slider>
             </div>
+          </div>
+
+          <!-- Task Timeline Section -->
+          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-3">
+            <app-task-timeline [tokenSummary]="useCase.tokenSummary()" [isRunning]="!isReadOnly()"></app-task-timeline>
           </div>
 
           <!-- AI Dev Team Section -->
@@ -126,7 +134,7 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
                       <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
                       {{ node.roleName }}
                     </div>
-                    <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure">
+                    <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure" [disabled]="isReadOnly()">
                       <mat-icon class="!text-[14px]">settings</mat-icon>
                     </button>
                   </div>
@@ -173,7 +181,7 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
           </button>
         </div>
         
-        <div #scrollContainer class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth custom-scrollbar">
+        <div #scrollContainer class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth custom-scrollbar" (scroll)="onScroll($event)">
           <div *ngIf="messages().length === 0" class="flex flex-col items-center justify-center h-full text-slate-400">
             <mat-icon class="!w-12 !h-12 !text-[48px] mb-4 opacity-50">forum</mat-icon>
             <p>No messages yet. Start clarifying the requirements!</p>
@@ -187,8 +195,29 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
                 {{ msg.senderRole }}
               </span>
               <div class="px-5 py-3 rounded-2xl max-w-[80%] shadow-sm" 
-                   [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'"
-                   [innerHTML]="highlightMentions(msg.content) | markdown | async">
+                   [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'">
+                @if (msg.content.length > 1000 && !expandedMessageIds.has(msg.id)) {
+                  <div class="relative max-h-64 overflow-hidden">
+                    <div [innerHTML]="highlightMentions((msg.content | markdown | async) || '')"></div>
+                    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#2a2b2d] to-transparent pointer-events-none"
+                         [ngClass]="msg.senderRole === 'HUMAN' ? 'from-blue-600' : ''"></div>
+                  </div>
+                  <div class="mt-2 text-center">
+                    <button mat-button class="!text-xs opacity-80 hover:opacity-100" (click)="toggleExpand(msg.id)">
+                      展开完整内容 <mat-icon class="!text-[14px] align-middle">expand_more</mat-icon>
+                    </button>
+                  </div>
+                } @else {
+                  <div [innerHTML]="highlightMentions((msg.content | markdown | async) || '')"></div>
+                  @if (msg.content.length > 1000) {
+                    <div class="mt-2 text-center border-t border-slate-100 dark:border-slate-700/50 pt-2"
+                         [ngClass]="msg.senderRole === 'HUMAN' ? 'border-blue-500' : ''">
+                      <button mat-button class="!text-xs opacity-80 hover:opacity-100" (click)="toggleExpand(msg.id)">
+                        收起内容 <mat-icon class="!text-[14px] align-middle">expand_less</mat-icon>
+                      </button>
+                    </div>
+                  }
+                }
               </div>
               <span class="text-[10px] text-slate-400 mt-1 mx-2">{{ msg.createTime | date:'shortTime' }}</span>
             </div>
@@ -203,13 +232,14 @@ import { TaskDetailDialogComponent } from './task-detail-dialog.component';
                 cdkAutosizeMinRows="1"
                 cdkAutosizeMaxRows="6"
                 [(ngModel)]="newMessage" 
-                placeholder="Type a message..." 
+                [placeholder]="isReadOnly() ? 'Task is completed. Chat is read-only.' : 'Type a message...'" 
+                [disabled]="isReadOnly()"
                 (input)="onInput($event)" 
                 (keydown)="onKeyDown($event)"
                 class="w-full bg-transparent border-none focus:ring-0 resize-none p-0 text-slate-800 dark:text-slate-200 text-sm outline-none m-0 leading-5 overflow-hidden block"
               ></textarea>
             </label>
-            <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="!newMessage.trim()" class="shrink-0 bg-blue-600 !text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:!text-slate-400 transition-colors" style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="!newMessage.trim() || isReadOnly()" class="shrink-0 bg-blue-600 !text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:!text-slate-400 transition-colors" style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
               <mat-icon class="!text-[18px] m-0">arrow_upward</mat-icon>
             </button>
 
@@ -299,6 +329,7 @@ export class AiDevChatComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private dialog = inject(MatDialog);
   private sidebarService = inject(SidebarService);
+  private sanitizer = inject(DomSanitizer);
   
   taskId: string = '';
   messages: Signal<AiDevChatMessage[]>;
@@ -315,11 +346,22 @@ export class AiDevChatComponent implements OnInit {
 
   currentTask = computed(() => this.useCase.tasks().find(t => t.id === this.taskId));
 
+  isReadOnly = computed(() => {
+    const task = this.currentTask();
+    if (!task) return false;
+    return task.status === AiDevTaskStatus.COMPLETED ||
+           task.status === AiDevTaskStatus.ROLLED_BACK ||
+           task.status === AiDevTaskStatus.FAILED;
+  });
+
   /** 头脑风暴配置 Slider 本地状态，随 currentTask 同步初始化 */
   brainstormRounds = 5;
   contextWindow = 3;
 
+  expandedMessageIds = new Set<string>();
+
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  private isNearBottom = true;
 
   toggleSidebar() {
     this.sidebarService.toggle();
@@ -358,9 +400,25 @@ export class AiDevChatComponent implements OnInit {
     });
   }
 
-  scrollToBottom(): void {
+  toggleExpand(id: string) {
+    if (this.expandedMessageIds.has(id)) {
+      this.expandedMessageIds.delete(id);
+    } else {
+      this.expandedMessageIds.add(id);
+    }
+  }
+
+  onScroll(event: Event) {
+    const target = event.target as HTMLElement;
+    const threshold = 150;
+    const position = target.scrollTop + target.clientHeight;
+    const height = target.scrollHeight;
+    this.isNearBottom = position > height - threshold;
+  }
+
+  scrollToBottom(force = false): void {
     try {
-      if (this.scrollContainer) {
+      if (this.scrollContainer && (this.isNearBottom || force)) {
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       }
     } catch(err) { }
@@ -380,13 +438,11 @@ export class AiDevChatComponent implements OnInit {
           this.selectedNode = this.profiles()[0];
         }
 
-        // Poll messages every 3 seconds to keep receiving updates
-        const intervalId = setInterval(() => {
-          this.useCase.loadMessages(this.taskId);
-        }, 3000);
+        // Connect to SSE stream
+        this.useCase.connectSseStream(this.taskId);
 
         this.destroyRef.onDestroy(() => {
-          clearInterval(intervalId);
+          this.useCase.disconnectSseStream();
         });
       }
     });
@@ -410,11 +466,24 @@ export class AiDevChatComponent implements OnInit {
     });
   }
 
-  highlightMentions(content: string): string {
+  highlightMentions(content: any): any {
     if (!content) return content;
-    return content.replace(/@([a-zA-Z0-9_-]+)/g, (match, name) => {
+    let text = '';
+    let isSafe = false;
+    if (typeof content === 'string') {
+      text = content;
+    } else if (content && typeof content === 'object' && 'changingThisBreaksApplicationSecurity' in content) {
+      text = content.changingThisBreaksApplicationSecurity;
+      isSafe = true;
+    } else {
+      text = String(content);
+    }
+
+    const highlighted = text.replace(/@([a-zA-Z0-9_-]+)/g, (match, name) => {
       return `<span class="text-blue-600 dark:text-blue-400 font-medium bg-blue-100/60 dark:bg-blue-900/40 px-1.5 py-0.5 rounded-md mx-0.5 cursor-pointer hover:bg-blue-200/60 dark:hover:bg-blue-800/60 transition-colors">@${name}</span>`;
     });
+
+    return isSafe ? this.sanitizer.bypassSecurityTrustHtml(highlighted) : highlighted;
   }
 
   filteredAgents(): AiDevAgentProfile[] {
@@ -490,6 +559,7 @@ export class AiDevChatComponent implements OnInit {
       this.useCase.sendMessage(this.taskId, this.newMessage);
       this.newMessage = '';
       this.showMentionSuggestions = false;
+      this.scrollToBottom(true);
     }
   }
 
@@ -502,7 +572,8 @@ export class AiDevChatComponent implements OnInit {
   }
 
   canApprove(): boolean {
-    return !!this.taskId;
+    const task = this.currentTask();
+    return !!task && (task.status === AiDevTaskStatus.WAITING_ON_APPROVAL || task.status === AiDevTaskStatus.WAITING_RESUME);
   }
 
   closePage() {

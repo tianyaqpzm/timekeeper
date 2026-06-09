@@ -47,3 +47,20 @@ export enum AiDevTaskStatus {
   FAILED = 'FAILED'
 }
 
+export interface PhaseMetric {
+  phase: string;
+  agentRole: string;
+  promptTokens: number;
+  completionTokens: number;
+  cost: number;
+  durationMs: number;
+  callCount: number;
+}
+
+export interface TokenSummary {
+  totalPromptTokens: number;
+  totalCompletionTokens: number;
+  totalCost: number;
+  totalDurationMs: number;
+  phases: PhaseMetric[];
+}

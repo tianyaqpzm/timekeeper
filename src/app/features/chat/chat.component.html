@@ -225,16 +225,18 @@
                             <div *ngIf="msg.content"
                                 class="flex items-center gap-0.5 mt-1 -ml-2 opacity-0 group-hover/msg:opacity-100 transition-opacity duration-200">
                                 <button mat-icon-button (click)="rateResponse($index, 'good')"
-                                    [class.text-blue-500]="responseRatings().get($index) === 'good'"
+                                    [class.text-blue-500]="msg.rating === 'good'"
+                                    [class.rating-pulse]="ratingAnimIndex() === $index"
                                     class="!w-8 !h-8 !flex !items-center !justify-center text-gray-400 hover:text-blue-500 transition-colors"
                                     [matTooltip]="'CHAT.RATE_GOOD' | translate">
-                                    <mat-icon class="!text-[18px]">thumb_up_off_alt</mat-icon>
+                                    <mat-icon class="!text-[18px]">{{ msg.rating === 'good' ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
                                 </button>
                                 <button mat-icon-button (click)="rateResponse($index, 'bad')"
-                                    [class.text-red-500]="responseRatings().get($index) === 'bad'"
+                                    [class.text-red-500]="msg.rating === 'bad'"
+                                    [class.rating-pulse]="ratingAnimIndex() === $index"
                                     class="!w-8 !h-8 !flex !items-center !justify-center text-gray-400 hover:text-red-500 transition-colors"
                                     [matTooltip]="'CHAT.RATE_BAD' | translate">
-                                    <mat-icon class="!text-[18px]">thumb_down_off_alt</mat-icon>
+                                    <mat-icon class="!text-[18px]">{{ msg.rating === 'bad' ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
                                 </button>
                                 <button mat-icon-button (click)="copyText(msg.content)"
                                     class="!w-8 !h-8 !flex !items-center !justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"

@@ -14,12 +14,16 @@ export interface ChatSource {
  * 聊天消息接口。
  */
 export interface ChatMessage {
+    /** 后端消息 ID（可选，用于评分） */
+    id?: number;
     /** 角色：用户或模型 */
     role: 'user' | 'model';
     /** 消息内容 */
     content: string;
     /** 引用来源（可选） */
     sources?: ChatSource[];
+    /** 用户评价: good (点赞) / bad (点踩) / null/undefined (未评价) */
+    rating?: 'good' | 'bad' | null;
 }
 
 /**

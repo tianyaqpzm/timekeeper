@@ -21,7 +21,6 @@ export class ChatUseCase {
     public isRecording = signal(false);
     public isCameraOpen = signal(false);
     public selectedFiles = signal<File[]>([]);
-    public responseRatings = signal<Map<number, 'good' | 'bad'>>(new Map());
 
     private currentSubscription: Subscription | null = null;
 
@@ -234,6 +233,12 @@ export class ChatUseCase {
                                 ...newMsgs[aiMsgIndex], 
                                 content: newMsgs[aiMsgIndex].content + data 
                             };
+                        } else if (data.messageId) {
+                            // 保存后端返回的消息 ID，用于后续评分
+                            newMsgs[aiMsgIndex] = { 
+                                ...newMsgs[aiMsgIndex], 
+                                id: data.messageId 
+                            };
                         } else if (data.sources) {
                             newMsgs[aiMsgIndex] = { 
                                 ...newMsgs[aiMsgIndex], 
@@ -285,7 +290,7 @@ export class ChatUseCase {
     editMessage(index: number, setInputCallback: (content: string) => void) {
         const msgs = this.messages();
         const content = msgs[index].content;
-        const cleanedContent = content.replace(/ \\[(?:File|Image|Photo):[^\\]]*\\]/g, '').trim();
+        const cleanedContent = content.replace(/ \[(?:File|Image|Photo):[^\]]*\]/g, '').trim();
 
         this.messages.set(msgs.slice(0, index));
         setInputCallback(cleanedContent);
@@ -321,6 +326,42 @@ export class ChatUseCase {
         if (userMsgIndex !== -1) {
             this.editMessage(userMsgIndex, setInputCallback);
             setTimeout(() => sendMessageCallback(), 0);
+        }
+    }
+
+    /**
+     * 对 AI 回复进行评分（点赞/点踩），持久化到后端。
+     * 支持 toggle 行为：点击已选中的评分 = 取消评分。
+     * @param index - 消息在 messages 中的索引。
+     * @param rating - 'good' 或 'bad'。
+     */
+    rateMessage(index: number, rating: 'good' | 'bad') {
+        const msgs = this.messages();
+        const msg = msgs[index];
+        if (!msg || msg.role !== 'model') return;
+
+        const newRating = msg.rating === rating ? null : rating;
+
+        // 乐观更新 UI
+        this.messages.update(all => {
+            const updated = [...all];
+            updated[index] = { ...updated[index], rating: newRating };
+            return updated;
+        });
+
+        // 持久化到后端
+        if (msg.id) {
+            this.chatApi.rateMessage(msg.id, this.activeSessionId(), newRating).subscribe({
+                error: (err) => {
+                    console.error('Failed to save rating', err);
+                    // 回滚: 恢复原来的评级
+                    this.messages.update(all => {
+                        const updated = [...all];
+                        updated[index] = { ...updated[index], rating: msg.rating };
+                        return updated;
+                    });
+                }
+            });
         }
     }
 

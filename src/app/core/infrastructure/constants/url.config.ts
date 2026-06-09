@@ -6,7 +6,8 @@ export const URLConfig = {
     CHAT: {
         HISTORY: '/rest/biz/v1/history',
         SESSIONS: '/rest/biz/v1/history/sessions',
-        AGENT_CHAT: '/rest/agent/v1/chat'
+        AGENT_CHAT: '/rest/agent/v1/chat',
+        RATING: (id: number | string) => `/rest/biz/v1/history/${id}/rating`
     },
     KNOWLEDGE: {
         BASE: '/rest/biz/v1/knowledge',
@@ -46,6 +47,7 @@ export const URLConfig = {
         PROFILES: '/rest/biz/v1/ai-dev/profiles',
         RESUME: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/resume`,
         ROLLBACK: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/rollback`,
+        REOPEN: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/reopen`,
         CONFIG: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/config`
     }
 };

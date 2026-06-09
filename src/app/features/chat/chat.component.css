@@ -247,6 +247,19 @@
 }
 
 
+/* Rating Pulse Animation for Like/Dislike buttons */
+@keyframes rating-pulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.25); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+:host ::ng-deep .rating-pulse .mat-icon {
+    animation: rating-pulse 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
 /* Citation Tag Styling */
 .citation-tag {
     display: inline-flex;

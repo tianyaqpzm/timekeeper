@@ -26,7 +26,7 @@ export interface ChatRepository {
      * @param topicId - 知识库主题 ID（可选）。
      * @returns 流式响应内容 Observable。
      */
-    sendMessageStream(sessionId: string, message: string, topicId: string | null): Observable<string | { content?: string, sources?: any[] }>;
+    sendMessageStream(sessionId: string, message: string, topicId: string | null): Observable<string | { content?: string, sources?: any[], messageId?: number }>;
 
     /**
      * 删除指定会话。
@@ -34,4 +34,13 @@ export interface ChatRepository {
      * @returns 操作结果 Observable。
      */
     deleteSession(sessionId: string): Observable<void>;
+
+    /**
+     * 对消息进行评分。
+     * @param messageId - 后端消息 ID。
+     * @param sessionId - 会话 ID。
+     * @param rating - 评分: 'good', 'bad', 或 null (取消评分)。
+     * @returns 操作结果 Observable。
+     */
+    rateMessage(messageId: number, sessionId: string, rating: 'good' | 'bad' | null): Observable<void>;
 }

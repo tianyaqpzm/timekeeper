@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: on_demand
+description: ms-ng-view 前端架构规范（已拆分）。深度参考见 skills/angular-reference/SKILL.md
 ---
 
 # 前端架构与代码规范指南 (ms-ng-view)

@@ -88,12 +88,13 @@ export class ChatComponent {
     protected get currentUser() { return this.userService.currentUser; }
     protected get topics() { return this.knowledgeUseCase.topics; }
     protected get selectedTopic() { return this.knowledgeUseCase.selectedTopic; }
-    protected get responseRatings() { return this.chatUseCase.responseRatings; }
-
     protected readonly document = document;
 
     // 引用悬浮窗状态
     protected citationTooltip = signal<{ id: string, x: number, y: number } | null>(null);
+
+    // 点赞/点踩动画触发信号：跟踪最后点击索引和方向，触发的动画由组件模板绑定
+    protected ratingAnimIndex = signal<number | null>(null);
 
 
     constructor(
@@ -357,19 +358,15 @@ export class ChatComponent {
     }
 
     /**
-     * 对 AI 回复进行点赞/点踩评分。
+     * 对 AI 回复进行点赞/点踩评分，持久化到后端。
      * @param index - 消息索引。
      * @param rating - 'good' 或 'bad'。
      */
     protected rateResponse(index: number, rating: 'good' | 'bad') {
-        const ratings = new Map(this.responseRatings());
-        const existing = ratings.get(index);
-        if (existing === rating) {
-            ratings.delete(index);
-        } else {
-            ratings.set(index, rating);
-        }
-        this.responseRatings.set(ratings);
+        this.chatUseCase.rateMessage(index, rating);
+        // 触发缩放脉冲动画
+        this.ratingAnimIndex.set(index);
+        setTimeout(() => this.ratingAnimIndex.set(null), 350);
     }
 
     /**

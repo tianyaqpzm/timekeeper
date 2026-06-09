@@ -1,0 +1,42 @@
+<div class="p-4 bg-gray-900 rounded-lg text-xs font-mono text-gray-300 w-full mt-4 border border-gray-700 shadow-inner">
+  <div class="mb-3 text-gray-400 font-bold uppercase tracking-widest border-b border-gray-800 pb-2">
+    Task Execution Timeline
+  </div>
+  
+  <div *ngIf="!tokenSummary || phases.length === 0" class="text-gray-500 italic py-2">
+    Waiting for phase execution data...
+  </div>
+
+  <div *ngIf="tokenSummary && phases.length > 0" class="space-y-3">
+    <div *ngFor="let phase of phases; let i = index" class="relative">
+      <div class="flex justify-between mb-1 items-end">
+        <span class="font-bold text-gray-200 uppercase tracking-wide">{{ phase.phase }} <span class="text-gray-500 font-normal">({{ phase.agentRole }})</span></span>
+        <span class="text-blue-400 font-semibold">{{ (phase.durationMs / 1000).toFixed(1) }}s</span>
+      </div>
+      
+      <div class="w-full bg-gray-800 rounded-sm h-3 overflow-hidden shadow-inner flex">
+        <div class="h-full transition-all duration-500 relative flex items-center"
+             [ngClass]="(isRunning && i === phases.length - 1) ? 'bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.9)] animate-stripes' : 'bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.8)]'"
+             [style.width.%]="getWidthPercentage(phase.durationMs)">
+            <div *ngIf="isRunning && i === phases.length - 1" class="absolute inset-0 bg-white/20 animate-pulse"></div>
+            <div *ngIf="!(isRunning && i === phases.length - 1)" class="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-20"></div>
+        </div>
+      </div>
+      
+      <div class="flex gap-4 mt-1 text-[10px] text-gray-500">
+        <span>inp: <span class="text-gray-300 font-medium">{{ phase.promptTokens | number }}</span></span>
+        <span>out: <span class="text-gray-300 font-medium">{{ phase.completionTokens | number }}</span></span>
+        <span class="text-green-500">cost: ${{ phase.cost.toFixed(4) }}</span>
+        <span>calls: <span class="text-gray-300">{{ phase.callCount }}</span></span>
+      </div>
+    </div>
+    
+    <div class="mt-4 pt-3 border-t border-gray-800 flex justify-between items-center text-sm font-bold">
+      <div class="flex gap-4">
+        <span>Total Tokens: <span class="text-gray-200">{{ (tokenSummary.totalPromptTokens + tokenSummary.totalCompletionTokens) | number }}</span></span>
+        <span class="text-green-400">Total Cost: ${{ tokenSummary.totalCost.toFixed(4) }}</span>
+      </div>
+      <span class="text-blue-400">Total Time: {{ (tokenSummary.totalDurationMs / 1000).toFixed(1) }}s</span>
+    </div>
+  </div>
+</div>
