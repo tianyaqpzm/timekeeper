@@ -45,6 +45,7 @@ export class MsHeaderComponent implements OnInit {
 
     protected navItems = [
         { label: 'NAV.CHAT', icon: 'chat_bubble', path: '/chat', color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-900/30' },
+        { label: 'NAV.AI_DEV', icon: 'rocket_launch', path: '/ai-dev', color: 'text-indigo-600 dark:text-indigo-400', bgColor: 'bg-indigo-50 dark:bg-indigo-900/30' },
         { label: 'NAV.KNOWLEDGE', icon: 'auto_stories', path: '/knowledge', color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-900/30' },
         { label: 'NAV.PROMPT', icon: 'terminal', path: '/prompt', color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-900/30' },
         { label: 'NAV.MCP_MARKET', icon: 'extension', path: '/mcp-market', color: 'text-orange-600 dark:text-orange-400', bgColor: 'bg-orange-50 dark:bg-orange-900/30' },

@@ -11,6 +11,25 @@ export interface AiDevTask {
   maxBrainstormingRounds: number;
   /** 滑动窗口历史消息条数 */
   contextSlidingWindow: number;
+  
+  targetBranch?: string;
+  relatedIssues?: string;
+  constraints?: string;
+  priority?: string;
+  affectedProjects?: string[];
+  labels?: string[];
+  relatedWorkspaces?: string[];
+}
+
+export interface AiDevCreateRequest {
+  title: string;
+  description: string;
+  targetBranch?: string;
+  relatedIssues?: string;
+  constraints?: string;
+  priority?: string;
+  affectedProjects?: string[];
+  labels?: string[];
 }
 
 export interface AiDevChatMessage {

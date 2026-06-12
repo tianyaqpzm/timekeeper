@@ -17,7 +17,10 @@ import { TaskTimelineComponent } from '../task-timeline/task-timeline.component'
 import { TranslateModule } from '@ngx-translate/core';
 import { SidebarService } from '../../../../core/infrastructure/services/sidebar.service';
 import { TaskDetailDialogComponent } from './task-detail-dialog.component';
+import { TaskConfigDialogComponent } from './task-config-dialog.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AuthService } from '../../../../core/infrastructure/services/auth.service';
+import { UserService } from '../../../../core/infrastructure/services/user.service';
 
 @Component({
   selector: 'app-ai-dev-chat',
@@ -49,18 +52,23 @@ import { DomSanitizer } from '@angular/platform-browser';
         [class.translate-x-0]="isSidebarOpen()" [class.md:translate-x-0]="true"
         [class.overflow-visible]="true">
         
-        <div class="p-4 h-full flex flex-col w-80" [class.hidden]="!isSidebarOpen()">
+        <div class="p-4 h-full flex flex-col w-80 overflow-y-auto custom-scrollbar" [class.hidden]="!isSidebarOpen()">
           
           <!-- Task Goal Section -->
-          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-2">
+          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-2 shrink-0">
             <div class="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               <span class="flex items-center gap-1.5">
                 <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">gps_fixed</mat-icon>
                 {{ 'AI_DEV.TASK_GOAL' | translate }}
               </span>
-              <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 normal-case font-normal border border-slate-200 dark:border-slate-700">
-                {{ currentTask()?.status }}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 normal-case font-normal border border-slate-200 dark:border-slate-700">
+                  {{ currentTask()?.status }}
+                </span>
+                <button mat-icon-button class="!w-5 !h-5 flex items-center justify-center text-slate-400 hover:text-purple-500 transition-colors" [title]="'AI_DEV.BRAINSTORM_CONFIG' | translate" (click)="openTaskConfig()">
+                  <mat-icon class="!text-[16px]">settings</mat-icon>
+                </button>
+              </div>
             </div>
             
             <div (click)="openTaskDetails()" class="p-3 rounded-lg border border-slate-200 dark:border-[#444746] bg-slate-50 dark:bg-black/10 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-all duration-200 group">
@@ -71,55 +79,20 @@ import { DomSanitizer } from '@angular/platform-browser';
                 {{ currentTask()?.description }}
               </p>
               <div class="mt-2 flex items-center justify-end text-[10px] text-blue-600 dark:text-blue-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>查看详情</span>
+                <span>{{ 'AI_DEV.VIEW_DETAILS' | translate }}</span>
                 <mat-icon class="!w-3 !h-3 !text-[12px] ml-0.5">chevron_right</mat-icon>
               </div>
             </div>
           </div>
 
-          <!-- Brainstorm Config Section -->
-          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-3">
-            <div class="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
-              <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">psychology</mat-icon>
-              头脑风暴配置
-            </div>
-
-            <!-- Max Brainstorming Rounds -->
-            <div class="flex flex-col gap-1">
-              <div class="flex justify-between items-center">
-                <span class="text-xs text-slate-600 dark:text-slate-400">最大讨论轮数</span>
-                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ brainstormRounds }}</span>
-              </div>
-              <mat-slider min="1" max="10" step="1" class="w-full" discrete [disabled]="isReadOnly()">
-                <input matSliderThumb [(ngModel)]="brainstormRounds" (change)="onConfigChange()" [disabled]="isReadOnly()" />
-              </mat-slider>
-            </div>
-
-            <!-- Context Sliding Window -->
-            <div class="flex flex-col gap-1">
-              <div class="flex justify-between items-center">
-                <span class="text-xs text-slate-600 dark:text-slate-400">滑动窗口条数</span>
-                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 min-w-[20px] text-right">{{ contextWindow }}</span>
-              </div>
-              <mat-slider min="1" max="5" step="1" class="w-full" discrete [disabled]="isReadOnly()">
-                <input matSliderThumb [(ngModel)]="contextWindow" (change)="onConfigChange()" [disabled]="isReadOnly()" />
-              </mat-slider>
-            </div>
-          </div>
-
-          <!-- Task Timeline Section -->
-          <div *ngIf="currentTask()" class="mb-4 pb-4 border-b border-slate-200 dark:border-[#444746] flex flex-col gap-3">
-            <app-task-timeline [tokenSummary]="useCase.tokenSummary()" [isRunning]="!isReadOnly()"></app-task-timeline>
-          </div>
-
           <!-- AI Dev Team Section -->
-          <div class="flex-1 flex flex-col min-h-0">
+          <div class="flex flex-col mb-4 shrink-0">
             <div class="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 border-b border-slate-100 dark:border-[#444746] pb-2">
               <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center">group_work</mat-icon>
-              <span>AI Dev Team</span>
+              <span>{{ 'AI_DEV.TEAM_SECTION' | translate }}</span>
             </div>
             
-            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+            <div class="flex flex-col space-y-3">
               @for (node of profiles(); track node.id) {
                 <div 
                   class="p-3 rounded-lg border cursor-pointer transition-all duration-200 flex flex-col gap-2"
@@ -131,7 +104,8 @@ import { DomSanitizer } from '@angular/platform-browser';
                   
                   <div class="flex items-center justify-between">
                     <div class="font-medium text-sm flex items-center gap-2">
-                      <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
+                      <img *ngIf="node.avatar?.includes('/') || node.avatar?.includes('.')" [src]="node.avatar" class="w-4 h-4 rounded-full object-cover" />
+                      <mat-icon *ngIf="!(node.avatar?.includes('/') || node.avatar?.includes('.'))" class="!w-4 !h-4 !text-[16px] text-slate-500">{{ node.avatar || 'smart_toy' }}</mat-icon>
                       {{ node.roleName }}
                     </div>
                     <button mat-icon-button (click)="configureRole(node, $event)" class="!w-6 !h-6" title="Configure" [disabled]="isReadOnly()">
@@ -150,6 +124,11 @@ import { DomSanitizer } from '@angular/platform-browser';
             </div>
           </div>
 
+          <!-- Task Timeline Section -->
+          <div *ngIf="currentTask()" class="flex flex-col gap-3 border-t border-slate-200 dark:border-[#444746] pt-4 shrink-0 pb-4">
+            <app-task-timeline [tokenSummary]="useCase.tokenSummary()" [isRunning]="!isReadOnly()"></app-task-timeline>
+          </div>
+
         </div>
 
         <!-- Sidebar Toggle Handle (Desktop) -->
@@ -164,20 +143,20 @@ import { DomSanitizer } from '@angular/platform-browser';
 
       <!-- Main Chat Area -->
       <div class="flex-1 flex flex-col h-full bg-slate-50 dark:bg-[#131314]">
-        <div class="p-4 border-b border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] flex justify-between items-center shadow-sm z-10">
+        <div class="py-2 px-4 border-b border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] flex justify-between items-center shadow-sm z-10">
           <div class="flex items-center gap-2">
-            <button mat-icon-button (click)="toggleSidebar()" title="Toggle Sidebar" class="md:hidden">
-              <mat-icon>menu</mat-icon>
+            <button mat-icon-button (click)="toggleSidebar()" title="Toggle Sidebar" class="md:hidden !w-8 !h-8 flex items-center justify-center">
+              <mat-icon class="!text-[18px]">menu</mat-icon>
             </button>
             <div>
-              <h2 class="text-lg font-medium m-0 flex items-center gap-2">
-                <mat-icon>chat</mat-icon> Task Discussion
+              <h2 class="text-base font-medium m-0 flex items-center gap-1.5">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px]">chat</mat-icon> {{ currentTask()?.title || 'Task Discussion' }}
               </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" *ngIf="taskId">Task ID: {{ taskId }}</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0" *ngIf="taskId">Task ID: {{ taskId }}</p>
             </div>
           </div>
-          <button mat-icon-button (click)="closePage()" title="Close Tab">
-            <mat-icon>close</mat-icon>
+          <button mat-icon-button (click)="closePage()" title="Close Tab" class="!w-8 !h-8 flex items-center justify-center">
+            <mat-icon class="!text-[18px]">close</mat-icon>
           </button>
         </div>
         
@@ -192,10 +171,12 @@ import { DomSanitizer } from '@angular/platform-browser';
               <span class="text-xs text-slate-500 dark:text-slate-400 mb-1 mx-2 font-medium flex items-center gap-1">
                 <mat-icon *ngIf="msg.senderRole !== 'HUMAN'" class="!text-[14px] !w-[14px] !h-[14px]">smart_toy</mat-icon>
                 <mat-icon *ngIf="msg.senderRole === 'HUMAN'" class="!text-[14px] !w-[14px] !h-[14px]">person</mat-icon>
-                {{ msg.senderRole }}
+                {{ msg.senderRole === 'HUMAN' ? currentUserName() : msg.senderRole }}
               </span>
-              <div class="px-5 py-3 rounded-2xl max-w-[80%] shadow-sm" 
-                   [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'">
+              <div class="flex items-end gap-2 group max-w-full" [ngClass]="msg.senderRole === 'HUMAN' ? 'flex-row-reverse' : 'flex-row'">
+                <div class="px-4 py-2.5 rounded-2xl max-w-[85%] shadow-sm text-[13px] leading-relaxed overflow-hidden" 
+                     [ngClass]="msg.senderRole === 'HUMAN' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white dark:bg-[#2a2b2d] text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-[#444746]'">
+                  <!-- chat content inside -->
                 @if (msg.content.length > 1000 && !expandedMessageIds.has(msg.id)) {
                   <div class="relative max-h-64 overflow-hidden">
                     <div [innerHTML]="highlightMentions((msg.content | markdown | async) || '')"></div>
@@ -204,7 +185,7 @@ import { DomSanitizer } from '@angular/platform-browser';
                   </div>
                   <div class="mt-2 text-center">
                     <button mat-button class="!text-xs opacity-80 hover:opacity-100" (click)="toggleExpand(msg.id)">
-                      展开完整内容 <mat-icon class="!text-[14px] align-middle">expand_more</mat-icon>
+                      {{ 'AI_DEV.EXPAND_FULL_CONTENT' | translate }} <mat-icon class="!text-[14px] align-middle">expand_more</mat-icon>
                     </button>
                   </div>
                 } @else {
@@ -213,11 +194,18 @@ import { DomSanitizer } from '@angular/platform-browser';
                     <div class="mt-2 text-center border-t border-slate-100 dark:border-slate-700/50 pt-2"
                          [ngClass]="msg.senderRole === 'HUMAN' ? 'border-blue-500' : ''">
                       <button mat-button class="!text-xs opacity-80 hover:opacity-100" (click)="toggleExpand(msg.id)">
-                        收起内容 <mat-icon class="!text-[14px] align-middle">expand_less</mat-icon>
+                        {{ 'AI_DEV.COLLAPSE_CONTENT' | translate }} <mat-icon class="!text-[14px] align-middle">expand_less</mat-icon>
                       </button>
                     </div>
                   }
                 }
+              </div>
+              <button *ngIf="msg.content" mat-icon-button
+                      class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 bg-white dark:bg-[#2a2b2d] border border-slate-200 dark:border-[#444746] shadow-sm hover:bg-slate-50 dark:hover:bg-[#3a3b3d]"
+                      style="width: 28px; height: 28px; line-height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                      (click)="copyMessage(msg.content)" title="Copy">
+                <mat-icon class="!text-[14px] text-slate-600 dark:text-slate-300">content_copy</mat-icon>
+              </button>
               </div>
               <span class="text-[10px] text-slate-400 mt-1 mx-2">{{ msg.createTime | date:'shortTime' }}</span>
             </div>
@@ -254,7 +242,8 @@ import { DomSanitizer } from '@angular/platform-browser';
                     <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
                          [ngClass]="i === selectedMentionIndex ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'hover:bg-slate-50 dark:hover:bg-[#2a2b2d]'"
                          (click)="selectMention(agent)">
-                      <mat-icon class="!w-4 !h-4 !text-[16px] opacity-70">{{ agent.avatar || 'smart_toy' }}</mat-icon>
+                      <img *ngIf="agent.avatar?.includes('/') || agent.avatar?.includes('.')" [src]="agent.avatar" class="w-4 h-4 rounded-full object-cover opacity-80" />
+                      <mat-icon *ngIf="!(agent.avatar?.includes('/') || agent.avatar?.includes('.'))" class="!w-4 !h-4 !text-[16px] opacity-70">{{ agent.avatar || 'smart_toy' }}</mat-icon>
                       <span class="text-sm font-medium">{{ agent.roleName }}</span>
                     </div>
                   }
@@ -330,6 +319,8 @@ export class AiDevChatComponent implements OnInit {
   private dialog = inject(MatDialog);
   private sidebarService = inject(SidebarService);
   private sanitizer = inject(DomSanitizer);
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
   
   taskId: string = '';
   messages: Signal<AiDevChatMessage[]>;
@@ -352,6 +343,10 @@ export class AiDevChatComponent implements OnInit {
     return task.status === AiDevTaskStatus.COMPLETED ||
            task.status === AiDevTaskStatus.ROLLED_BACK ||
            task.status === AiDevTaskStatus.FAILED;
+  });
+
+  currentUserName = computed(() => {
+    return this.userService.currentUser()?.name || 'HUMAN';
   });
 
   /** 头脑风暴配置 Slider 本地状态，随 currentTask 同步初始化 */
@@ -405,6 +400,15 @@ export class AiDevChatComponent implements OnInit {
       this.expandedMessageIds.delete(id);
     } else {
       this.expandedMessageIds.add(id);
+    }
+  }
+
+  async copyMessage(content: string) {
+    try {
+      await navigator.clipboard.writeText(content);
+      // Optional: add a tiny snackbar or notification here if needed
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
     }
   }
 
@@ -587,6 +591,26 @@ export class AiDevChatComponent implements OnInit {
     if (this.taskId) {
       this.useCase.updateTaskConfig(this.taskId, this.brainstormRounds, this.contextWindow);
     }
+  }
+
+  openTaskConfig() {
+    const dialogRef = this.dialog.open(TaskConfigDialogComponent, {
+      data: {
+        brainstormRounds: this.brainstormRounds,
+        contextWindow: this.contextWindow,
+        isReadOnly: this.isReadOnly()
+      },
+      width: '400px',
+      panelClass: ['custom-dialog-container', 'animate-fade-in-up']
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.brainstormRounds = result.brainstormRounds;
+        this.contextWindow = result.contextWindow;
+        this.onConfigChange();
+      }
+    });
   }
 }
 

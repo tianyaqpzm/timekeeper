@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { TokenSummary } from '../../domain/ai-dev.model';
 
 @Component({
   selector: 'app-task-timeline',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './task-timeline.component.html',
   styles: [`
     @keyframes progress-stripes {

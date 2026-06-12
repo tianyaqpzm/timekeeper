@@ -1,61 +1,177 @@
-<div class="p-6 dark:bg-[#1e1f20] dark:text-[#e3e3e3] w-[500px] max-w-full flex flex-col gap-4">
-  <h2 mat-dialog-title class="!flex !items-center !gap-2.5 !text-xl !font-bold !m-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+<div class="p-6 dark:bg-[#1e1f20] dark:text-[#e3e3e3] w-[900px] max-w-[95vw] max-h-[90vh] flex flex-col gap-4 overflow-hidden">
+  <h2 mat-dialog-title class="!flex !items-center !gap-2.5 !text-xl !font-bold !m-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent flex-shrink-0">
     <mat-icon class="!text-blue-500 !w-6 !h-6 !text-[24px]">rocket_launch</mat-icon>
     {{ 'AI_DEV.CREATE_TASK' | translate }}
   </h2>
   
-  <p class="text-xs text-slate-500 dark:text-slate-400 -mt-2">
-    由 ms-ai-devops 常驻服务驱动，AI 团队将自动分析、设计、编码并测试您的需求。
+  <p class="text-xs text-slate-500 dark:text-slate-400 -mt-2 flex-shrink-0">
+    {{ 'AI_DEV.CREATE_TASK_DESC' | translate }}
   </p>
 
-  <mat-dialog-content class="!p-0 !my-2">
-    <div class="flex flex-col gap-2">
-      <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-        {{ 'AI_DEV.DESC_LABEL' | translate }}
-      </label>
-      <textarea
-        [(ngModel)]="taskDescription"
-        rows="4"
-        [placeholder]="'AI_DEV.DESC_PLACEHOLDER' | translate"
-        class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all"
-        (keydown.enter)="$event.preventDefault(); taskDescription.trim() && onSubmit()"
-      ></textarea>
-    </div>
+  <mat-dialog-content class="!p-0 !my-2 flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar">
+    <div class="flex flex-col md:flex-row gap-6">
+      
+      <!-- Left Column: Form -->
+      <div class="flex-1 flex flex-col gap-4">
+        
+        <!-- Title -->
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {{ 'AI_DEV.TITLE_LABEL' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <input
+            [(ngModel)]="taskTitle"
+            [placeholder]="'AI_DEV.TITLE_PLACEHOLDER' | translate"
+            class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+          />
+        </div>
 
-    <div class="flex flex-col gap-2 mt-4">
-      <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-        关联项目 (Related Projects)
-      </label>
-      <mat-form-field appearance="outline" class="w-full text-sm">
-        <mat-chip-grid #chipGrid aria-label="Project selection">
-          <mat-chip-row *ngFor="let project of relatedWorkspaces" (removed)="remove(project)">
-            {{project}}
-            <button matChipRemove [attr.aria-label]="'remove ' + project">
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip-row>
-        </mat-chip-grid>
-        <input placeholder="输入前缀搜索项目..." #projectInput [formControl]="projectCtrl"
-          [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
-          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-          (matChipInputTokenEnd)="add($event)"/>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-          <mat-option *ngFor="let project of filteredProjects | async" [value]="project">
-            {{project}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+        <!-- Description -->
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {{ 'AI_DEV.DESC_LABEL' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            [(ngModel)]="taskDescription"
+            rows="4"
+            [placeholder]="'AI_DEV.DESC_PLACEHOLDER' | translate"
+            class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+          ></textarea>
+        </div>
+
+        <!-- 2-column small inputs: Priority & Target Branch -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {{ 'AI_DEV.PRIORITY_LABEL' | translate }}
+            </label>
+            <select [(ngModel)]="priority" class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer">
+              <option value="High">{{ 'AI_DEV.PRIORITY_HIGH' | translate }}</option>
+              <option value="Medium">{{ 'AI_DEV.PRIORITY_MEDIUM' | translate }}</option>
+              <option value="Low">{{ 'AI_DEV.PRIORITY_LOW' | translate }}</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {{ 'AI_DEV.TARGET_BRANCH_LABEL' | translate }}
+            </label>
+            <input
+              [(ngModel)]="targetBranch"
+              [placeholder]="'AI_DEV.TARGET_BRANCH_PLACEHOLDER' | translate"
+              class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Constraints -->
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {{ 'AI_DEV.CONSTRAINTS_LABEL' | translate }}
+          </label>
+          <textarea
+            [(ngModel)]="constraints"
+            rows="2"
+            [placeholder]="'AI_DEV.CONSTRAINTS_PLACEHOLDER' | translate"
+            class="w-full resize-none rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+          ></textarea>
+        </div>
+
+        <!-- Related Issues & Projects -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {{ 'AI_DEV.RELATED_ISSUES_LABEL' | translate }}
+            </label>
+            <input
+              [(ngModel)]="relatedIssues"
+              [placeholder]="'AI_DEV.RELATED_ISSUES_PLACEHOLDER' | translate"
+              class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+            />
+          </div>
+
+          <!-- Affected Projects (Chips) -->
+          <div class="flex flex-col gap-1 w-full">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {{ 'AI_DEV.AFFECTED_PROJECTS_LABEL' | translate }}
+            </label>
+            <div class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-3 py-1.5 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all min-h-[46px] flex items-center">
+              <mat-chip-grid #chipGrid aria-label="Project selection" class="w-full !p-0">
+                <mat-chip-row *ngFor="let project of affectedProjects" (removed)="remove(project)" class="!bg-slate-100 dark:!bg-[#2e2f30] !text-slate-700 dark:!text-slate-300 !min-h-[28px] !text-xs">
+                  {{project}}
+                  <button matChipRemove [attr.aria-label]="'remove ' + project" class="!opacity-60 hover:!opacity-100">
+                    <mat-icon class="!scale-75">cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+                <input [placeholder]="'AI_DEV.PROJECT_SEARCH_PLACEHOLDER' | translate" #projectInput [formControl]="projectCtrl"
+                  class="flex-grow bg-transparent border-none outline-none text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 min-w-[100px] h-7"
+                  [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  (matChipInputTokenEnd)="add($event)"/>
+              </mat-chip-grid>
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                <mat-option *ngFor="let project of filteredProjects | async" [value]="project" class="!text-sm">
+                  {{project}}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Agent Profiles -->
+      <div class="w-full md:w-[320px] flex flex-col gap-3 border-t md:border-t-0 md:border-l border-slate-200 dark:border-[#444746] pt-4 md:pt-0 md:pl-6 flex-shrink-0">
+        <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+          <mat-icon class="!w-5 !h-5 !text-[20px] !text-purple-500">group</mat-icon>
+          {{ 'AI_DEV.AI_TEAM_LABEL' | translate }}
+        </h3>
+        
+        <div class="flex flex-col gap-3 overflow-y-auto pr-1 pb-1">
+          @if (useCase.isLoading()) {
+            <div class="text-xs text-slate-500 italic">{{ 'COMMON.LOADING' | translate }}</div>
+          } @else if (useCase.agentProfiles().length === 0) {
+            <div class="text-xs text-slate-500 italic">{{ 'AI_DEV.NO_TEAM_CONFIG' | translate }}</div>
+          } @else {
+            @for (profile of useCase.agentProfiles(); track profile.roleName) {
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-[#252627] border border-slate-100 dark:border-[#333537] hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                <!-- Avatar -->
+                <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-white dark:bg-[#1e1f20] border border-slate-200 dark:border-[#444746] shadow-sm overflow-hidden">
+                  @if (profile.avatar) {
+                    <img [src]="profile.avatar" [alt]="profile.roleName" class="w-full h-full object-cover">
+                  } @else {
+                    <span class="text-slate-500 text-lg font-medium">{{profile.roleName.charAt(0)}}</span>
+                  }
+                </div>
+                <!-- Info -->
+                <div class="flex flex-col overflow-hidden w-full">
+                  <div class="font-medium text-sm text-slate-800 dark:text-slate-200 truncate" [title]="profile.roleName">
+                    {{profile.roleName}}
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 truncate" [title]="profile.modelName">
+                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px] flex-shrink-0">psychology</mat-icon>
+                    <span class="truncate">{{profile.modelName || ('AI_DEV.DEFAULT_MODEL' | translate)}}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 truncate" [title]="profile.baseUrl">
+                    {{profile.baseUrl}}
+                  </div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+      
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="!p-0 !mt-2 !gap-3">
+  <mat-dialog-actions align="end" class="!p-0 !mt-2 !gap-3 flex-shrink-0 border-t border-slate-200 dark:border-[#444746] pt-4">
     <button mat-button class="!rounded-xl" (click)="onCancel()">
       {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button
       mat-flat-button
-      class="!rounded-xl !bg-gradient-to-br !from-blue-500 !to-purple-600 !text-white !font-medium !shadow-md !shadow-blue-500/20"
-      [disabled]="!taskDescription.trim()"
+      class="!rounded-xl !bg-gradient-to-br !from-blue-500 !to-purple-600 !text-white !font-medium !shadow-md !shadow-blue-500/20 disabled:!opacity-50 disabled:!shadow-none"
+      [disabled]="!taskTitle.trim() || !taskDescription.trim()"
       (click)="onSubmit()"
     >
       <mat-icon class="!text-[16px] !w-4 !h-4 !mr-1">send</mat-icon>

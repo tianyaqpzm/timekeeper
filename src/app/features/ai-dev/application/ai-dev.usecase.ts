@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AiDevTask, AiDevChatMessage, AiDevAgentProfile, TokenSummary } from '../domain/ai-dev.model';
+import { AiDevTask, AiDevChatMessage, AiDevAgentProfile, TokenSummary, AiDevCreateRequest } from '../domain/ai-dev.model';
 import { AiDevRepository } from '../adapter/ai-dev.repository';
 
 @Injectable({
@@ -124,7 +124,9 @@ export class AiDevUseCase {
         } else if (data.eventType === 'TOKEN_USAGE') {
           const p = data.payload;
           this.tokenSummary.update(curr => {
-            if (!curr) return curr;
+            if (!curr) {
+              curr = { totalPromptTokens: 0, totalCompletionTokens: 0, totalCost: 0, totalDurationMs: 0, phases: [] };
+            }
             const updated = { ...curr, phases: [...curr.phases] };
             updated.totalPromptTokens += p.promptTokens || 0;
             updated.totalCompletionTokens += p.compTokens || 0;
@@ -175,12 +177,11 @@ export class AiDevUseCase {
 
   /**
    * 创建新任务，初始状态 PENDING，由 ms-ai-devops 常驻服务自动拾取执行。
-   * @param description 自然语言任务描述
-   * @param relatedWorkspaces 相关项目列表
+   * @param request 创建任务请求对象
    */
-  async createTask(description: string, relatedWorkspaces: string[]): Promise<void> {
+  async createTask(request: AiDevCreateRequest): Promise<void> {
     try {
-      await firstValueFrom(this.repository.createTask(description, relatedWorkspaces));
+      await firstValueFrom(this.repository.createTask(request));
       await this.loadTasks();
     } catch (err: any) {
       this.error.set(err.message || 'Failed to create task');

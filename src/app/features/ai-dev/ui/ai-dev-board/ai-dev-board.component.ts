@@ -8,6 +8,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DeleteConfirmDialogComponent } from '../../../chat/delete-confirm-dialog.component';
 import { CreateTaskDialogComponent } from './create-task-dialog.component';
 import { DevopsConfigDialogComponent } from './devops-config-dialog.component';
@@ -22,7 +23,7 @@ import { DevopsConfigDialogComponent } from './devops-config-dialog.component';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
-    DevopsConfigDialogComponent
+    DragDropModule
   ],
   templateUrl: './ai-dev-board.component.html',
   styleUrls: ['./ai-dev-board.component.css']
@@ -137,14 +138,14 @@ export class AiDevBoardComponent implements OnInit, OnDestroy {
 
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
-      width: '500px',
+      width: '900px',
       panelClass: ['custom-dialog-container', 'animate-fade-in-up']
     });
 
-    dialogRef.afterClosed().subscribe(async (result: { description: string, relatedWorkspaces: string[] } | undefined) => {
+    dialogRef.afterClosed().subscribe(async (result: any) => {
       if (result && result.description) {
         this.isCreating = true;
-        await this.useCase.createTask(result.description, result.relatedWorkspaces);
+        await this.useCase.createTask(result);
         this.isCreating = false;
       }
     });
@@ -183,5 +184,24 @@ export class AiDevBoardComponent implements OnInit, OnDestroy {
 
   openChat(taskId: string): void {
     window.open(`/#/ai-dev/chat/${taskId}`, '_blank');
+  }
+
+  onDrop(event: CdkDragDrop<any>): void {
+    if (event.previousContainer === event.container) {
+      return;
+    }
+    
+    const task = event.item.data as AiDevTask;
+    const targetId = event.container.id;
+    
+    if (targetId === 'generatingList' && (task.status === AiDevTaskStatus.WAITING_ON_APPROVAL || task.status === AiDevTaskStatus.WAITING_RESUME)) {
+      this.useCase.resumeTask(task.id);
+    } else if (targetId === 'failedList') {
+      this.useCase.rollbackTask(task.id);
+    } else if (targetId === 'planningList' && (task.status === AiDevTaskStatus.COMPLETED || task.status === AiDevTaskStatus.FAILED || task.status === AiDevTaskStatus.ROLLED_BACK || task.status === AiDevTaskStatus.ROLLBACK_REQUESTED)) {
+      this.useCase.reopenTask(task.id);
+    } else {
+      this.useCase.loadTasks();
+    }
   }
 }
