@@ -47,5 +47,9 @@ export const routes: Routes = [
     path: 'ai-dev/chat/:taskId',
     loadComponent: () => import('./app/features/ai-dev/ui/ai-dev-chat/ai-dev-chat.component').then(m => m.AiDevChatComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'notice-board',
+    loadChildren: () => import('./app/features/notice-board/notice-board.routes').then(m => m.NOTICE_BOARD_ROUTES)
   }
 ];

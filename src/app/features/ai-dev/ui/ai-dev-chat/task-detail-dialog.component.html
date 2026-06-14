@@ -13,6 +13,13 @@
           <span class="font-mono font-medium">{{ task.id }}</span>
         </div>
         <div class="flex flex-col gap-0.5">
+          <span class="text-xs text-slate-500 dark:text-slate-400">{{ 'AI_DEV.ENGINE_MODE_LABEL' | translate }} & Roles</span>
+          <span class="font-medium text-[11px] truncate" [title]="task.engineMode + ' - ' + (task.assignedRoles ? task.assignedRoles.join(', ') : '')">
+            {{ task.engineMode === 'HERMES_SINGLE' ? ('AI_DEV.ENGINE_MODE_SINGLE' | translate) : ('AI_DEV.ENGINE_MODE_RELAY' | translate) }}
+            - {{ task.assignedRoles ? task.assignedRoles.join(', ') : '' }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-0.5">
           <span class="text-xs text-slate-500 dark:text-slate-400">{{ 'AI_DEV.TASK_STATUS' | translate }}</span>
           <div>
             <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">

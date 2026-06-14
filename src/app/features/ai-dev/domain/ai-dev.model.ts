@@ -19,6 +19,8 @@ export interface AiDevTask {
   affectedProjects?: string[];
   labels?: string[];
   relatedWorkspaces?: string[];
+  engineMode?: string;
+  assignedRoles?: string[];
 }
 
 export interface AiDevCreateRequest {
@@ -30,6 +32,8 @@ export interface AiDevCreateRequest {
   priority?: string;
   affectedProjects?: string[];
   labels?: string[];
+  engineMode?: string;
+  assignedRoles?: string[];
 }
 
 export interface AiDevChatMessage {

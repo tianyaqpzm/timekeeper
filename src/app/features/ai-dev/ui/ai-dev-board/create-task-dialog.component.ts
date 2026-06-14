@@ -43,6 +43,7 @@ export class CreateTaskDialogComponent implements OnInit {
   taskTitle = '';
   taskDescription = '';
   priority = 'Medium';
+  engineMode = 'HERMES_SINGLE';
   constraints = '';
   relatedIssues = '';
   targetBranch = '';
@@ -56,6 +57,15 @@ export class CreateTaskDialogComponent implements OnInit {
   @ViewChild('projectInput') projectInput!: ElementRef<HTMLInputElement>;
   
   public useCase = inject(AiDevUseCase);
+
+  get displayedProfiles() {
+    const allProfiles = this.useCase.agentProfiles();
+    if (this.engineMode === 'HERMES_SINGLE') {
+      const fsa = allProfiles.find(p => p.roleName === 'FSA');
+      return fsa ? [fsa] : (allProfiles.length > 0 ? [allProfiles[0]] : []);
+    }
+    return allProfiles;
+  }
 
   constructor(
     public dialogRef: MatDialogRef<CreateTaskDialogComponent>
@@ -113,10 +123,12 @@ export class CreateTaskDialogComponent implements OnInit {
         title,
         description: desc,
         priority: this.priority,
+        engineMode: this.engineMode,
         constraints: this.constraints.trim(),
         relatedIssues: this.relatedIssues.trim(),
         targetBranch: this.targetBranch.trim(),
-        affectedProjects: this.affectedProjects
+        affectedProjects: this.affectedProjects,
+        assignedRoles: this.displayedProfiles.map(p => p.roleName)
       });
     }
   }

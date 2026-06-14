@@ -39,8 +39,8 @@
           ></textarea>
         </div>
 
-        <!-- 2-column small inputs: Priority & Target Branch -->
-        <div class="grid grid-cols-2 gap-4">
+        <!-- 3-column small inputs: Priority, Engine Mode & Target Branch -->
+        <div class="grid grid-cols-3 gap-4">
           <div class="flex flex-col gap-1">
             <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
               {{ 'AI_DEV.PRIORITY_LABEL' | translate }}
@@ -49,6 +49,15 @@
               <option value="High">{{ 'AI_DEV.PRIORITY_HIGH' | translate }}</option>
               <option value="Medium">{{ 'AI_DEV.PRIORITY_MEDIUM' | translate }}</option>
               <option value="Low">{{ 'AI_DEV.PRIORITY_LOW' | translate }}</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {{ 'AI_DEV.ENGINE_MODE_LABEL' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <select [(ngModel)]="engineMode" required class="w-full rounded-xl border border-slate-200 dark:border-[#444746] bg-white dark:bg-[#1e1f20] px-4 py-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer">
+              <option value="HERMES_SINGLE">{{ 'AI_DEV.ENGINE_MODE_SINGLE' | translate }}</option>
+              <option value="HERMES_RELAY">{{ 'AI_DEV.ENGINE_MODE_RELAY' | translate }}</option>
             </select>
           </div>
           <div class="flex flex-col gap-1">
@@ -129,10 +138,10 @@
         <div class="flex flex-col gap-3 overflow-y-auto pr-1 pb-1">
           @if (useCase.isLoading()) {
             <div class="text-xs text-slate-500 italic">{{ 'COMMON.LOADING' | translate }}</div>
-          } @else if (useCase.agentProfiles().length === 0) {
+          } @else if (displayedProfiles.length === 0) {
             <div class="text-xs text-slate-500 italic">{{ 'AI_DEV.NO_TEAM_CONFIG' | translate }}</div>
           } @else {
-            @for (profile of useCase.agentProfiles(); track profile.roleName) {
+            @for (profile of displayedProfiles; track profile.roleName) {
               <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-[#252627] border border-slate-100 dark:border-[#333537] hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                 <!-- Avatar -->
                 <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-white dark:bg-[#1e1f20] border border-slate-200 dark:border-[#444746] shadow-sm overflow-hidden">
@@ -171,7 +180,7 @@
     <button
       mat-flat-button
       class="!rounded-xl !bg-gradient-to-br !from-blue-500 !to-purple-600 !text-white !font-medium !shadow-md !shadow-blue-500/20 disabled:!opacity-50 disabled:!shadow-none"
-      [disabled]="!taskTitle.trim() || !taskDescription.trim()"
+      [disabled]="!taskTitle.trim() || !taskDescription.trim() || !engineMode"
       (click)="onSubmit()"
     >
       <mat-icon class="!text-[16px] !w-4 !h-4 !mr-1">send</mat-icon>

@@ -1,0 +1,37 @@
+<h2 mat-dialog-title class="!text-xl !font-semibold text-neutral-800">{{ 'NOTICE_BOARD.DIALOG.ADD_ITEM_TITLE' | translate }}</h2>
+<mat-dialog-content class="!pt-4">
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.TARGET_CLIENT_LABEL' | translate }}</mat-label>
+      <input matInput formControlName="targetClient" [placeholder]="'NOTICE_BOARD.DIALOG.TARGET_CLIENT_PLACEHOLDER' | translate" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.REFERENCE_URL_LABEL' | translate }}</mat-label>
+      <input matInput formControlName="referenceUrl" [placeholder]="'NOTICE_BOARD.DIALOG.REFERENCE_URL_PLACEHOLDER' | translate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.CONTENT_URL_LABEL' | translate }}</mat-label>
+      <textarea matInput formControlName="contentUrl" rows="3" [placeholder]="'NOTICE_BOARD.DIALOG.CONTENT_URL_PLACEHOLDER' | translate" required></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.EXPIRE_TIME_LABEL' | translate }}</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="expireTime" required>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.USAGE_DETAILS_LABEL' | translate }}</mat-label>
+      <textarea matInput formControlName="usageDetails" rows="2" [placeholder]="'NOTICE_BOARD.DIALOG.USAGE_DETAILS_PLACEHOLDER' | translate"></textarea>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="!px-6 !pb-6">
+  <button mat-button mat-dialog-close>{{ 'NOTICE_BOARD.DIALOG.BTN_CANCEL' | translate }}</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="submit()">{{ 'NOTICE_BOARD.DIALOG.BTN_PUBLISH_RESOURCE' | translate }}</button>
+</mat-dialog-actions>

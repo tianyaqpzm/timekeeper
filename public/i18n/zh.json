@@ -12,7 +12,8 @@
     "MCP_MARKET": "能力集",
     "DASHBOARD": "倒计时",
     "EVENTS": "活动列表",
-    "CUSTOMIZE": "界面定制"
+    "CUSTOMIZE": "界面定制",
+    "NOTICE_BOARD": "公告栏"
   },
   "MCP_MARKET": {
     "TITLE": "能力集 & 插件库",
@@ -114,6 +115,9 @@
     "CREATE_TASK": "新建开发任务",
     "CREATE_TASK_DESC": "由 ms-ai-devops 常驻服务驱动，AI 团队将自动分析、设计、编码并测试您的需求。",
     "BOARD_DESC": "由 ms-ai-devops 常驻服务驱动，自动监听并执行任务",
+    "ENGINE_MODE_LABEL": "引擎模式 (Engine Mode)",
+    "ENGINE_MODE_SINGLE": "单体伪装群聊 (HERMES_SINGLE)",
+    "ENGINE_MODE_RELAY": "异构多体接力 (HERMES_RELAY)",
     "DESC_LABEL": "任务需求描述",
     "DESC_PLACEHOLDER": "描述您的开发需求，AI 团队将自动分析、设计、编码和测试您的需求...",
     "TITLE_LABEL": "标题 (Title)",
@@ -175,7 +179,7 @@
     "TEAM_SECTION": "AI 开发团队",
     "PHASE": {
       "EVALUATOR": "评估",
-      "ORCHESTRATOR": "编排",
+      "FSA": "全栈架构师",
       "PLANNER": "规划",
       "ARCHITECT": "架构设计",
       "CODER": "编码实现",
@@ -183,7 +187,7 @@
     },
     "ROLE": {
       "EVALUATOR": "评估员",
-      "ORCHESTRATOR": "编排者",
+      "FSA": "全栈架构师",
       "PLANNER": "规划师",
       "ARCHITECT": "架构师",
       "CODER": "工程师",
@@ -197,7 +201,8 @@
     "SAVE": "保存",
     "SAVING": "正在保存...",
     "REFRESH": "刷新列表",
-    "LOADING": "加载中"
+    "LOADING": "加载中",
+    "CLOSE": "关闭"
   },
   "KNOWLEDGE": {
     "TITLE": "知识空间",
@@ -360,6 +365,62 @@
       "MIN": "分",
       "SEC": "秒",
       "USER_PREFIX": "User"
+    }
+  },
+  "NOTICE_BOARD": {
+    "TITLE": "公告栏",
+    "SUBTITLE": "内部信息公告与公共资源下载",
+    "SEARCH_RESOURCES": "搜索配置资源...",
+    "BTN_ADD_ANNOUNCEMENT": "发布公告",
+    "ADD_CONFIG_SOURCE": "新增公告",
+    "LATEST_ANNOUNCEMENTS": "最新公告",
+    "SUBSCRIPTIONS_POOL": "客户端配置资源池",
+    "TABLE": {
+      "TARGET_CLIENT": "公告标题",
+      "USAGE_DETAILS": "使用说明",
+      "REFERENCE_URL": "下载地址",
+      "GO_TO_DOWNLOAD": "前往下载",
+      "EXPIRE_TIME": "过期时间",
+      "ACTIONS": "操作",
+      "COPY_LINK_TIP": "一键复制提取链接"
+    },
+    "EMPTY_RESOURCES": "当前没有任何可用的配置资源",
+    "COPIED_TO_CLIPBOARD": "已复制到剪贴板",
+    "CLOSE": "关闭",
+    "DIALOG": {
+      "ADD_ANNOUNCEMENT_TITLE": "发布公告",
+      "ANNOUNCEMENT_TITLE_LABEL": "公告标题",
+      "ANNOUNCEMENT_TITLE_PLACEHOLDER": "输入公告标题",
+      "ANNOUNCEMENT_CONTENT_LABEL": "公告内容",
+      "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "输入详细公告内容",
+      "STATUS_LABEL": "公告状态",
+      "STATUS_DRAFT": "草稿",
+      "STATUS_PUBLISHED": "发布中",
+      "STATUS_EXPIRED": "已到期",
+      "EXPIRE_TIME_LABEL": "过期时间 (选填)",
+      "ADD_ITEM_TITLE": "新增公告",
+      "TARGET_CLIENT_LABEL": "公告标题",
+      "TARGET_CLIENT_PLACEHOLDER": "输入公告标题",
+      "REFERENCE_URL_LABEL": "下载地址",
+      "REFERENCE_URL_PLACEHOLDER": "输入软件下载地址",
+      "CONTENT_URL_LABEL": "提取链接内容 (提取码或订阅URL)",
+      "CONTENT_URL_PLACEHOLDER": "输入敏感的订阅地址或提取码",
+      "USAGE_DETAILS_LABEL": "使用说明",
+      "USAGE_DETAILS_PLACEHOLDER": "简要说明使用方法",
+      "BTN_PUBLISH": "发布",
+      "BTN_PUBLISH_RESOURCE": "发布资源",
+      "BTN_CANCEL": "取消"
+    },
+    "DETAIL": {
+      "PRIVATE_CONTENT": "私密内容",
+      "VERIFICATION_REQUIRED": "需要验证",
+      "ENTER_EXTRACTION_CODE": "请输入全局提取码以查看此公告。",
+      "EXTRACTION_CODE": "提取码",
+      "VERIFYING": "验证中...",
+      "UNLOCK_CONTENT": "解锁内容",
+      "ERROR_INVALID_CODE": "提取码无效",
+      "ERROR_NOT_FOUND": "公告未找到",
+      "ERROR_SERVER": "服务器异常"
     }
   }
 }

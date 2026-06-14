@@ -12,7 +12,8 @@
     "MCP_MARKET": "Capability Set",
     "DASHBOARD": "Countdown",
     "EVENTS": "Event List",
-    "CUSTOMIZE": "Customize"
+    "CUSTOMIZE": "Customize",
+    "NOTICE_BOARD": "Notice Board"
   },
   "MCP_MARKET": {
     "TITLE": "Capability Set & Plugin Market",
@@ -114,6 +115,9 @@
     "CREATE_TASK": "New Development Task",
     "CREATE_TASK_DESC": "Driven by ms-ai-devops daemon, the AI team will automatically analyze, design, code, and test your request.",
     "BOARD_DESC": "Driven by ms-ai-devops daemon, automatically listens to and executes tasks",
+    "ENGINE_MODE_LABEL": "Engine Mode",
+    "ENGINE_MODE_SINGLE": "Single Process Mock (HERMES_SINGLE)",
+    "ENGINE_MODE_RELAY": "Multi-Process Relay (HERMES_RELAY)",
     "DESC_LABEL": "Task Requirement Description",
     "DESC_PLACEHOLDER": "Describe your development requirement, the AI team will automatically analyze, design, code, and test your request...",
     "TITLE_LABEL": "Title",
@@ -175,7 +179,7 @@
     "TEAM_SECTION": "AI Dev Team",
     "PHASE": {
       "EVALUATOR": "EVALUATOR",
-      "ORCHESTRATOR": "ORCHESTRATOR",
+      "FSA": "FSA",
       "PLANNER": "PLANNER",
       "ARCHITECT": "ARCHITECT",
       "CODER": "CODER",
@@ -183,7 +187,7 @@
     },
     "ROLE": {
       "EVALUATOR": "EVALUATOR",
-      "ORCHESTRATOR": "ORCHESTRATOR",
+      "FSA": "FSA",
       "PLANNER": "PLANNER",
       "ARCHITECT": "ARCHITECT",
       "CODER": "CODER",
@@ -197,7 +201,8 @@
     "SAVE": "Save",
     "SAVING": "Saving...",
     "REFRESH": "Refresh List",
-    "LOADING": "Loading"
+    "LOADING": "Loading",
+    "CLOSE": "Close"
   },
   "KNOWLEDGE": {
     "TITLE": "Knowledge Space",
@@ -360,6 +365,62 @@
       "MIN": "m",
       "SEC": "s",
       "USER_PREFIX": "User"
+    }
+  },
+  "NOTICE_BOARD": {
+    "TITLE": "Notice Board",
+    "SUBTITLE": "Internal Information Announcements & Public Resource Downloads",
+    "SEARCH_RESOURCES": "Search resources...",
+    "BTN_ADD_ANNOUNCEMENT": "Publish Announcement",
+    "ADD_CONFIG_SOURCE": "Add Announcement",
+    "LATEST_ANNOUNCEMENTS": "Latest Announcements",
+    "SUBSCRIPTIONS_POOL": "Client Config Resource Pool",
+    "TABLE": {
+      "TARGET_CLIENT": "Announcement Title",
+      "USAGE_DETAILS": "Usage Details",
+      "REFERENCE_URL": "Reference URL",
+      "GO_TO_DOWNLOAD": "Go to Download",
+      "EXPIRE_TIME": "Expire Time",
+      "ACTIONS": "Actions",
+      "COPY_LINK_TIP": "Copy Link"
+    },
+    "EMPTY_RESOURCES": "No configuration resources available at this time.",
+    "COPIED_TO_CLIPBOARD": "Copied to clipboard",
+    "CLOSE": "Close",
+    "DIALOG": {
+      "ADD_ANNOUNCEMENT_TITLE": "Publish Announcement",
+      "ANNOUNCEMENT_TITLE_LABEL": "Announcement Title",
+      "ANNOUNCEMENT_TITLE_PLACEHOLDER": "Enter announcement title",
+      "ANNOUNCEMENT_CONTENT_LABEL": "Announcement Content",
+      "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "Enter detailed announcement content",
+      "STATUS_LABEL": "Status",
+      "STATUS_DRAFT": "Draft",
+      "STATUS_PUBLISHED": "Published",
+      "STATUS_EXPIRED": "Expired",
+      "EXPIRE_TIME_LABEL": "Expire Time (Optional)",
+      "ADD_ITEM_TITLE": "Add Announcement",
+      "TARGET_CLIENT_LABEL": "Announcement Title",
+      "TARGET_CLIENT_PLACEHOLDER": "Enter Announcement Title",
+      "REFERENCE_URL_LABEL": "Download URL",
+      "REFERENCE_URL_PLACEHOLDER": "Enter software download URL",
+      "CONTENT_URL_LABEL": "Content URL (Code or Subscription)",
+      "CONTENT_URL_PLACEHOLDER": "Enter sensitive subscription URL or code",
+      "USAGE_DETAILS_LABEL": "Usage Details",
+      "USAGE_DETAILS_PLACEHOLDER": "Briefly explain how to use",
+      "BTN_PUBLISH": "Publish",
+      "BTN_PUBLISH_RESOURCE": "Publish Resource",
+      "BTN_CANCEL": "Cancel"
+    },
+    "DETAIL": {
+      "PRIVATE_CONTENT": "Private Content",
+      "VERIFICATION_REQUIRED": "Verification Required",
+      "ENTER_EXTRACTION_CODE": "Please enter the global extraction code to view this announcement.",
+      "EXTRACTION_CODE": "Extraction Code",
+      "VERIFYING": "Verifying...",
+      "UNLOCK_CONTENT": "Unlock Content",
+      "ERROR_INVALID_CODE": "Invalid Extraction Code",
+      "ERROR_NOT_FOUND": "Announcement Not Found",
+      "ERROR_SERVER": "Server Error"
     }
   }
 }
