@@ -7,6 +7,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { signal } from '@angular/core';
 import { Announcement, NoticeBoardItem } from '../domain/notice-board.model';
 import { AddAnnouncementDialog } from './add-announcement.dialog';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('NoticeBoardComponent', () => {
   let component: NoticeBoardComponent;
@@ -23,7 +24,11 @@ describe('NoticeBoardComponent', () => {
       noticeBoardItems: signal<NoticeBoardItem[]>([]),
       isLoading: signal<boolean>(false),
       error: signal<string | null>(null),
-      isAdmin: signal<boolean>(true)
+      isAdmin: signal<boolean>(true),
+      totalAnnouncements: signal<number>(0),
+      currentPage: signal<number>(1),
+      pageSize: signal<number>(10),
+      keyword: signal<string>('')
     };
 
     snackBarMock = {
@@ -35,13 +40,15 @@ describe('NoticeBoardComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [NoticeBoardComponent, NoopAnimationsModule],
+      imports: [NoticeBoardComponent, NoopAnimationsModule, TranslateModule.forRoot()],
       providers: [
         { provide: NoticeBoardUseCase, useValue: useCaseMock },
         { provide: MatSnackBar, useValue: snackBarMock },
         { provide: MatDialog, useValue: dialogMock }
       ]
-    }).compileComponents();
+    })
+    .overrideProvider(MatDialog, { useValue: dialogMock })
+    .compileComponents();
 
     fixture = TestBed.createComponent(NoticeBoardComponent);
     component = fixture.componentInstance;

@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoticeBoardUseCase } from '../use-case/notice-board.usecase';
@@ -18,11 +20,15 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { NoticeBoardItem } from '../domain/notice-board.model';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { CustomPaginatorIntl } from '../../../shared/components/custom-paginator-intl';
 
 @Component({
   selector: 'app-notice-board',
   standalone: true,
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -58,6 +64,8 @@ export class NoticeBoardComponent implements OnInit, OnDestroy {
   private readonly dialog = inject(MatDialog);
 
   private intervalId: any;
+  private searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
   topAnnouncements = computed(() => {
     return this.useCase.announcements().slice(0, 5);
@@ -70,18 +78,18 @@ export class NoticeBoardComponent implements OnInit, OnDestroy {
   searchQuery = signal<string>('');
 
   filteredAnnouncements = computed(() => {
-    const query = this.searchQuery().toLowerCase();
-    const items = this.useCase.announcements();
-    if (!query) {
-      return items;
-    }
-    return items.filter(item => 
-      item.title.toLowerCase().includes(query)
-    );
+    return this.useCase.announcements();
   });
 
   ngOnInit(): void {
     this.useCase.loadData();
+    
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.useCase.setKeyword(keyword);
+    });
     
     // Auto-rotate top announcements
     this.intervalId = setInterval(() => {
@@ -96,6 +104,14 @@ export class NoticeBoardComponent implements OnInit, OnDestroy {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
+  onSearchQueryChange(query: string): void {
+    this.searchQuery.set(query);
+    this.searchSubject.next(query);
   }
 
   openAddAnnouncementDialog(): void {

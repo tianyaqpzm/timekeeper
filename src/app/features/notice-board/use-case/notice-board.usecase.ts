@@ -18,6 +18,7 @@ export class NoticeBoardUseCase {
   readonly noticeBoardItems = signal<NoticeBoardItem[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
+  readonly keyword = signal<string>('');
 
   // Mock Admin State (Should be wired up to actual Auth UseCase)
   readonly isAdmin = signal<boolean>(true); // Placeholder for actual auth logic
@@ -27,7 +28,7 @@ export class NoticeBoardUseCase {
     this.error.set(null);
 
     // Load Announcements (Paged)
-    this.adapter.getAnnouncements(this.currentPage(), this.pageSize()).pipe(
+    this.adapter.getAnnouncements(this.currentPage(), this.pageSize(), this.keyword()).pipe(
       tap(data => {
         if ('records' in data) {
           this.announcements.set(data.records);
@@ -120,6 +121,12 @@ export class NoticeBoardUseCase {
     // Angular Material Paginator is 0-indexed, our backend is 1-indexed
     this.currentPage.set(pageIndex + 1);
     this.pageSize.set(pageSize);
+    this.loadData();
+  }
+
+  setKeyword(keyword: string): void {
+    this.keyword.set(keyword);
+    this.currentPage.set(1);
     this.loadData();
   }
 }

@@ -8,6 +8,7 @@
 /* 1. 引入插件 */
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/container-queries";
+@plugin "@tailwindcss/typography";
 
 /* 2. 在这里配置主题 (替代 tailwind.config.js) */
 @theme {

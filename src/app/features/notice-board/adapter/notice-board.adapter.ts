@@ -9,11 +9,18 @@ export class NoticeBoardAdapter {
   private readonly http = inject(HttpClient);
   private readonly basePath = `${environment.VITE_GATEWAY_URL}/rest/biz/v1`;
 
-  getAnnouncements(page?: number, size?: number): Observable<PageResult<Announcement> | Announcement[]> {
+  getAnnouncements(page?: number, size?: number, keyword?: string): Observable<PageResult<Announcement> | Announcement[]> {
     let url = `${this.basePath}/announcements`;
-    if (page !== undefined && size !== undefined) {
-      url += `?page=${page}&size=${size}`;
+    const params = new URLSearchParams();
+    if (page !== undefined) params.append('page', page.toString());
+    if (size !== undefined) params.append('size', size.toString());
+    if (keyword) params.append('keyword', keyword);
+    
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
     }
+    
     return this.http.get<PageResult<Announcement> | Announcement[]>(url);
   }
 
