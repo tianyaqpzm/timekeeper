@@ -25,8 +25,10 @@ export class ChatApiAdapter implements ChatRepository {
             params: { sessionId }
         }).pipe(
             map(history => history.map(h => ({
+                id: h.id,
                 role: h.role === 'ai' ? 'model' : 'user',
-                content: h.content
+                content: h.content,
+                rating: h.rating ?? null
             })))
         );
     }
@@ -51,14 +53,25 @@ export class ChatApiAdapter implements ChatRepository {
     }
 
     /**
+     * 对消息进行评分。
+     * @param messageId - 后端消息 ID。
+     * @param sessionId - 会话 ID。
+     * @param rating - 评分: 'good', 'bad', 或 null (取消评分)。
+     * @returns 操作结果 Observable。
+     */
+    rateMessage(messageId: number, sessionId: string, rating: 'good' | 'bad' | null): Observable<void> {
+        return this.http.post<void>(URLConfig.CHAT.RATING(messageId), { rating });
+    }
+
+    /**
      * 发送流式消息。
      * @param sessionId - 会话 ID。
      * @param message - 用户消息内容。
      * @param topicId - 知识库主题 ID（可选）。
      * @returns 流式响应内容 Observable (字符串或包含 sources 的对象)。
      */
-    sendMessageStream(sessionId: string, message: string, topicId: string | null): Observable<string | { content?: string, sources?: any[] }> {
-        return new Observable<string | { content?: string, sources?: any[] }>(observer => {
+    sendMessageStream(sessionId: string, message: string, topicId: string | null): Observable<string | { content?: string, sources?: any[], messageId?: number }> {
+        return new Observable<string | { content?: string, sources?: any[], messageId?: number }>(observer => {
             let lastProcessedIndex = 0;
             let lineBuffer = '';
 
@@ -131,6 +144,10 @@ export class ChatApiAdapter implements ChatRepository {
                 // 如果包含 sources，发送整个对象供 UseCase 识别
                 if (parsed.sources) {
                     observer.next({ sources: parsed.sources });
+                }
+                // 如果包含 messageId，发送给 UseCase
+                if (parsed.messageId) {
+                    observer.next({ messageId: parsed.messageId });
                 }
             } catch (e) {
                 // 忽略解析错误

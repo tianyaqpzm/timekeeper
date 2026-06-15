@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: on_demand
+description: ms-ng-view 完整历史规范（已拆分）。深度参考见 skills/angular-reference/SKILL.md
 ---
 
 # Role (角色)

@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+::ng-deep .mat-mdc-dialog-content {
+  padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions {
+  padding: 0 !important;
+}

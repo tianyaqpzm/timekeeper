@@ -1,0 +1,136 @@
+<div class="min-h-screen bg-gray-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 p-6 md:p-12 font-sans selection:bg-indigo-500/30">
+  <div class="max-w-6xl mx-auto space-y-10">
+
+    <!-- Header Section -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" @fadeInUp>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400">
+          {{ 'NOTICE_BOARD.TITLE' | translate }}
+        </h1>
+        <p class="text-neutral-600 dark:text-neutral-400 mt-2">{{ 'NOTICE_BOARD.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="flex gap-3" *ngIf="useCase.isAdmin()">
+        <button mat-flat-button color="primary" class="!rounded-full !px-6 shadow-lg shadow-indigo-500/20" (click)="openAddAnnouncementDialog()">
+          <mat-icon>campaign</mat-icon> {{ 'NOTICE_BOARD.BTN_ADD_ANNOUNCEMENT' | translate }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Announcements Ticker Section -->
+    <section *ngIf="topAnnouncements().length > 0" class="flex items-center bg-white dark:bg-neutral-800/80 border border-amber-200 dark:border-amber-500/20 rounded-full px-6 py-3 shadow-sm" @fadeInUp>
+      <mat-icon class="text-amber-500 dark:text-amber-400 mr-3 animate-pulse">campaign</mat-icon>
+      <span class="font-medium text-amber-700 dark:text-amber-500 mr-4 whitespace-nowrap">{{ 'NOTICE_BOARD.LATEST_ANNOUNCEMENTS' | translate }}:</span>
+      
+      <div class="flex-1 overflow-hidden h-6 relative">
+        <div class="flex flex-col transition-transform duration-500 ease-in-out" [style.transform]="'translateY(-' + (currentAnnouncementIndex() * 1.5) + 'rem)'">
+          <div *ngFor="let ann of topAnnouncements()" class="h-6 flex items-center justify-between w-full">
+            <a href="#/notice-board/a/{{ann.id}}?code={{ann.extractionCode}}" target="_blank" class="truncate text-neutral-700 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors block font-medium">
+              <span *ngIf="ann.status === 'PUBLISHED'" class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2 align-middle"></span>
+              {{ ann.title }}
+            </a>
+            <span class="text-xs text-neutral-400 ml-4 whitespace-nowrap">{{ ann.createTime | date:'yyyy-MM-dd' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subscriptions Section (Table & Search) -->
+    <section class="space-y-4" @fadeInUp>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
+        
+        <mat-form-field appearance="outline" class="w-full sm:w-64 -mb-4">
+          <mat-icon matPrefix class="text-neutral-400">search</mat-icon>
+          <input matInput [placeholder]="'NOTICE_BOARD.SEARCH_RESOURCES' | translate" [ngModel]="searchQuery()" (ngModelChange)="onSearchQueryChange($event)">
+        </mat-form-field>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-700/50 shadow-xl shadow-black/5 dark:shadow-2xl backdrop-blur-sm bg-white/80 dark:bg-neutral-800/40">
+        <table mat-table [dataSource]="filteredAnnouncements()" class="w-full !bg-transparent">
+
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef class="!text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">公告标题</th>
+            <td mat-cell *matCellDef="let item" class="!text-neutral-800 dark:!text-neutral-200 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              <a href="#/notice-board/a/{{item.id}}?code={{item.extractionCode}}" target="_blank" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors no-underline hover:underline cursor-pointer font-medium">
+                {{ item.title }}
+              </a>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="!text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">状态</th>
+            <td mat-cell *matCellDef="let item" class="!text-neutral-800 dark:!text-neutral-200 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              <span *ngIf="item.status === 'DRAFT'" class="px-2 py-1 text-xs font-medium rounded-md bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-600">
+                {{ 'NOTICE_BOARD.DIALOG.STATUS_DRAFT' | translate }}
+              </span>
+              <span *ngIf="item.status === 'PUBLISHED'" class="px-2 py-1 text-xs font-medium rounded-md bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                {{ 'NOTICE_BOARD.DIALOG.STATUS_PUBLISHED' | translate }}
+              </span>
+              <span *ngIf="item.status === 'EXPIRED'" class="px-2 py-1 text-xs font-medium rounded-md bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20">
+                已到期
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Create Time Column -->
+          <ng-container matColumnDef="createTime">
+            <th mat-header-cell *matHeaderCellDef class="!text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">发布时间</th>
+            <td mat-cell *matCellDef="let item" class="!text-neutral-800 dark:!text-neutral-200 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              {{ item.createTime | date:'yyyy-MM-dd HH:mm' }}
+            </td>
+          </ng-container>
+
+          <!-- Expire Time Column -->
+          <ng-container matColumnDef="expireTime">
+            <th mat-header-cell *matHeaderCellDef class="!text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">过期时间</th>
+            <td mat-cell *matCellDef="let item" class="!text-neutral-800 dark:!text-neutral-200 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              {{ item.expireTime ? (item.expireTime | date:'yyyy-MM-dd HH:mm') : '永久' }}
+            </td>
+          </ng-container>
+
+          <!-- Extraction Code Column -->
+          <ng-container matColumnDef="extractionCode">
+            <th mat-header-cell *matHeaderCellDef class="!text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">提取码</th>
+            <td mat-cell *matCellDef="let item" class="!text-neutral-800 dark:!text-neutral-200 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              <span *ngIf="item.extractionCode" class="font-mono text-sm bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded">{{ item.extractionCode }}</span>
+              <span *ngIf="!item.extractionCode" class="text-neutral-400">-</span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="!text-right !pr-6 !text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">{{ 'NOTICE_BOARD.TABLE.ACTIONS' | translate }}</th>
+            <td mat-cell *matCellDef="let item" class="!text-right !pr-6 !border-b-neutral-200 dark:!border-b-neutral-700/50">
+              <button mat-icon-button *ngIf="useCase.isAdmin()"
+                      class="!text-neutral-400 dark:!text-neutral-400 hover:!text-red-600 dark:hover:!text-red-400 hover:!bg-red-50 dark:hover:!bg-red-400/10 transition-colors"
+                      [matTooltip]="'COMMON.DELETE' | translate"
+                      (click)="deleteAnnouncement(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['title', 'status', 'createTime', 'expireTime', 'extractionCode', 'actions']" class="!bg-neutral-50/50 dark:!bg-neutral-800/50"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['title', 'status', 'createTime', 'expireTime', 'extractionCode', 'actions'];" class="hover:bg-neutral-50/50 dark:hover:bg-neutral-700/30 transition-colors"></tr>
+        </table>
+        
+        <!-- Empty State -->
+        <div *ngIf="filteredAnnouncements().length === 0 && !useCase.isLoading()" class="p-12 text-center text-neutral-400 dark:text-neutral-500 flex flex-col items-center gap-3">
+          <mat-icon class="text-4xl mb-2 opacity-50">search_off</mat-icon>
+          <p>{{ 'NOTICE_BOARD.NO_RESULTS' | translate }}</p>
+        </div>
+
+        <mat-paginator [length]="useCase.totalAnnouncements()"
+                       [pageSize]="useCase.pageSize()"
+                       [pageIndex]="useCase.currentPage() - 1"
+                       [pageSizeOptions]="[5, 10, 25, 100]"
+                       (page)="onPageChange($event)"
+                       aria-label="Select page">
+        </mat-paginator>
+      </div>
+    </section>
+
+  </div>
+</div>

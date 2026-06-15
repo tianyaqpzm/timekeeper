@@ -1,0 +1,203 @@
+<div class="h-full overflow-y-auto bg-gray-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 p-6 md:p-12 font-sans selection:bg-indigo-500/30">
+  <div class="max-w-4xl mx-auto space-y-10">
+
+    <!-- Header Section -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-in">
+      <div class="flex-1 min-w-0">
+        <!-- 非编辑模式：展示标题 -->
+        <h1 *ngIf="!isEditing()" class="text-2xl md:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400 truncate">
+          {{ isVerified() ? announcement()?.title : '' }}
+        </h1>
+        <!-- 编辑模式：标题输入框 -->
+        <input
+          *ngIf="isEditing()"
+          class="w-full text-2xl md:text-3xl font-extrabold tracking-tight bg-transparent border-b-2 border-indigo-400 focus:border-indigo-600 dark:focus:border-indigo-300 outline-none text-neutral-900 dark:text-neutral-100 pb-1 transition-colors"
+          [ngModel]="editTitle()"
+          (ngModelChange)="editTitle.set($event)"
+          placeholder="公告标题"
+          id="edit-title-input"
+        />
+        <p class="text-neutral-600 dark:text-neutral-400 mt-2" *ngIf="isVerified() && !isEditing()">
+          {{ announcement()?.createTime | date:'yyyy-MM-dd HH:mm' }}
+        </p>
+      </div>
+
+      <!-- 编辑操作按钮区（已登录用户 + 已验证）-->
+      <div class="flex items-center gap-2 shrink-0" *ngIf="isVerified() && canEdit()">
+
+        <!-- 非编辑模式：显示"编辑"按钮 -->
+        <ng-container *ngIf="!isEditing()">
+          <button
+            id="btn-enter-edit"
+            mat-stroked-button
+            class="!rounded-full !border-indigo-400 !text-indigo-500 dark:!border-indigo-400 dark:!text-indigo-400 hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors"
+            (click)="enterEditMode()"
+            matTooltip="编辑此公告">
+            <mat-icon>edit</mat-icon>
+            编辑
+          </button>
+        </ng-container>
+
+        <!-- 编辑模式：预览切换 + 保存 + 取消 -->
+        <ng-container *ngIf="isEditing()">
+          <button
+            id="btn-toggle-preview"
+            mat-icon-button
+            [matTooltip]="showPreview() ? '切换到编辑' : '预览 Markdown'"
+            class="!text-neutral-500 dark:!text-neutral-400"
+            (click)="togglePreview()">
+            <mat-icon>{{ showPreview() ? 'code' : 'preview' }}</mat-icon>
+          </button>
+          <button
+            id="btn-cancel-edit"
+            mat-stroked-button
+            class="!rounded-full !text-neutral-600 dark:!text-neutral-300 hover:!bg-neutral-100 dark:hover:!bg-neutral-700/50 transition-colors"
+            (click)="cancelEdit()">
+            <mat-icon>close</mat-icon>
+            取消
+          </button>
+          <button
+            id="btn-save-edit"
+            mat-flat-button
+            color="primary"
+            class="!rounded-full shadow-md shadow-indigo-500/20"
+            [disabled]="isSaving() || isUploading()"
+            (click)="saveEdit()">
+            <mat-icon *ngIf="!isSaving()">save</mat-icon>
+            <mat-icon *ngIf="isSaving()" class="animate-spin">autorenew</mat-icon>
+            {{ isSaving() ? '保存中...' : '保存' }}
+          </button>
+        </ng-container>
+      </div>
+    </header>
+
+    <!-- Verification Section -->
+    <div *ngIf="!isVerified()" class="flex flex-col items-center justify-center py-10">
+      <div class="bg-white dark:bg-neutral-800 p-6 rounded-3xl shadow-xl w-full max-w-md text-center border border-neutral-200 dark:border-neutral-700 relative overflow-hidden">
+        <div class="absolute -top-16 -right-16 w-32 h-32 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-cyan-500/20 dark:bg-cyan-500/10 rounded-full blur-2xl"></div>
+        
+        <mat-icon class="text-indigo-500 dark:text-indigo-400 text-5xl mb-3 relative z-10" style="height: 50px; width: 50px; font-size: 50px;">lock</mat-icon>
+        <h2 class="text-xl font-bold mb-2 relative z-10">{{ 'NOTICE_BOARD.DETAIL.VERIFICATION_REQUIRED' | translate }}</h2>
+        <p class="text-neutral-500 dark:text-neutral-400 text-sm mb-6 relative z-10">{{ 'NOTICE_BOARD.DETAIL.ENTER_EXTRACTION_CODE' | translate }}</p>
+        
+        <mat-form-field appearance="outline" class="w-full mb-1 relative z-10">
+          <mat-label>{{ 'NOTICE_BOARD.DETAIL.EXTRACTION_CODE' | translate }}</mat-label>
+          <input matInput [type]="showCode() ? 'text' : 'password'" [ngModel]="extractionCode()" (ngModelChange)="extractionCode.set($event)" (keyup.enter)="verifyAndLoad()">
+          <mat-icon matPrefix>key</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="toggleShowCode()" [attr.aria-label]="showCode() ? 'Hide code' : 'Show code'">
+            <mat-icon>{{ showCode() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        
+        <div class="text-red-500 text-sm mb-3 min-h-[20px] relative z-10 font-medium">
+          <span *ngIf="errorMsg()">{{ errorMsg() | translate }}</span>
+        </div>
+
+        <button mat-flat-button color="primary" class="w-full !rounded-xl !py-5 shadow-lg shadow-indigo-500/30 relative z-10" 
+                [disabled]="isLoading() || !extractionCode().trim()" 
+                (click)="verifyAndLoad()">
+          <mat-icon *ngIf="!isLoading()">lock_open</mat-icon>
+          <mat-icon *ngIf="isLoading()" class="animate-spin">autorenew</mat-icon>
+          {{ isLoading() ? ('NOTICE_BOARD.DETAIL.VERIFYING' | translate) : ('NOTICE_BOARD.DETAIL.UNLOCK_CONTENT' | translate) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div *ngIf="isVerified() && announcement()" class="bg-white dark:bg-neutral-800 rounded-3xl p-8 md:p-12 shadow-xl border border-neutral-200 dark:border-neutral-700/50 relative overflow-hidden animate-fade-in-up">
+      <!-- Decorator -->
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-indigo-500/10 to-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- 阅读模式：Markdown 渲染 -->
+      <div *ngIf="!isEditing()" class="markdown-body prose prose-indigo dark:prose-invert max-w-none relative z-10 leading-relaxed">
+        <markdown [data]="announcement()?.content"></markdown>
+      </div>
+
+      <!-- 编辑模式：Markdown 编辑器 -->
+      <div *ngIf="isEditing()" class="relative z-10 space-y-3">
+
+        <!-- 上传进度条 -->
+        <mat-progress-bar
+          *ngIf="isUploading()"
+          mode="indeterminate"
+          class="!rounded-full !h-1">
+        </mat-progress-bar>
+
+        <!-- ── Markdown 工具栏 ── -->
+        <div class="editor-toolbar flex flex-wrap items-center gap-1 px-3 py-2 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-600/50 rounded-xl">
+          <ng-container *ngFor="let action of toolbarActions">
+            <!-- 分隔线 -->
+            <div *ngIf="action.divider" class="w-px h-5 bg-neutral-300 dark:bg-neutral-600 mx-1"></div>
+            <button
+              mat-icon-button
+              class="!w-8 !h-8 !text-neutral-500 dark:!text-neutral-400 hover:!text-indigo-600 dark:hover:!text-indigo-400 hover:!bg-indigo-50 dark:hover:!bg-indigo-500/10 transition-colors"
+              [matTooltip]="action.tooltip"
+              type="button"
+              (click)="action.action()">
+              <mat-icon class="text-base" style="font-size:18px;height:18px;width:18px;">{{ action.icon }}</mat-icon>
+            </button>
+          </ng-container>
+
+          <!-- 上传状态提示 -->
+          <span *ngIf="isUploading()" class="ml-2 text-xs text-indigo-500 dark:text-indigo-400 animate-pulse flex items-center gap-1">
+            <mat-icon class="text-xs animate-spin" style="font-size:14px;height:14px;width:14px;">autorenew</mat-icon>
+            上传中...
+          </span>
+
+          <!-- 隐藏的文件选择器 -->
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            id="image-file-input"
+            accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+            (change)="onFileSelected($event)"
+          />
+        </div>
+
+        <!-- ── 编辑区 / 预览区 ── -->
+
+        <!-- 预览模式 -->
+        <div
+          *ngIf="showPreview()"
+          class="markdown-body prose prose-indigo dark:prose-invert max-w-none leading-relaxed border border-dashed border-indigo-300 dark:border-indigo-500/40 rounded-xl p-4 bg-indigo-50/30 dark:bg-indigo-500/5 min-h-[300px]">
+          <markdown [data]="editContent()"></markdown>
+        </div>
+
+        <!-- 编辑文本区（支持拖拽 & 粘贴图片） -->
+        <div
+          *ngIf="!showPreview()"
+          class="relative"
+          [class.drag-over]="isDragOver()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)">
+
+          <!-- 拖拽遮罩层 -->
+          <div *ngIf="isDragOver()"
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50/80 dark:bg-indigo-900/40 backdrop-blur-sm pointer-events-none">
+            <mat-icon class="text-indigo-500 mb-2" style="font-size:48px;height:48px;width:48px;">cloud_upload</mat-icon>
+            <span class="text-indigo-600 dark:text-indigo-400 font-semibold text-lg">松开以上传图片</span>
+          </div>
+
+          <textarea
+            #contentTextarea
+            id="edit-content-textarea"
+            class="w-full min-h-[400px] bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-600/50 rounded-xl p-4 font-mono text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:border-indigo-400 transition-all resize-y leading-relaxed"
+            [ngModel]="editContent()"
+            (ngModelChange)="editContent.set($event)"
+            (paste)="onPaste($event)"
+            placeholder="在此输入 Markdown 内容...&#10;&#10;支持：&#10;  • 拖拽图片到此区域上传&#10;  • Ctrl+V 粘贴图片&#10;  • 点击工具栏图片图标上传">
+          </textarea>
+
+          <!-- 底部提示 -->
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1 px-1">
+            支持 Markdown · 可拖拽或 Ctrl+V 粘贴图片（最大 10MB）
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
