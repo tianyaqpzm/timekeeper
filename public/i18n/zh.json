@@ -137,7 +137,7 @@
     "AI_TEAM_LABEL": "参与的 AI 团队",
     "NO_TEAM_CONFIG": "暂无配置信息",
     "DEFAULT_MODEL": "默认模型",
-    "PROFILE_SYNC_HINT": "与本地 <code>~/.hermes/profiles/{{role}}/SOUL.md</code> 双向同步",
+    "PROFILE_SYNC_HINT": "与本地 <code>{{path}}</code> 双向同步",
     "BRAINSTORM_CONFIG": "头脑风暴配置",
     "VIEW_DETAILS": "查看详情",
     "EXPAND_FULL_CONTENT": "展开完整内容",

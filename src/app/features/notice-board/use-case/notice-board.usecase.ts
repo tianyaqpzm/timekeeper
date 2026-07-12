@@ -117,6 +117,17 @@ export class NoticeBoardUseCase {
     });
   }
 
+  updateAnnouncement(id: number, request: AnnouncementRequest, onSuccess?: () => void): void {
+    this.adapter.updateAnnouncement(id, request).subscribe({
+      next: (updatedAnnouncement) => {
+        this.announcements.update(list => list.map(item => item.id === id ? updatedAnnouncement : item));
+        this.snackBar.open('Announcement updated successfully', 'Close', { duration: 3000 });
+        if (onSuccess) onSuccess();
+      },
+      error: () => this.snackBar.open('Failed to update announcement', 'Close', { duration: 3000 })
+    });
+  }
+
   changePage(pageIndex: number, pageSize: number): void {
     // Angular Material Paginator is 0-indexed, our backend is 1-indexed
     this.currentPage.set(pageIndex + 1);

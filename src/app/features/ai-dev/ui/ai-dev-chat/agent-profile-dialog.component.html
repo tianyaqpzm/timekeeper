@@ -1,10 +1,16 @@
 <h2 mat-dialog-title class="flex items-center gap-2 text-slate-800 dark:text-gray-200">
   <mat-icon class="text-blue-500">manage_accounts</mat-icon>
-  Configure Role: {{ profile.roleName }}
+  <span *ngIf="isNew">Create Role</span>
+  <span *ngIf="!isNew">Configure Role: {{ profile.roleName }}</span>
 </h2>
 
 <mat-dialog-content class="!pt-4 min-w-[400px]">
   <div class="flex flex-col gap-4">
+    <mat-form-field *ngIf="isNew" appearance="outline" class="w-full hide-subscript">
+      <mat-label>Role Name</mat-label>
+      <input matInput [(ngModel)]="profile.roleName" placeholder="e.g., TESTER, ANALYST" required>
+    </mat-form-field>
+
     <mat-form-field appearance="outline" class="w-full hide-subscript">
       <mat-label>Avatar (Icon Name or Image URL)</mat-label>
       <input matInput [(ngModel)]="profile.avatar" placeholder="e.g., smart_toy, /images/avatar.png">
@@ -12,6 +18,13 @@
         <img *ngIf="profile.avatar?.includes('/') || profile.avatar?.includes('.')" [src]="profile.avatar" class="w-6 h-6 rounded-full object-cover mr-2" />
         <mat-icon *ngIf="!(profile.avatar?.includes('/') || profile.avatar?.includes('.'))" class="text-slate-400 mr-2">{{ profile.avatar || 'smart_toy' }}</mat-icon>
       </ng-container>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>Agent Type</mat-label>
+      <mat-select [(ngModel)]="profile.agentType" placeholder="Select Agent Type">
+        <mat-option *ngFor="let t of agentTypes" [value]="t">{{ t }}</mat-option>
+      </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-full hide-subscript">
@@ -29,10 +42,15 @@
       <input matInput [(ngModel)]="profile.apiToken" type="password" placeholder="sk-...">
     </mat-form-field>
 
+    <mat-form-field appearance="outline" class="w-full hide-subscript">
+      <mat-label>Local Sync Path (Optional)</mat-label>
+      <input matInput [(ngModel)]="profile.localSyncPath" [placeholder]="'e.g., ' + defaultPathPlaceholder">
+    </mat-form-field>
+
     <mat-form-field appearance="outline" class="w-full">
       <mat-label>SOUL (System Prompt)</mat-label>
-      <textarea matInput [(ngModel)]="profile.systemPrompt" rows="8" placeholder="# Role: ...&#10;&#10;Describe the agent's identity, mission, responsibilities, and constraints.&#10;Synced with ~/.hermes/profiles/<role>/SOUL.md"></textarea>
-      <mat-hint [innerHTML]="'AI_DEV.PROFILE_SYNC_HINT' | translate:{ role: (profile.roleName | lowercase) }"></mat-hint>
+      <textarea matInput [(ngModel)]="profile.systemPrompt" rows="8" [placeholder]="'# Role: ...\n\nDescribe the agent\'s identity, mission, responsibilities, and constraints.\nSynced with ' + syncPathHint"></textarea>
+      <mat-hint [innerHTML]="'AI_DEV.PROFILE_SYNC_HINT' | translate:{ path: syncPathHint }"></mat-hint>
     </mat-form-field>
   </div>
 </mat-dialog-content>

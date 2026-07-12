@@ -34,6 +34,7 @@ export interface AiDevCreateRequest {
   labels?: string[];
   engineMode?: string;
   assignedRoles?: string[];
+  importFromGithub?: boolean;
 }
 
 export interface AiDevChatMessage {
@@ -42,6 +43,8 @@ export interface AiDevChatMessage {
   senderRole: string;
   content: string;
   createTime: string;
+  githubSyncStatus?: string;
+  githubSyncError?: string;
 }
 
 export interface AiDevAgentProfile {
@@ -52,9 +55,12 @@ export interface AiDevAgentProfile {
   modelName: string;
   avatar: string;
   systemPrompt: string;
+  localSyncPath?: string;
+  agentType?: string;
 }
 
 export enum AiDevTaskStatus {
+  IMPORT_REQUESTED = 'IMPORT_REQUESTED', // 新增：正在从 GitHub 导入中
   PENDING = 'PENDING',               // 已创建，等待 ms-ai-devops 拾取
   RUNNING = 'RUNNING',               // 已被常驻服务拾取，执行中
   STARTING = 'STARTING',

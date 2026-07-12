@@ -48,7 +48,8 @@ export const URLConfig = {
         RESUME: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/resume`,
         ROLLBACK: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/rollback`,
         REOPEN: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/reopen`,
-        CONFIG: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/config`
+        CONFIG: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/config`,
+        ASSIGNED_ROLES: (id: string) => `/rest/biz/v1/ai-dev/tasks/${id}/assigned-roles`
     }
 };
 

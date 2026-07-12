@@ -137,7 +137,7 @@
     "AI_TEAM_LABEL": "Participating AI Team",
     "NO_TEAM_CONFIG": "No configuration info",
     "DEFAULT_MODEL": "Default Model",
-    "PROFILE_SYNC_HINT": "Bidirectional sync with local <code>~/.hermes/profiles/{{role}}/SOUL.md</code>",
+    "PROFILE_SYNC_HINT": "Bidirectional sync with local <code>{{path}}</code>",
     "BRAINSTORM_CONFIG": "Brainstorm Config",
     "VIEW_DETAILS": "View Details",
     "EXPAND_FULL_CONTENT": "Expand Full Content",

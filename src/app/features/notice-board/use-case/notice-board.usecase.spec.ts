@@ -14,6 +14,7 @@ describe('NoticeBoardUseCase', () => {
     adapterMock = {
       getAnnouncements: jest.fn(),
       createAnnouncement: jest.fn(),
+      updateAnnouncement: jest.fn(),
       getNoticeBoardItems: jest.fn(),
       createNoticeBoardItem: jest.fn(),
       trackItemView: jest.fn()
@@ -105,5 +106,33 @@ describe('NoticeBoardUseCase', () => {
     const updatedItem = useCase.noticeBoardItems().find(i => i.id === 1);
     expect(updatedItem?.lastViewedTime).not.toBe('oldTime');
     expect(adapterMock.trackItemView).toHaveBeenCalledWith(1);
+  });
+
+  it('should update an announcement successfully', () => {
+    const mockAnnouncements: Announcement[] = [
+      { id: 1, title: 'Old Title', content: 'Old Content', status: 'DRAFT', createTime: '', updateTime: '' }
+    ];
+    useCase.announcements.set(mockAnnouncements);
+
+    const request: AnnouncementRequest = { title: 'New Title', content: 'New Content', status: 'PUBLISHED', extractionCode: '123' };
+    const mockUpdatedAnnouncement: Announcement = { id: 1, ...request, createTime: '', updateTime: '' };
+    adapterMock.updateAnnouncement.mockReturnValue(of(mockUpdatedAnnouncement));
+    
+    const onSuccessSpy = jest.fn();
+
+    useCase.updateAnnouncement(1, request, onSuccessSpy);
+
+    expect(useCase.announcements()).toContainEqual(mockUpdatedAnnouncement);
+    expect(snackBarMock.open).toHaveBeenCalledWith('Announcement updated successfully', 'Close', { duration: 3000 });
+    expect(onSuccessSpy).toHaveBeenCalled();
+  });
+
+  it('should handle error when updating announcement', () => {
+    const request: AnnouncementRequest = { title: 'New Title', content: 'New Content', status: 'PUBLISHED', extractionCode: '123' };
+    adapterMock.updateAnnouncement.mockReturnValue(throwError(() => new Error('Error')));
+
+    useCase.updateAnnouncement(1, request);
+
+    expect(snackBarMock.open).toHaveBeenCalledWith('Failed to update announcement', 'Close', { duration: 3000 });
   });
 });

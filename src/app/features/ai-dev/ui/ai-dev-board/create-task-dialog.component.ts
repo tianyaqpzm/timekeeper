@@ -47,6 +47,7 @@ export class CreateTaskDialogComponent implements OnInit {
   constraints = '';
   relatedIssues = '';
   targetBranch = '';
+  importFromGithub = false;
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   projectCtrl = new FormControl('');
@@ -118,17 +119,20 @@ export class CreateTaskDialogComponent implements OnInit {
   onSubmit(): void {
     const title = this.taskTitle.trim();
     const desc = this.taskDescription.trim();
-    if (title && desc) {
+    const isGithubImport = this.importFromGithub && this.relatedIssues.trim().length > 0;
+
+    if (isGithubImport || (title && desc)) {
       this.dialogRef.close({
-        title,
-        description: desc,
+        title: title || 'GitHub Issue 导入任务',
+        description: desc || '正在从 GitHub 自动导入 Issue 详细描述...',
         priority: this.priority,
         engineMode: this.engineMode,
         constraints: this.constraints.trim(),
         relatedIssues: this.relatedIssues.trim(),
         targetBranch: this.targetBranch.trim(),
         affectedProjects: this.affectedProjects,
-        assignedRoles: this.displayedProfiles.map(p => p.roleName)
+        assignedRoles: this.displayedProfiles.map(p => p.roleName),
+        importFromGithub: isGithubImport
       });
     }
   }

@@ -14,11 +14,13 @@ export class AiDevRepository {
     return this.http.get<AiDevTask[]>(URLConfig.AI_DEV.TASKS);
   }
 
-  getProfiles(): Observable<AiDevAgentProfile[]> {
-    return this.http.get<AiDevAgentProfile[]>(URLConfig.AI_DEV.PROFILES);
+  getProfiles(taskId?: string): Observable<AiDevAgentProfile[]> {
+    const url = taskId ? `${URLConfig.AI_DEV.PROFILES}?taskId=${taskId}` : URLConfig.AI_DEV.PROFILES;
+    return this.http.get<AiDevAgentProfile[]>(url);
   }
 
   updateProfile(roleName: string, profile: Partial<AiDevAgentProfile>): Observable<AiDevAgentProfile> {
+    console.log('【PUT Profile Request】roleName:', roleName, 'payload:', JSON.stringify(profile));
     return this.http.put<AiDevAgentProfile>(`${URLConfig.AI_DEV.PROFILES}/${roleName}`, profile);
   }
 
@@ -62,6 +64,10 @@ export class AiDevRepository {
     return this.http.put<void>(URLConfig.AI_DEV.CONFIG(taskId), { maxBrainstormingRounds, contextSlidingWindow });
   }
 
+  updateTaskAssignedRoles(taskId: string, assignedRoles: string[]): Observable<void> {
+    return this.http.put<void>(URLConfig.AI_DEV.ASSIGNED_ROLES(taskId), assignedRoles);
+  }
+
   /** 健康检查本地 ms-ai-devops 服务连接 */
   checkHealth(url: string): Observable<any> {
     return this.http.get<any>(`${url}/health`);
@@ -70,5 +76,10 @@ export class AiDevRepository {
   /** 获取任务的 Token 消耗聚合报告 */
   getTokenSummary(taskId: string): Observable<TokenSummary> {
     return this.http.get<TokenSummary>(`${URLConfig.AI_DEV.TASKS}/${taskId}/token-summary`);
+  }
+
+  /** 触发将特定聊天消息同步推送到 GitHub Issue 评论 */
+  pushMessageToGithub(taskId: string, messageId: string): Observable<void> {
+    return this.http.post<void>(`${URLConfig.AI_DEV.TASKS}/${taskId}/messages/${messageId}/push-github`, {});
   }
 }

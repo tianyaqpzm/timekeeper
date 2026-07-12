@@ -412,3 +412,28 @@ html.dark .mat-mdc-form-field input::-webkit-calendar-picker-indicator {
   /* 如果上面的 color-scheme 没生效，这行代码会强制把图标亮度拉满变成白色 */
   filter: brightness(0) invert(1);
 }
+
+/* =================================================================
+   Angular CDK Drag and Drop 拖拽优化 (消除残影与滞后)
+   ================================================================= */
+.cdk-drag-preview {
+  /* 强制禁用过渡动画，保证拖拽预览卡片能够实时跟手，解决残影问题 */
+  transition: none !important;
+  animation: none !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 6px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cdk-drag-placeholder {
+  /* 拖拽时在原列表中的占位卡片显示虚线边框或半透明状态，提升拖拽视觉体验 */
+  opacity: 0.3 !important;
+}
+
+.cdk-drag-animating {
+  /* 只有在释放鼠标或排列位置发生变化（回弹/重排）时，才允许过渡效果 */
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1) !important;
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  /* 当拖拽进行中，列表中的其他卡片在重排移动时可以使用过渡效果 */
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

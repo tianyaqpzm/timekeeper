@@ -90,4 +90,18 @@ describe('NoticeBoardAdapter', () => {
     expect(req.request.body).toEqual({});
     req.flush(null);
   });
+
+  it('should update an announcement', () => {
+    const request: AnnouncementRequest = { title: 'Updated Title', content: 'Updated Content', status: 'PUBLISHED', extractionCode: '123' };
+    const mockAnnouncement: Announcement = { id: 1, ...request, createTime: '2023-01-01', updateTime: '2023-01-01' };
+
+    adapter.updateAnnouncement(1, request).subscribe(data => {
+      expect(data).toEqual(mockAnnouncement);
+    });
+
+    const req = httpMock.expectOne(`${basePath}/announcements/1`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(request);
+    req.flush(mockAnnouncement);
+  });
 });

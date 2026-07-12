@@ -46,21 +46,31 @@ export class AiDevUseCase {
     }
   }
 
-  async loadProfiles(): Promise<void> {
+  async loadProfiles(taskId?: string): Promise<void> {
     try {
-      const profiles = await firstValueFrom(this.repository.getProfiles());
+      const profiles = await firstValueFrom(this.repository.getProfiles(taskId));
       this.agentProfiles.set(profiles);
     } catch (err: any) {
       this.error.set(err.message || 'Failed to load agent profiles');
     }
   }
 
-  async updateProfile(roleName: string, profile: Partial<AiDevAgentProfile>): Promise<void> {
+  async updateProfile(roleName: string, profile: Partial<AiDevAgentProfile>, taskId?: string): Promise<void> {
     try {
       await firstValueFrom(this.repository.updateProfile(roleName, profile));
-      await this.loadProfiles();
+      await this.loadProfiles(taskId);
     } catch (err: any) {
       this.error.set(err.message || 'Failed to update agent profile');
+      throw err;
+    }
+  }
+
+  async updateTaskAssignedRoles(taskId: string, assignedRoles: string[]): Promise<void> {
+    try {
+      await firstValueFrom(this.repository.updateTaskAssignedRoles(taskId, assignedRoles));
+      await this.loadTasks();
+    } catch (err: any) {
+      this.error.set(err.message || 'Failed to update task assigned roles');
       throw err;
     }
   }
@@ -117,6 +127,11 @@ export class AiDevUseCase {
               return newMsgs;
             });
           }
+        } else if (data.eventType === 'GITHUB_SYNC_PENDING') {
+          const p = data.payload;
+          this.currentMessages.update(msgs =>
+            msgs.map(m => m.id === p.messageId ? { ...m, githubSyncStatus: p.status } : m)
+          );
         } else if (data.eventType === 'CHAT_COMPLETED' || data.eventType === 'CHAT_REPLY') {
           this.loadMessages(taskId);
         } else if (data.eventType === 'TASK_COMPLETED' || data.eventType === 'ERROR') {
@@ -277,5 +292,55 @@ export class AiDevUseCase {
     } catch (err) {
       this.devopsConnectionStatus.set('DISCONNECTED');
     }
+  }
+
+  /**
+   * 触发将特定聊天消息同步推送到 GitHub
+   */
+  async pushMessageToGithub(taskId: string, messageId: string): Promise<void> {
+    try {
+      // 乐观更新 UI：设定状态为同步中 PENDING
+      this.currentMessages.update(msgs =>
+        msgs.map(m => m.id === messageId ? { ...m, githubSyncStatus: 'PENDING', githubSyncError: undefined } : m)
+      );
+
+      await firstValueFrom(this.repository.pushMessageToGithub(taskId, messageId));
+      
+      // 开启最多 10 次的局部短轮询（每 2 秒一次，最大 20s）拉取最新的同步结果
+      this.pollMessageSyncStatus(taskId, messageId, 0);
+    } catch (err: any) {
+      this.error.set(err.message || 'Failed to trigger GitHub sync');
+      this.currentMessages.update(msgs =>
+        msgs.map(m => m.id === messageId ? { ...m, githubSyncStatus: 'FAILED', githubSyncError: err.message } : m)
+      );
+    }
+  }
+
+  private pollMessageSyncStatus(taskId: string, messageId: string, retryCount: number): void {
+    if (retryCount > 10) {
+      // 超时仍未成功，设为 FAILED
+      this.currentMessages.update(msgs =>
+        msgs.map(m => m.id === messageId && m.githubSyncStatus === 'PENDING'
+          ? { ...m, githubSyncStatus: 'FAILED', githubSyncError: 'Sync timeout' }
+          : m
+        )
+      );
+      return;
+    }
+
+    setTimeout(async () => {
+      try {
+        const messages = await firstValueFrom(this.repository.getChatMessages(taskId));
+        const currentMsg = messages.find(m => m.id === messageId);
+        
+        if (currentMsg && (currentMsg.githubSyncStatus === 'SUCCESS' || currentMsg.githubSyncStatus === 'FAILED')) {
+          this.currentMessages.set(messages);
+        } else {
+          this.pollMessageSyncStatus(taskId, messageId, retryCount + 1);
+        }
+      } catch (e) {
+        this.pollMessageSyncStatus(taskId, messageId, retryCount + 1);
+      }
+    }, 2000);
   }
 }

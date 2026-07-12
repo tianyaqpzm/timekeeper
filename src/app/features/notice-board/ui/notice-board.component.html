@@ -104,6 +104,12 @@
             <th mat-header-cell *matHeaderCellDef class="!text-right !pr-6 !text-neutral-500 dark:!text-neutral-400 !font-medium !border-b-neutral-200 dark:!border-b-neutral-700">{{ 'NOTICE_BOARD.TABLE.ACTIONS' | translate }}</th>
             <td mat-cell *matCellDef="let item" class="!text-right !pr-6 !border-b-neutral-200 dark:!border-b-neutral-700/50">
               <button mat-icon-button *ngIf="useCase.isAdmin()"
+                      class="!text-neutral-400 dark:!text-neutral-400 hover:!text-indigo-600 dark:hover:!text-indigo-400 hover:!bg-indigo-50 dark:hover:!bg-indigo-400/10 transition-colors mr-1"
+                      [matTooltip]="'COMMON.EDIT' | translate"
+                      (click)="openEditAnnouncementDialog(item)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button *ngIf="useCase.isAdmin()"
                       class="!text-neutral-400 dark:!text-neutral-400 hover:!text-red-600 dark:hover:!text-red-400 hover:!bg-red-50 dark:hover:!bg-red-400/10 transition-colors"
                       [matTooltip]="'COMMON.DELETE' | translate"
                       (click)="deleteAnnouncement(item)">

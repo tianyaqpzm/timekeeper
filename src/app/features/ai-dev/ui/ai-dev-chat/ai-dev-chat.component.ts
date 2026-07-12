@@ -21,6 +21,7 @@ import { TaskConfigDialogComponent } from './task-config-dialog.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from '../../../../core/infrastructure/services/auth.service';
 import { UserService } from '../../../../core/infrastructure/services/user.service';
+import { DeleteConfirmDialogComponent } from '../../../chat/delete-confirm-dialog.component';
 
 @Component({
   selector: 'app-ai-dev-chat',
@@ -173,7 +174,7 @@ export class AiDevChatComponent implements OnInit {
       if (id) {
         this.taskId = id;
         this.useCase.loadMessages(this.taskId);
-        this.useCase.loadProfiles();
+        this.useCase.loadProfiles(this.taskId);
         this.useCase.loadTasks();
         
         // Auto select first node
@@ -204,7 +205,73 @@ export class AiDevChatComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.useCase.updateProfile(node.roleName, result);
+        this.useCase.updateProfile(node.roleName, result, this.taskId);
+      }
+    });
+  }
+
+  addNewRole() {
+    const dialogRef = this.dialog.open(AgentProfileDialogComponent, {
+      data: {
+        roleName: '',
+        avatar: 'smart_toy',
+        modelName: 'gemini-1.5-pro',
+        systemPrompt: ''
+      } as AiDevAgentProfile,
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result && result.roleName) {
+        try {
+          // 1. 创建或更新底层的 AI 角色配置
+          await this.useCase.updateProfile(result.roleName, result, this.taskId);
+          
+          // 2. 将此新角色的 roleName 加入当前会话的角色分配列表中并同步
+          const taskVal = this.currentTask();
+          if (taskVal) {
+            const currentRoles = taskVal.assignedRoles || [];
+            if (!currentRoles.includes(result.roleName)) {
+              const updatedRoles = [...currentRoles, result.roleName];
+              await this.useCase.updateTaskAssignedRoles(this.taskId, updatedRoles);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to create and assign new role:', err);
+        }
+      }
+    });
+  }
+
+  removeRole(node: AiDevAgentProfile, event: Event) {
+    event.stopPropagation();
+    
+    const dialogRef = this.dialog.open(DeleteConfirmDialogComponent, {
+      data: {
+        title: '移除 AI 角色',
+        message: `确定要从本次会话中移除 AI 角色 "${node.roleName}" 吗？`
+      },
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(async confirm => {
+      if (confirm) {
+        const taskVal = this.currentTask();
+        if (taskVal) {
+          const currentRoles = taskVal.assignedRoles || [];
+          const updatedRoles = currentRoles.filter(role => role !== node.roleName);
+          try {
+            await this.useCase.updateTaskAssignedRoles(this.taskId, updatedRoles);
+            
+            // 若被删除角色正好被选中，重置选中状态
+            if (this.selectedNode?.id === node.id) {
+              const remaining = this.displayProfiles();
+              this.selectedNode = remaining.length > 0 ? remaining[0] : null;
+            }
+          } catch (err) {
+            console.error('Failed to remove role from task:', err);
+          }
+        }
       }
     });
   }
@@ -351,6 +418,17 @@ export class AiDevChatComponent implements OnInit {
         this.onConfigChange();
       }
     });
+  }
+
+  hasGithubIssue(): boolean {
+    const task = this.currentTask();
+    return !!(task && task.relatedIssues && task.relatedIssues.trim().length > 0);
+  }
+
+  pushToGithub(message: AiDevChatMessage) {
+    if (this.taskId && message && message.id) {
+      this.useCase.pushMessageToGithub(this.taskId, message.id);
+    }
   }
 }
 

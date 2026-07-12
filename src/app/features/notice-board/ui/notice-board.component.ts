@@ -16,6 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatDividerModule } from '@angular/material/divider';
 import { AddAnnouncementDialog } from './add-announcement.dialog';
+import { EditAnnouncementDialog } from './edit-announcement.dialog';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -45,7 +46,8 @@ import { CustomPaginatorIntl } from '../../../shared/components/custom-paginator
     MatDialogModule,
     DatePipe,
     TranslateModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    EditAnnouncementDialog
   ],
   animations: [
     trigger('fadeInUp', [
@@ -118,6 +120,14 @@ export class NoticeBoardComponent implements OnInit, OnDestroy {
     this.dialog.open(AddAnnouncementDialog, {
       width: '600px',
       disableClose: true
+    });
+  }
+
+  openEditAnnouncementDialog(item: any): void {
+    this.dialog.open(EditAnnouncementDialog, {
+      width: '600px',
+      disableClose: true,
+      data: { announcement: item }
     });
   }
 

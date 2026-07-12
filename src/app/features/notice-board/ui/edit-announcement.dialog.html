@@ -1,0 +1,41 @@
+<h2 mat-dialog-title class="!text-xl !font-semibold text-neutral-800">编辑公告</h2>
+<mat-dialog-content class="!pt-4">
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.ANNOUNCEMENT_TITLE_LABEL' | translate }}</mat-label>
+      <input matInput formControlName="title" [placeholder]="'NOTICE_BOARD.DIALOG.ANNOUNCEMENT_TITLE_PLACEHOLDER' | translate" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DIALOG.ANNOUNCEMENT_CONTENT_LABEL' | translate }}</mat-label>
+      <textarea matInput formControlName="content" rows="5" [placeholder]="'NOTICE_BOARD.DIALOG.ANNOUNCEMENT_CONTENT_PLACEHOLDER' | translate" required></textarea>
+    </mat-form-field>
+
+    <div class="flex gap-4">
+      <mat-form-field appearance="outline" class="w-1/2">
+        <mat-label>{{ 'NOTICE_BOARD.DIALOG.STATUS_LABEL' | translate }}</mat-label>
+        <mat-select formControlName="status" required>
+          <mat-option value="DRAFT">{{ 'NOTICE_BOARD.DIALOG.STATUS_DRAFT' | translate }}</mat-option>
+          <mat-option value="PUBLISHED">{{ 'NOTICE_BOARD.DIALOG.STATUS_PUBLISHED' | translate }}</mat-option>
+          <mat-option value="EXPIRED">已到期 (EXPIRED)</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-1/2">
+        <mat-label>{{ 'NOTICE_BOARD.DIALOG.EXPIRE_TIME_LABEL' | translate }}</mat-label>
+        <input matInput type="datetime-local" formControlName="expireTime">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>{{ 'NOTICE_BOARD.DETAIL.EXTRACTION_CODE' | translate }}</mat-label>
+      <input matInput formControlName="extractionCode" [placeholder]="'NOTICE_BOARD.DETAIL.ENTER_EXTRACTION_CODE' | translate" required>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="!px-6 !pb-6">
+  <button mat-button mat-dialog-close>{{ 'NOTICE_BOARD.DIALOG.BTN_CANCEL' | translate }}</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="submit()">保存修改</button>
+</mat-dialog-actions>
